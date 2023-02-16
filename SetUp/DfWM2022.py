@@ -2,6 +2,18 @@ from statsbombpy import sb
 import pandas as pd
 import DataManipulationAngleDistance
 
+"""
+DfWM2022: prepare the dataset of WM2022, such it can be evaluated.
+The dataset is manipulated, such that it only contains shots, and no other events.
+Shots from penalties, free kicks and headers are not taken into account, since they distort the picture.
+The dataset of the shot events is joined with the dataset of the according match.
+Like this we have additional information about the game.
+Additionally the dataset is manipulated, such that 4 additional rows are created (x, y, angle, distance).
+Angle calculates the open angle from the striker to the goal.
+Distance calculates the distance from the striker to the goal centre.
+the manipulated dataset is saved in a JSON format.
+"""
+
 # 43,106 is the code of the WM 2022. This can be found in the excel overview "CompetitionOverview.xlsx"
 dfMatchesWM2022 = pd.DataFrame(sb.matches(43, 106))
 

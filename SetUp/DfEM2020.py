@@ -2,6 +2,18 @@ from statsbombpy import sb
 import pandas as pd
 from SetUp import DataManipulationAngleDistance
 
+"""
+DfEM2020: prepare the dataset of EM2020, such it can be evaluated.
+The dataset is manipulated, such that it only contains shots, and no other events.
+Shots from penalties, free kicks and headers are not taken into account, since they distort the picture.
+The dataset of the shot events is joined with the dataset of the according match.
+Like this we have additional information about the game.
+Additionally the dataset is manipulated, such that 4 additional rows are created (x, y, angle, distance).
+Angle calculates the open angle from the striker to the goal.
+Distance calculates the distance from the striker to the goal centre.
+the manipulated dataset is saved in a JSON format.
+"""
+
 # 55,43 is the code of the EM 2020. This can be found in the excel overview "CompetitionOverview.xlsx"
 dfMatchesEM2020 = pd.DataFrame(sb.matches(55, 43))
 

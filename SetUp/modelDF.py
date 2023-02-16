@@ -2,6 +2,18 @@ from statsbombpy import sb
 import pandas as pd
 import DataManipulationAngleDistance
 
+"""
+modelDF: prepare the dataset of all Competition, expect EM2020 & WM2022, such a model can be created from the data.
+The dataset is manipulated, such that it only contains shots, and no other events.
+Shots from penalties, free kicks and headers are not taken into account, since they distort the picture.
+The dataset of the shot events is joined with the dataset of the according match.
+Like this we have additional information about the game.
+Additionally the dataset is manipulated, such that 4 additional rows are created (x, y, angle, distance).
+Angle calculates the open angle from the striker to the goal.
+Distance calculates the distance from the striker to the goal centre.
+the manipulated dataset is saved in a JSON format.
+"""
+
 # save all competition and their season in a dictionary
 dfComp = sb.competitions()
 competitionIDs = dfComp.competition_id.values.tolist()
@@ -25,7 +37,7 @@ for index in range(len(competitionIDs)):
     print("progress bar: ", index, "/", len(competitionIDs))
     #try:
     # too old ones dont work as well
-    if (currentCompetition == 16 and currentSeason == 76):
+    if currentCompetition == 16 and currentSeason == 76:
         print("fail happened in comp: ", currentCompetition, " in season: ", currentSeason)
         continue
     elif (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106):
@@ -45,7 +57,8 @@ for index in range(len(competitionIDs)):
         for event in matchIDs:
             getEventsInMatch = sb.events(event)
             print("i am still working, nothing to worry")
-            # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
+            # only keep the necessary rows,
+            # which have something to do with shots and are not from penalties or freekicks
             getEventsInMatch = getEventsInMatch.query(
                 "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
             # add them to the current model
