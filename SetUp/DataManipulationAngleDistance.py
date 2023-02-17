@@ -18,11 +18,12 @@ or the angel a shooter has to the goal is calculated and added to the dataframe
 # these are the official coordinates of statsbomb.
 # they official disclosures can be found in statsbomb Open Data specification v1.pdf
 # https://github.com/statsbomb/statsbombpy/blob/master/doc/StatsBomb%20Open%20Data%20Specification%20v1.1.pdf
-goal_length = 7.32
+# all values in yards
+goal_length = 8
 x_coordinate_post1 = 120
-y_coordinate_post1 = 36.34
+y_coordinate_post1 = 36
 x_coordinate_post2 = 120
-y_coordinate_post2 = 43.66
+y_coordinate_post2 = 44
 x_coordinate_goalCentre = 120
 y_coordinate_goalCentre = y_coordinate_post1 + goal_length / 2
 
@@ -68,4 +69,8 @@ def distance(dataframe):
     # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
     dataframe["distance_to_goal_centre"] = ((dataframe["x_coordinate"] - x_coordinate_goalCentre) ** 2 + (
             dataframe["y_coordinate"] - y_coordinate_goalCentre) ** 2) ** 0.5
+    return dataframe
+
+def addGoalBinary(dataframe):
+    dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
     return dataframe

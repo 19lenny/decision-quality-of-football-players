@@ -1,6 +1,7 @@
 from statsbombpy import sb
 import pandas as pd
 import DataManipulationAngleDistance
+import numpy as np
 
 """
 modelDF: prepare the dataset of all Competition, expect EM2020 & WM2022, such a model can be created from the data.
@@ -35,39 +36,35 @@ for index in range(len(competitionIDs)):
     currentCompetition = competitionIDs[index]
     currentSeason = seasonIDs[index]
     print("progress bar: ", index, "/", len(competitionIDs))
-    #try:
-    # too old ones dont work as well
-    if currentCompetition == 16 and currentSeason == 76:
-        print("fail happened in comp: ", currentCompetition, " in season: ", currentSeason)
-        continue
-    elif (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106):
-        print("comp: ", currentCompetition, " season: ", currentSeason)
-        # get all matches of the current competition / season
-        dfMatches = pd.DataFrame(sb.matches(currentCompetition, currentSeason))
-        # all MatchIDs of the current season
-        matchIDs = dfMatches.match_id.values.tolist()
+    try:
+        if (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106):
+            print("comp: ", currentCompetition, " season: ", currentSeason)
+            # get all matches of the current competition / season
+            dfMatches = pd.DataFrame(sb.matches(currentCompetition, currentSeason))
+            # all MatchIDs of the current season
+            matchIDs = dfMatches.match_id.values.tolist()
 
-        # add this matches to a data frame, this is needed for additional information later during the join
-        dfAllMatches = pd.concat([dfMatches, dfAllMatches])
-        # set the key index for the join later
-        dfMatches.set_index("match_id")
+            # add this matches to a data frame, this is needed for additional information later during the join
+            dfAllMatches = pd.concat([dfMatches, dfAllMatches])
+            # set the key index for the join later
+            dfMatches.set_index("match_id")
 
-        # add all shot events, of every game, of every season in every competition, except the ones that are evaluated
-        # here go through every event in every match
-        for event in matchIDs:
-            getEventsInMatch = sb.events(event)
-            print("i am still working, nothing to worry")
-            # only keep the necessary rows,
-            # which have something to do with shots and are not from penalties or freekicks
-            getEventsInMatch = getEventsInMatch.query(
-                "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
-            # add them to the current model
-            dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])
+            # add all shot events, of every game, of every season in every competition, except the ones that are evaluated
+            # here go through every event in every match
+            for event in matchIDs:
+                getEventsInMatch = sb.events(event)
+                print("i am still working, nothing to worry")
+                # only keep the necessary rows,
+                # which have something to do with shots and are not from penalties or freekicks
+                getEventsInMatch = getEventsInMatch.query(
+                    "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
+                # add them to the current model
+                dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])
 
-    """except AttributeError:
+    except AttributeError:
         counter += 1
         print("fail counter: ", counter)
-        print("fail happened in comp: ", currentCompetition, " in season: ", currentSeason)"""
+        print("fail happened in comp: ", currentCompetition, " in season: ", currentSeason)
 
 # join Shots and Matches
 # therefore we know from every score the competition stage, the competition and additional information
@@ -83,10 +80,12 @@ dfModelData = DataManipulationAngleDistance.coordinates(dfModelData)
 dfModelData = DataManipulationAngleDistance.angle(dfModelData)
 # add distance
 dfModelData = DataManipulationAngleDistance.distance(dfModelData)
+# binary solution of goal or no goal, so the model can easier be created
+dfModelData = DataManipulationAngleDistance.addGoalBinary(dfModelData)
 
 # only keep the interesting columns
 dfModelData = dfModelData[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "distance_to_goal_centre",
+    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "distance_to_goal_centre",
      "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
      "minute", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage"]]
