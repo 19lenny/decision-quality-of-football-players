@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-import DataManipulationAngleDistance
+import DataManipulation
 
 """
 DfWM2022: prepare the dataset of WM2022, such it can be evaluated.
@@ -41,16 +41,20 @@ dfWM2022 = dfShotWM2022.join(dfMatchesWM2022.set_index('match_id'), on='match_id
 # therefore we calculate for every shot, the angle and the distance
 
 # convert coordinates from list, to x and y entries
-dfWM2022 = DataManipulationAngleDistance.coordinates(dfWM2022)
+dfWM2022 = DataManipulation.coordinates(dfWM2022)
 # add angle
-dfWM2022 = DataManipulationAngleDistance.angle(dfWM2022)
+dfWM2022 = DataManipulation.angle(dfWM2022)
+# add angle in rad
+dfWM2022 = DataManipulation.angleInRadian(dfWM2022)
 # add distance
-dfWM2022 = DataManipulationAngleDistance.distance(dfWM2022)
+dfWM2022 = DataManipulation.distance(dfWM2022)
+#add goal
+dfWM2022 = DataManipulation.addGoalBinary(dfWM2022)
 
 # save only the needed columns
 dfWM2022 = dfWM2022[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "distance_to_goal_centre",
-     "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
+    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "angleInRadian", "distance_to_goal_centre",
+     "shot_statsbomb_xg", "goal", "match_id", "shot_body_part", "period",
      "team", "play_pattern", "minute", "player", "shot_freeze_frame", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage"]]
 

@@ -1,35 +1,44 @@
 import model
 
-# first we have to create a model on all Shot Data (except the one we are evaluating)
-logRegModel = model.create_model(
-    "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/allModelData.json")
+# Set Up
 
-# next step is to show the info of the model
-model.show_info(logRegModel)
+# name the model
+modelname = "xGAngleDistance"
+# which attributes should be taken into account?
+attributes = ['angleInRadian', 'distance_to_goal_centre']
+#create the model without intercept
+logRegModelLogit = model.create_model_logit("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/allModelData.json", attributes)
+#show the summary of the model
+model.show_info(logRegModelLogit)
 
 # next step is to predict the probability of each shot of the EM2020 and WM2022
 # the prediction should be saved to the dataframe and added to the json file
 
-# test of Angle and Distance
-modelname = "xGAngleDistance"
-attributes = ['angle', 'distance_to_goal_centre']
+
+# prediction
+
 
 # EM 2020
-dfEM2020 = model.prediction(modelname, logRegModel,
+dfEM2020 = model.prediction(modelname, logRegModelLogit,
                             'G:/Meine Ablage/a_uni 10. Semester - '
                             'Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json', attributes)
+# calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfEM2020 = model.calculateAccuracy(modelname, dfEM2020)
-# savedf
-dfEM2020.reset_index(inplace=True)
-dfEM2020.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json')
 
 # WM 2022
-dfWM2022 = model.prediction(modelname, logRegModel,
+dfWM2022 = model.prediction(modelname, logRegModelLogit,
                             'G:/Meine Ablage/a_uni 10. Semester - '
-                            'Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json', attributes)
+                          'Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json', attributes)
+# calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfWM2022 = model.calculateAccuracy(modelname, dfWM2022)
-# savedf
-dfWM2022.reset_index(inplace=True)
+
+
+# save df
+
+# em2020
+dfEM2020.to_json(
+                  'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json')
+
+# wm2022
 dfWM2022.to_json(
     'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json')

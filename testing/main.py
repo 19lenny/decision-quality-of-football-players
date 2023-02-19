@@ -6,7 +6,7 @@ from SetUp import JSONtoDF
 
 
 # first we have to create a model on all Shot Data (except the one we are evaluating)
-logRegModel = model.create_model(
+logRegModel = model.create_model_glm(
     "/JSON/allModelData.json")
 
 # next step is to show the info of the model

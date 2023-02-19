@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-import DataManipulationAngleDistance
+import DataManipulation
 import numpy as np
 
 """
@@ -75,17 +75,19 @@ dfModelData = dfShotModelData.join(dfMatches.set_index('match_id'), on='match_id
 # therefore we calculate for every shot, the angle and the distance
 
 # convert coordinates from list, to x and y entries
-dfModelData = DataManipulationAngleDistance.coordinates(dfModelData)
+dfModelData = DataManipulation.coordinates(dfModelData)
 # add angle
-dfModelData = DataManipulationAngleDistance.angle(dfModelData)
+dfModelData = DataManipulation.angle(dfModelData)
+# add angle in rad
+dfModelData = DataManipulation.angleInRadian(dfModelData)
 # add distance
-dfModelData = DataManipulationAngleDistance.distance(dfModelData)
+dfModelData = DataManipulation.distance(dfModelData)
 # binary solution of goal or no goal, so the model can easier be created
-dfModelData = DataManipulationAngleDistance.addGoalBinary(dfModelData)
+dfModelData = DataManipulation.addGoalBinary(dfModelData)
 
 # only keep the interesting columns
 dfModelData = dfModelData[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "distance_to_goal_centre",
+    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "angleInRadian", "distance_to_goal_centre",
      "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
      "minute", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage"]]

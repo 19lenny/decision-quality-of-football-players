@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-from SetUp import DataManipulationAngleDistance
+from SetUp import DataManipulation
 
 """
 DfEM2020: prepare the dataset of EM2020, such it can be evaluated.
@@ -41,16 +41,20 @@ dfEM2020 = dfShotEM2020.join(dfMatchesEM2020.set_index('match_id'), on='match_id
 # therefore we calculate for every shot, the angle and the distance
 
 # convert coordinates from list, to x and y entries
-dfEM2020 = DataManipulationAngleDistance.coordinates(dfEM2020)
+dfEM2020 = DataManipulation.coordinates(dfEM2020)
 # add angle
-dfEM2020 = DataManipulationAngleDistance.angle(dfEM2020)
+dfEM2020 = DataManipulation.angle(dfEM2020)
+# add angle in rad
+dfEM2020 = DataManipulation.angleInRadian(dfEM2020)
 # add distance
-dfEM2020 = DataManipulationAngleDistance.distance(dfEM2020)
+dfEM2020 = DataManipulation.distance(dfEM2020)
+#add goal
+dfEM2020 = DataManipulation.addGoalBinary(dfEM2020)
 
 # save only the needed columns
 dfEM2020 = dfEM2020[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "distance_to_goal_centre",
-     "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
+    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "angleInRadian", "distance_to_goal_centre",
+     "shot_statsbomb_xg", "goal", "match_id", "shot_body_part", "period",
      "team", "play_pattern", "minute", "player", "shot_freeze_frame", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage"]]
 

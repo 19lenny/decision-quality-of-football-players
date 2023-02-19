@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-from SetUp import DataManipulationAngleDistance
+from SetUp import DataManipulation
 
 # 55,43 is the code of the EM 2020. This can be found in the excel overview "CompetitionOverview.xlsx"
 # 43,106 is the code of the WM 2022. This can be found in the excel overview "CompetitionOverview.xlsx"
