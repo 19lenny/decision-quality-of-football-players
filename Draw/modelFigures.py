@@ -1,13 +1,9 @@
-import statsmodels.formula.api as smf
-from matplotlib import colors, cm
-
-from SetUp import JSONtoDF, DataManipulation
+from SetUp import JSONtoDF
 import numpy as np
-import pandas as pd
 
 # Plotting
 import matplotlib.pyplot as plt
-import FCPython
+from Draw import FCPython
 
 # Statistical fitting of models
 import statsmodels.api as sm
