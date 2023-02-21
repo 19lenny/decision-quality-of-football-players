@@ -1,7 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-import DataManipulation
-import numpy as np
+import DataManipulation, CONSTANTS
 
 """
 modelDF: prepare the dataset of all Competition, expect EM2020 & WM2022, such a model can be created from the data.
@@ -100,7 +99,6 @@ dfModelData.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfModelData.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/allModelData.json')
+dfModelData.to_json(CONSTANTS.JSONMODELALLSHOTS)
 
 print("i am finished")

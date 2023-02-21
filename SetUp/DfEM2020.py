@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-from SetUp import DataManipulation
+from SetUp import DataManipulation, CONSTANTS
 
 """
 DfEM2020: prepare the dataset of EM2020, such it can be evaluated.
@@ -23,7 +23,8 @@ matchIdEM2020 = dfMatchesEM2020.match_id.values.tolist()
 # initialize df
 dfShotEM2020 = pd.DataFrame()
 
-# this must be done for every event in every game, then we have a dataframe with all shots from every game from the EM2020
+# this must be done for every event in every game,
+# then we have a dataframe with all shots from every game from the EM2020
 for event in matchIdEM2020:
     getEventsInMatch = sb.events(event)
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
@@ -34,10 +35,12 @@ for event in matchIdEM2020:
 # set the key index for the join later
 dfMatchesEM2020.set_index("match_id")
 
-# join Shots and Matches, therefore we know from every score the compettion stage, the competition and additional information
+# join Shots and Matches, therefore we know from every score the compettion stage,
+# the competition and additional information
 dfEM2020 = dfShotEM2020.join(dfMatchesEM2020.set_index('match_id'), on='match_id')
 
-# before we save the df, we want to add crucial information to the shot, with this information we can later calculate the xG
+# before we save the df, we want to add crucial information to the shot,
+# with this information we can later calculate the xG
 # therefore we calculate for every shot, the angle and the distance
 
 # convert coordinates from list, to x and y entries
@@ -66,6 +69,6 @@ dfEM2020.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfEM2020.to_json('G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json')
+dfEM2020.to_json(CONSTANTS.JSONEM2020)
 
 print("i am finished")

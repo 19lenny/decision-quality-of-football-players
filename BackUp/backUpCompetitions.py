@@ -1,5 +1,6 @@
 from statsbombpy import sb
+from SetUp import CONSTANTS
 # save all competition and their season in a dictionary
 dfComp = sb.competitions()
-dfComp.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpComp.json')
+filename = "dfBackUpComp.json"
+dfComp.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)

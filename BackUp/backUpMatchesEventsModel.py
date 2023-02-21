@@ -1,5 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
+from SetUp import CONSTANTS
 
 
 # save all competition and their season in a dictionary
@@ -57,9 +58,9 @@ dfAllEvents.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfAllEvents.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpEventsModel.json')
-dfAllMatches.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpMatchesModel.json')
+filename = "dfBackUpEventsModel.json"
+dfAllEvents.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
+filename = "dfBackUpMatchesModel.json"
+dfAllMatches.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
 
 print("i am finished")

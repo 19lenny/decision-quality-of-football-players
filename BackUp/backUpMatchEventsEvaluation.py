@@ -1,6 +1,6 @@
 from statsbombpy import sb
 import pandas as pd
-from SetUp import DataManipulation
+from SetUp import DataManipulation, CONSTANTS
 
 # 55,43 is the code of the EM 2020. This can be found in the excel overview "CompetitionOverview.xlsx"
 # 43,106 is the code of the WM 2022. This can be found in the excel overview "CompetitionOverview.xlsx"
@@ -41,16 +41,15 @@ dfEventsWM2022.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfEventsEM2020.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpEventsEvaluationEM2020.json')
-dfEventsWM2022.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpEventsEvaluationWM2022.json')
+filename = "dfBackUpEventsEvaluationEM2020.json"
+dfEventsEM2020.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
+filename = "dfBackUpEventsEvaluationWM2022.json"
+dfEventsWM2022.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
 
 #matches backup JSON
-dfMatchesEM2020.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpMatchesEvaluationEM2020.json')
-dfMatchesWM2022.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/dfBackUpMatchesEvaluationWM2022.json')
-
+filename = "dfBackUpMatchesEvaluationEM2020.json"
+dfMatchesEM2020.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
+filename = "dfBackUpMatchesEvaluationWM2022.json"
+dfMatchesWM2022.to_json(CONSTANTS.JSONBACKUPFOLDER + filename)
 
 print("i am finished")

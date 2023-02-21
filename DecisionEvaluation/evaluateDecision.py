@@ -1,20 +1,13 @@
-from SetUp import JSONtoDF, DataManipulation
+from SetUp import JSONtoDF, DataManipulation, CONSTANTS
 import pandas as pd
 import json
+import os
 
 from DecisionEvaluation import offside
 
-goal_length = 8
-x_coordinate_post1 = 120
-y_coordinate_post1 = 36
-x_coordinate_post2 = 120
-y_coordinate_post2 = 44
-x_coordinate_goalCentre = 120
-y_coordinate_goalCentre = y_coordinate_post1 + goal_length / 2
 
 # it has to be checked why distance is farther away as it should be
-df = JSONtoDF.createDF(
-    "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json")
+df = JSONtoDF.createDF(CONSTANTS.JSONEM2020)
 x = df['x_coordinate'].mean()
 y = df['y_coordinate'].mean()
 dist = df['distance_to_goal_centre'].mean()
@@ -38,6 +31,11 @@ for row in range(len(df)):
     # import it to a dataframe
     # this dataframe contains all data from all players that were in the frame during the shot
     dfOtherPlayers = pd.read_json('sample.json')
+
+    # sample.json is no longer needed and can be deleted
+    # clean up
+    filename = "sample.json"
+    os.remove(CONSTANTS.JSONDECEVA + filename)
 
     # for better readability are the x and y coordinates changed from a list setting to single rows
     dfOtherPlayers = DataManipulation.coordinates(dfOtherPlayers)
@@ -74,6 +72,5 @@ for row in range(len(df)):
     # if the players in the own team are offside, they cannot be passed to
 
     # todo: go through the whole pitch, check every square and give pass probability
-
 
 

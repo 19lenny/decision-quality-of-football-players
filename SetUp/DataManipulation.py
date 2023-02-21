@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from statsbombpy import sb
+from SetUp import CONSTANTS
 
 """
 DataManipulationAngleDistance: all methods receive a dataframe.
@@ -9,24 +10,6 @@ Either the coordination are displayed in a more readable fashion or
 the distance to the goal centre is calculated and added to the dataframe
 or the angel a shooter has to the goal is calculated and added to the dataframe
 """
-
-
-# Variable Definition
-# x and y coordinates do not have to be transformed:
-# https://www.bundesliga.com/en/faq/all-you-need-to-know-about-soccer/all-you-need-to-know-about-a-soccer-field-10572
-
-# these are the official coordinates of statsbomb.
-# they official disclosures can be found in statsbomb Open Data specification v1.pdf
-# https://github.com/statsbomb/statsbombpy/blob/master/doc/StatsBomb%20Open%20Data%20Specification%20v1.1.pdf
-# all values in yards
-goal_length = 8
-x_coordinate_post1 = 120
-y_coordinate_post1 = 36
-x_coordinate_post2 = 120
-y_coordinate_post2 = 44
-x_coordinate_goalCentre = 120
-y_coordinate_goalCentre = y_coordinate_post1 + goal_length / 2
-
 
 # this method calculates the coordinates of a given statsbomb dataframe
 # the location is already given in the dataframe, but it is given as a list
@@ -52,27 +35,29 @@ def coordinates(dataframe):
 def angle(dataframe):
     # Morales cesar a "A mathematics-based new penalty area in football: tackling diving", Journal of sports sciences
     # cosinussatz
-    dataframe["b"] = ((dataframe["x_coordinate"] - x_coordinate_post1) ** 2 +
-                      (dataframe["y_coordinate"] - y_coordinate_post1) ** 2) ** 0.5
-    dataframe["c"] = ((dataframe["x_coordinate"] - x_coordinate_post2) ** 2 +
-                      (dataframe["y_coordinate"] - y_coordinate_post2) ** 2) ** 0.5
-    dataframe["angle"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - goal_length ** 2)
+    dataframe["b"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
+                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+    dataframe["c"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
+                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+    dataframe["angle"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
                                   / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, 180,
-                                  np.rad2deg(np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - goal_length ** 2)
-                                                       / (2 * dataframe["b"] * dataframe["c"]))))
-    return dataframe
-#angle in radian
-def angleInRadian(dataframe):
-    dataframe["b"] = ((dataframe["x_coordinate"] - x_coordinate_post1) ** 2 +
-                      (dataframe["y_coordinate"] - y_coordinate_post1) ** 2) ** 0.5
-    dataframe["c"] = ((dataframe["x_coordinate"] - x_coordinate_post2) ** 2 +
-                      (dataframe["y_coordinate"] - y_coordinate_post2) ** 2) ** 0.5
-    dataframe["angleInRadian"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - goal_length ** 2)
-                                  / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, np.pi,
-                                  (np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - goal_length ** 2)
-                                                       / (2 * dataframe["b"] * dataframe["c"]))))
+                                  np.rad2deg(
+                                      np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                                / (2 * dataframe["b"] * dataframe["c"]))))
     return dataframe
 
+
+# angle in radian
+def angleInRadian(dataframe):
+    dataframe["b"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
+                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+    dataframe["c"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
+                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+    dataframe["angle"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                  / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, np.pi,
+                                  np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                            / (2 * dataframe["b"] * dataframe["c"])))
+    return dataframe
 
 
 # calculate distance and write it to the df
@@ -80,9 +65,10 @@ def angleInRadian(dataframe):
 def distance(dataframe):
     # distance
     # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
-    dataframe["distance_to_goal_centre"] = ((dataframe["x_coordinate"] - x_coordinate_goalCentre) ** 2 +
-                                            (dataframe["y_coordinate"] - y_coordinate_goalCentre) ** 2) ** 0.5
+    dataframe["distance_to_goal_centre"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_GOALCENTRE) ** 2 +
+                                            (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_GOALCENTRE) ** 2) ** 0.5
     return dataframe
+
 
 def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)

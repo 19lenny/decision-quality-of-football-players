@@ -35,6 +35,7 @@ def create_model_glm(filename, attributes):
     # return the model
     return test_model
 
+
 # create a logistic regression without an intercept
 # filename is the file location for which a model should be created, the file has to be in json format
 # attributes are the attributes that the model should learn on (x_values)
@@ -52,9 +53,11 @@ def create_model_logit(filename, attributes):
     # return the model
     return log_reg
 
+
 # this method prints the information about a given regression
 def show_info(regression):
     print(regression.summary())
+
 
 # this method predicts the the xG with the help of a given model
 # the prediction explicitely predicts xG and NOT xMisses
@@ -71,13 +74,13 @@ def prediction(modelname, regression, filename, attributes):
     df[modelname] = xGoal
     return df
 
+
 # method calculates accuracy of the model in comparison to the statsbomb estimation
 # the accuracy is defined as the difference between the regression calculation and the statsbomb estimation
 # the difference is saved to the data frame
 # the dataframe is updated and returned
 # the mean of the difference is printed out
 def calculateAccuracy(modelname, df):
-
     nameOfColumn = "difference" + modelname
     df[nameOfColumn] = df[modelname] - df["shot_statsbomb_xg"]
     print("the mean of the difference of ", modelname, " is: ", df[nameOfColumn].mean())

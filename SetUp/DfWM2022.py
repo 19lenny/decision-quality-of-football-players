@@ -1,6 +1,7 @@
 from statsbombpy import sb
 import pandas as pd
 import DataManipulation
+from SetUp import CONSTANTS
 
 """
 DfWM2022: prepare the dataset of WM2022, such it can be evaluated.
@@ -66,6 +67,6 @@ dfWM2022.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfWM2022.to_json('G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json')
+dfWM2022.to_json(CONSTANTS.JSONWM2022)
 
 print("i am finished")

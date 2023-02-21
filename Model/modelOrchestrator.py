@@ -1,4 +1,5 @@
 import model
+from SetUp import CONSTANTS
 
 # Set Up
 
@@ -7,7 +8,7 @@ modelname = "xGAngleDistance"
 # which attributes should be taken into account?
 attributes = ['angleInRadian', 'distance_to_goal_centre']
 #create the model without intercept
-logRegModelLogit = model.create_model_logit("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/allModelData.json", attributes)
+logRegModelLogit = model.create_model_logit(CONSTANTS.JSONMODELALLSHOTS, attributes)
 #show the summary of the model
 model.show_info(logRegModelLogit)
 
@@ -19,16 +20,12 @@ model.show_info(logRegModelLogit)
 
 
 # EM 2020
-dfEM2020 = model.prediction(modelname, logRegModelLogit,
-                            'G:/Meine Ablage/a_uni 10. Semester - '
-                            'Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json', attributes)
+dfEM2020 = model.prediction(modelname, logRegModelLogit, CONSTANTS.JSONEM2020, attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfEM2020 = model.calculateAccuracy(modelname, dfEM2020)
 
 # WM 2022
-dfWM2022 = model.prediction(modelname, logRegModelLogit,
-                            'G:/Meine Ablage/a_uni 10. Semester - '
-                          'Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json', attributes)
+dfWM2022 = model.prediction(modelname, logRegModelLogit, CONSTANTS.JSONWM2022, attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfWM2022 = model.calculateAccuracy(modelname, dfWM2022)
 
@@ -36,9 +33,7 @@ dfWM2022 = model.calculateAccuracy(modelname, dfWM2022)
 # save df
 
 # em2020
-dfEM2020.to_json(
-                  'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json')
+dfEM2020.to_json(CONSTANTS.JSONEM2020)
 
 # wm2022
-dfWM2022.to_json(
-    'G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json')
+dfWM2022.to_json(CONSTANTS.JSONWM2022)
