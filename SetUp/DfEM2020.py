@@ -25,12 +25,16 @@ dfShotEM2020 = pd.DataFrame()
 
 # this must be done for every event in every game,
 # then we have a dataframe with all shots from every game from the EM2020
+counter = 0
 for event in matchIdEM2020:
     getEventsInMatch = sb.events(event)
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
     getEventsInMatch = getEventsInMatch.query(
         "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
     dfShotEM2020 = pd.concat([dfShotEM2020, getEventsInMatch])
+    counter += 1
+    print("nothing to worry - still working")
+    print("progress bar: ", counter, " / ", len(matchIdEM2020))
 
 # set the key index for the join later
 dfMatchesEM2020.set_index("match_id")
@@ -50,7 +54,7 @@ dfEM2020 = DataManipulation.angle(dfEM2020)
 # add angle in rad
 dfEM2020 = DataManipulation.angleInRadian(dfEM2020)
 # add distance
-dfEM2020 = DataManipulation.distance(dfEM2020)
+dfEM2020 = DataManipulation.distancePlayerToGoal(dfEM2020)
 #add goal
 dfEM2020 = DataManipulation.addGoalBinary(dfEM2020)
 

@@ -11,6 +11,7 @@ the distance to the goal centre is calculated and added to the dataframe
 or the angel a shooter has to the goal is calculated and added to the dataframe
 """
 
+
 # this method calculates the coordinates of a given statsbomb dataframe
 # the location is already given in the dataframe, but it is given as a list
 # for easier calculation, the x and y coordinates should be saved as double values
@@ -53,21 +54,38 @@ def angleInRadian(dataframe):
                       (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
     dataframe["c"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
                       (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
-    dataframe["angle"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+    dataframe["angleInRadian"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
                                   / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, np.pi,
                                   np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
                                             / (2 * dataframe["b"] * dataframe["c"])))
     return dataframe
 
 
+def angleInRadianFromObjectToPoints(x_object, y_object, x_point1, y_point1, x_point2, y_point2):
+    b = ((x_object - x_point1) ** 2 + (y_object - y_point1) ** 2) ** 0.5
+    c = ((x_object - x_point2) ** 2 + (y_object - y_point2) ** 2) ** 0.5
+    a = ((x_point1 - x_point2) ** 2 + (y_point1 - y_point2) ** 2) ** 0.5
+    angle_in_rad = np.arccos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))
+
+    return angle_in_rad
+
+
 # calculate distance and write it to the df
 # return the adjusted df
-def distance(dataframe):
+def distancePlayerToGoal(dataframe):
     # distance
     # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
     dataframe["distance_to_goal_centre"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_GOALCENTRE) ** 2 +
                                             (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_GOALCENTRE) ** 2) ** 0.5
     return dataframe
+
+
+# calculate distance
+# return the distance in yards
+def distanceObjectToPoint(x_object, y_object, x_point, y_point):
+    # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
+    distance = ((x_object - x_point) ** 2 + (y_object - y_point) ** 2) ** 0.5
+    return distance
 
 
 def addGoalBinary(dataframe):

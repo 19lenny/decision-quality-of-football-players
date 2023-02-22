@@ -48,7 +48,7 @@ dfWM2022 = DataManipulation.angle(dfWM2022)
 # add angle in rad
 dfWM2022 = DataManipulation.angleInRadian(dfWM2022)
 # add distance
-dfWM2022 = DataManipulation.distance(dfWM2022)
+dfWM2022 = DataManipulation.distancePlayerToGoal(dfWM2022)
 #add goal
 dfWM2022 = DataManipulation.addGoalBinary(dfWM2022)
 

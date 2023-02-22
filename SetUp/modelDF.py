@@ -80,7 +80,7 @@ dfModelData = DataManipulation.angle(dfModelData)
 # add angle in rad
 dfModelData = DataManipulation.angleInRadian(dfModelData)
 # add distance
-dfModelData = DataManipulation.distance(dfModelData)
+dfModelData = DataManipulation.distancePlayerToGoal(dfModelData)
 # binary solution of goal or no goal, so the model can easier be created
 dfModelData = DataManipulation.addGoalBinary(dfModelData)
 
