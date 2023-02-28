@@ -16,7 +16,6 @@ def create_model_logit(filename, attributes):
     # creating the pandas data frame from the json file
     df = JSONtoDF.createDF(filename)
     # drop null values for better model quality
-    print(df.info())
     df = df.dropna()
     # train the model based on the attributes
     X_train = df[attributes]
@@ -36,7 +35,6 @@ def create_model_glm(filename, attributes):
 
     # drop possible null values, the model gets more accurate
     df = df.dropna()
-    print(df.info())
 
     # create the model based on the attributes
     model = ''

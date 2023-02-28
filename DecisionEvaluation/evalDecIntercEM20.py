@@ -33,7 +33,7 @@ for currentShot in range(len(dfSeason)):
     # now the dataset is ready to check if the player originally made a good decision with shooting
 
     # get the calculated xG value for the current shot
-    shooting_player_xG = dfSeason[CONSTANTS.MODELNAMENOINTERCEPT][currentShot]
+    shooting_player_xG = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][currentShot]
     x_shooting_player = dfSeason['x_coordinate'][currentShot]
     y_shooting_player = dfSeason['y_coordinate'][currentShot]
 
@@ -110,14 +110,14 @@ for currentShot in range(len(dfSeason)):
                 evaluationHelper.getHighestXGFromAlternatives(time_team_member,
                                                               time_opponent,
                                                               time_ball,
-                                                              logmodel=CONSTANTS.REGMODELNOINTERC,
+                                                              logmodel=CONSTANTS.REGMODELINTERC,
                                                               x_location=x, y_location=y)
 
             # if the alternative xG value for this current location is higher than for the other ones,
             # than update for the current shot the highest xG alternative
             if highest_alternative_xG_for_current_Location > xG_best_alternative[currentShot]:
                 xG_best_alternative[currentShot] = highest_alternative_xG_for_current_Location
-                xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAMENOINTERCEPT][
+                xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][
                                                  currentShot] - highest_alternative_xG_for_current_Location
                 if xG_difference[currentShot] <= 0:
                     shot_correct_decision[currentShot] = False
@@ -139,7 +139,7 @@ dfSeason['x_best_alt'] = x_alternative
 dfSeason['y_best_alt'] = y_alternative
 dfSeason['player_name_alt'] = alternative_player
 
-dfSeason.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM2020NOINT.json")
+dfSeason.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM20INT.json")
 # todo: drop shot_statsbomb xg
 attributes_to_drop = ["index", "shot_end_location", "shot_outcome", "shot_body_part", "play_pattern",
                       "shot_freeze_frame", "shot_type", "season"]
@@ -147,9 +147,9 @@ attributes_to_drop = ["index", "shot_end_location", "shot_outcome", "shot_body_p
 dfSeason = dfSeason.drop(columns=attributes_to_drop)
 
 dfReadability = dfSeason[
-    ["angle", "distance_to_goal_centre", CONSTANTS.MODELNAMENOINTERCEPT, "xG_best_alternative", "shot_decision_correct",
+    ["angle", "distance_to_goal_centre", CONSTANTS.MODELNAMEINTERCEPT, "xG_best_alternative", "shot_decision_correct",
      "x_best_alt", "y_best_alt", "match_id", "player", "minute"]]
-dfReadability.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM2020ReadableNOINT.json")
+dfReadability.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM2020ReadableINT.json")
 print("number of x_coordinate == 120: ", len(dfReadability[dfReadability['x_best_alt'] == 120]))
 print("number of x_coordinate == 0: ", len(dfReadability[dfReadability['x_best_alt'] == 0]))
 print("number of all shots at EM2020: ", len(dfReadability['minute']))

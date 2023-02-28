@@ -37,14 +37,14 @@ def findClosestPlayer(dataframe, x_location, y_location):
 # get all players that were in the frame during the current shot
 # the dataframe contains a json like format
 # this has to be transformed to a dataframe
-def getPlayersOfEvent(shot):
+def getPlayersOfEvent(shot, keyword):
     # transform players which are in the shot from a json like format to a dataframe format
 
     # the event comes in a json like format
     # transform it to a real json
     jsonOtherPlayers = json.dumps(shot)
     # save the json (name = sample.json), so we can import it to a dataframe
-    filename = "sample.json"
+    filename = keyword + ".json"
     with open(filename, "w") as outfile:
         outfile.write(jsonOtherPlayers)
 
