@@ -37,6 +37,7 @@ def findClosestPlayer(dataframe, x_location, y_location):
 # get all players that were in the frame during the current shot
 # the dataframe contains a json like format
 # this has to be transformed to a dataframe
+# keyword is a word for the helper file. this avoids that multiple classes try to create the same helper file
 def getPlayersOfEvent(shot, keyword):
     # transform players which are in the shot from a json like format to a dataframe format
 

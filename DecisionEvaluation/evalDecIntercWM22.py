@@ -149,7 +149,7 @@ dfSeason = dfSeason.drop(columns=attributes_to_drop)
 dfReadability = dfSeason[
     ["angle", "distance_to_goal_centre", CONSTANTS.MODELNAMEINTERCEPT, "xG_best_alternative", "shot_decision_correct",
      "x_best_alt", "y_best_alt", "match_id", "player", "minute"]]
-dfReadability.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationWM2022ReadableINT.json")
+dfReadability.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationWM22ReadableINT.json")
 print("number of x_coordinate == 120: ", len(dfReadability[dfReadability['x_best_alt'] == 120]))
 print("number of x_coordinate == 0: ", len(dfReadability[dfReadability['x_best_alt'] == 0]))
 print("number of all shots at WM2022: ", len(dfReadability['minute']))

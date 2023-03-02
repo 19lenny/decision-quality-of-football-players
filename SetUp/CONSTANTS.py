@@ -11,8 +11,12 @@ JSONEM2020 = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/The
 JSONWM2022 = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json"
 JSONMODELALLSHOTS = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" \
                     "Masterarbeit/Thesis/thesis/JSON/allModelData.json"
-JSONDECISIONEVALUATIONEM2020 =\
-    "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/DecisionEvaluationEM2020.json"
+JSONSHOTEVALUATIONEM2020 =\
+    "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/" \
+    "JSON/Evaluation/ShotEvaluationEM20INT.json"
+JSONSHOTEVALUATIONWM2022 =\
+    "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/" \
+    "JSON/Evaluation/ShotEvaluationWM22INT.json"
 
 
 # locations
