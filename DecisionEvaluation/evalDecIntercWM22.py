@@ -10,7 +10,6 @@ from DecisionEvaluation import offside
 
 dfSeason = JSONtoDF.createDF(CONSTANTS.JSONWM2022)
 
-
 # create a list to fill the alternative xG Values
 xG_best_alternative: List[float] = [0.0] * len(dfSeason)
 # create a list to fill the difference between the shooters decision and the best alternative
@@ -117,8 +116,8 @@ for currentShot in range(len(dfSeason)):
             # than update for the current shot the highest xG alternative
             if highest_alternative_xG_for_current_Location > xG_best_alternative[currentShot]:
                 xG_best_alternative[currentShot] = highest_alternative_xG_for_current_Location
-                xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][
-                                                 currentShot] - highest_alternative_xG_for_current_Location
+                xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][currentShot] - \
+                                             highest_alternative_xG_for_current_Location
                 if xG_difference[currentShot] <= 0:
                     shot_correct_decision[currentShot] = False
                 else:
@@ -133,6 +132,7 @@ for currentShot in range(len(dfSeason)):
     print("progress bar: ", currentShot, " / ", len(dfSeason) - 1, " | ", currentShot / (len(dfSeason) - 1) * 100, "%")
 
 dfSeason['xG_best_alternative'] = xG_best_alternative
+# calculate difference between xG finishing player and xG best alternative and add it to the dataframe
 dfSeason['xG_Delta_decision_alternative'] = xG_difference
 dfSeason['shot_decision_correct'] = shot_correct_decision
 dfSeason['x_best_alt'] = x_alternative
