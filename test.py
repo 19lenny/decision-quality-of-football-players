@@ -15,20 +15,12 @@ x = df['x_coordinate'].mean()
 y = df['y_coordinate'].mean()
 dist = df['distance_to_goal_centre'].mean()
 
-dfINT = JSONtoDF.createDF((CONSTANTS.JSONFILEPATH+"ShotEvaluationWM22ReadableINT.json"))
-dfNoInt = JSONtoDF.createDF((CONSTANTS.JSONFILEPATH+"ShotEvaluationEM2020ReadableNOINT.json"))
+dfEM20 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONEM2020)
+dfWM22 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONWM2022)
+dfTest = dfWM22[(dfWM22['minute'] == 45) & (dfWM22['competition_stage'] == 'Group Stage')]
+print(len(dfTest['minute']))
 
-print("number of x_coordinate == 120: ", len(dfINT[dfINT['x_best_alt'] == 120]))
-print("number of x_coordinate == 0: ", len(dfINT[dfINT['x_best_alt'] == 0]))
-print("number of all shots at EM2020: ", len(dfINT['minute']))
-print("number of right decision: ", len(dfINT[dfINT['shot_decision_correct'] == True]))
-print("number of wrong decision: ", len(dfINT[dfINT['shot_decision_correct'] == False]))
-
-print("-------------------------------------------------------------------------")
-print("number of x_coordinate == 120: ", len(dfNoInt[dfNoInt['x_best_alt'] == 120]))
-print("number of x_coordinate == 0: ", len(dfNoInt[dfNoInt['x_best_alt'] == 0]))
-print("number of all shots at EM2020: ", len(dfNoInt['minute']))
-print("number of right decision: ", len(dfNoInt[dfNoInt['shot_decision_correct'] == True]))
-print("number of wrong decision: ", len(dfNoInt[dfNoInt['shot_decision_correct'] == False]))
+dfTest2 = JSONtoDF.createDF("JSON/ShotsEM2020.json")
+dfTest2 = dfTest2[(dfTest2['minute'] > 90) & (dfTest2['competition_stage'] == 'Round of 16')]
 
 
