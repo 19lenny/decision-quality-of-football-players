@@ -27,9 +27,6 @@ for index in range(len(ko_stages)):
     # the df are bundled together because the evaluation is done for both df
     dfShotEval = pd.concat([dfEM20, dfWM22])
 
-    if ko_stages[index] == 'Final':
-        print('deb')
-
     # create group stage df and transform it to a list
     # when the list is empty then we are not in the ko stages, than the comparable stage is only the group stage
 

@@ -26,7 +26,7 @@ dfShotModelData = pd.DataFrame()
 dfAllMatches = pd.DataFrame()
 counter = 0
 
-# go through every season in every competitition, except the one that are getting evaluated
+# go through every season in every competition, except the one that are getting evaluated
 for index in range(len(competitionIDs)):
     # lets get all the matches of all seasons, except the ones we defined for our evaluation
     # EM2020: compID: 55, seasonID: 43

@@ -18,9 +18,11 @@ dist = df['distance_to_goal_centre'].mean()
 dfEM20 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONEM2020)
 dfWM22 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONWM2022)
 dfTest = dfWM22[(dfWM22['minute'] == 45) & (dfWM22['competition_stage'] == 'Group Stage')]
-print(len(dfTest['minute']))
+
 
 dfTest2 = JSONtoDF.createDF("JSON/ShotsEM2020.json")
 dfTest2 = dfTest2[(dfTest2['minute'] > 90) & (dfTest2['competition_stage'] == 'Round of 16')]
+
+dfEM20 = DataManipulation.score(dfEM20)
 
 

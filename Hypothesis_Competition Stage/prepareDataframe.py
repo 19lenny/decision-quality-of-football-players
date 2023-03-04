@@ -20,3 +20,13 @@ def KOvsGroupStage(path_to_df, name_KO_stage):
     dfManipulated.reset_index(inplace=True)
     dfManipulated.drop(["level_0", "index"], axis=1)
     return dfManipulated
+
+def TeamsInStage(df, name_KO_stage):
+
+    # create a dataframe with all teams that achieved the round of 16
+    # this searches for the teams and drops all duplicates, since a team cannot achieve multiple time
+    KO_stage = df[["home_team", "away_team"]][df['competition_stage'] == name_KO_stage].drop_duplicates()
+    KO_stage = pd.concat([KO_stage['home_team'], KO_stage['away_team'].rename({'away_team': 'home_team'})])
+    KO_stage = KO_stage.values.tolist()
+
+    return KO_stage

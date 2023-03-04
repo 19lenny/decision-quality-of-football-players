@@ -55,7 +55,7 @@ def getPlayersOfEvent(shot, keyword):
 
     # clean up
     # sample.json is no longer needed and can be deleted
-    os.remove(CONSTANTS.JSONDECEVA + filename)
+    os.remove(filename)
 
     # the player_id, the player_name, the position_id and the position name have in the df still a dictionary like format
     # change this, such that id and name are additional columns in the dataframe
