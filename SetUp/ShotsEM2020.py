@@ -30,7 +30,7 @@ for event in matchIdEM2020:
     getEventsInMatch = sb.events(event)
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
     getEventsInMatch = getEventsInMatch.query(
-        "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
+        "type == 'Shot' ")
     dfShotEM2020 = pd.concat([dfShotEM2020, getEventsInMatch])
     counter += 1
     print("nothing to worry - still working")
@@ -58,6 +58,7 @@ dfEM2020 = DataManipulation.distancePlayerToGoal(dfEM2020)
 #add goal
 dfEM2020 = DataManipulation.addGoalBinary(dfEM2020)
 
+
 # save only the needed columns
 dfEM2020 = dfEM2020[
     ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "angle", "angleInRadian", "distance_to_goal_centre",
@@ -73,6 +74,6 @@ dfEM2020.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfEM2020.to_json(CONSTANTS.JSONEM2020)
+dfEM2020.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Score/ShotsEM2020.json")
 
 print("i am finished")

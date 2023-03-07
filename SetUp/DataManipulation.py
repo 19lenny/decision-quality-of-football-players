@@ -95,8 +95,6 @@ def addGoalBinary(dataframe):
     return dataframe
 
 def score(df):
-    # todo finish this code
-    # todo: debug
     # first extract all match id of dataframe in a unique list
     match_id = df[["match_id"]].drop_duplicates()
     match_id = match_id.values.tolist()
@@ -106,6 +104,8 @@ def score(df):
     for match in match_id:
         # set up for every match
         dfCurrentMatch = df[df['match_id'] == match[0]].sort_values(by = ['minute'])
+        # reset index to go through in the for loop
+        dfCurrentMatch.reset_index(inplace=True)
         index = 0
         scores: List[int] = [0] * len(dfCurrentMatch)
         score_home_team: List[int] = [0] * len(dfCurrentMatch)
@@ -146,7 +146,5 @@ def score(df):
         dfCurrentMatch['home_score'] = score_home_team
         dfCurrentMatch['away_score'] = score_away_team
         dfUpdated = pd.concat([dfUpdated, dfCurrentMatch])
-
-
-        print("i am here")
+    dfUpdated.reset_index(drop=True, inplace=True)
     return dfUpdated

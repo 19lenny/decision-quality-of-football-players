@@ -11,11 +11,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from DecisionEvaluation import evaluationHelper
+from IPython.display import set_matplotlib_formats
 
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
 from DecisionEvaluation import offside
 
 square_meter_size = 1
-max_shot_distance = 20
+max_shot_distance = 25
 # -----------------------------------------------------------------------------------------------------------
 # create a grid which shows for every x and y combination the xGoal according to regression
 
@@ -29,16 +32,24 @@ y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE1,
                           CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
                           square_meter_size)
 """
-y_range_pitch = np.arange(18,
-                          62 + square_meter_size,
+y_range_pitch = np.arange(15,
+                          65+square_meter_size,
                           square_meter_size)
+
 xGList = []
 xList = []
 yList = []
 for x in x_range_pitch:
     for y in y_range_pitch:
-
-        if (x == 120) & (y == 36 | y == 44):
+        # left post
+        if (x == 120) & (y == 36):
+            xgPrediction = 0
+            xList.append(x)
+            yList.append(y)
+            xGList.append(xgPrediction)
+            continue
+        # right post
+        elif (x == 120) & (y == 44):
             xgPrediction = 0
             xList.append(x)
             yList.append(y)
@@ -71,26 +82,41 @@ data = {'x': xList,
         }
 dfXGGrid = pd.DataFrame(data)
 
-def valid_imshow_data(data):
-    data = np.asarray(data)
-    if data.ndim == 2:
-        return True
-    elif data.ndim == 3:
-        if 3 <= data.shape[2] <= 4:
-            return True
-        else:
-            print('The "data" has 3 dimensions but the last dimension '
-                  'must have a length of 3 (RGB) or 4 (RGBA), not "{}".'
-                  ''.format(data.shape[2]))
-            return False
-    else:
-        print('To visualize an image the data must be 2 dimensional or '
-              '3 dimensional, not "{}".'
-              ''.format(data.ndim))
-        return False
+"""
+What’s going on here? Looking at the Z data first, I’ve merely used the pivot_table method from pandas to cast my data 
+into a matrix format, where the columns/rows correspond to the values of Z for each of the points in the range of the 
+x-y-axes."""
 
-# x_coords = np.arange(min(xList),max(xList)+1)
-# y_coords = np.arange(min(yList),max(yList)+1)
-Z = dfXGGrid['xGPrediction']
+Z = dfXGGrid.pivot_table(index='x', columns='y', values='xGPrediction').T.values
+
+X_unique = np.sort(dfXGGrid.x.unique())
+Y_unique = np.sort(dfXGGrid.y.unique())
+X, Y = np.meshgrid(X_unique, Y_unique)
+# Initialize plot objects
+rcParams['figure.figsize'] = 8, 11  # sets plot size
+plt.rcParams["figure.autolayout"] = True
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+img = plt.imread("half field.png")
+ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 120, 15, 65])
+levels = np.linspace(Z.min(), Z.max(), 14)
 
 
+# Generate a color mapping of the levels we've specified
+import matplotlib.cm as cm  # matplotlib's color map library
+
+cpf = ax.contourf(X, Y, Z, len(levels), alpha=0.5, antialiased = True)
+
+# Set all level lines to black
+line_colors = ['white' for l in cpf.levels]
+
+# Make plot and customize axes
+cp = ax.contour(X, Y, Z, levels=levels, colors= line_colors)
+ax.clabel(cp, fontsize=12)
+ax.set_xlabel('x coordinate')
+_ = ax.set_ylabel('y coordinate')
+plt.title("xG Model", fontdict={'fontsize': 20})
+plt.colorbar(cpf, aspect=50)
+fig.tight_layout()
+plt.show()

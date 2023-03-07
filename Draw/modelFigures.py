@@ -15,7 +15,8 @@ x_coord = shots_model['x_coordinate']
 
 shots_model = JSONtoDF.createDF("../JSON/allModelData.json")
 
-shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle', 'angleInRadian', 'distance_to_goal_centre', 'shot_statsbomb_xg']]
+shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',
+                           'angleInRadian', 'distance_to_goal_centre', 'shot_statsbomb_xg']]
 x = shots_model['x_coordinate']
 y = shots_model['y_coordinate']
 

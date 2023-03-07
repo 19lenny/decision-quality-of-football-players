@@ -1,7 +1,7 @@
 from scipy.stats import ttest_ind
 
 from SetUp import JSONtoDF, CONSTANTS
-import prepareDataframe
+import prepareDataframeStage
 import pandas as pd
 
 # H0 the teams that had to leave after the group stage make the same decisions
@@ -10,7 +10,7 @@ import pandas as pd
 # first add WM 22 and EM 20 to one dataframe together
 dfEM20 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONEM2020)
 
-teams_ko_em20 = prepareDataframe.TeamsInStage(dfEM20, "Round of 16")
+teams_ko_em20 = prepareDataframeStage.TeamsInStage(dfEM20, "Round of 16")
 
 df_KO_teams_em20 = dfEM20[dfEM20['team'].isin(teams_ko_em20)]
 df_group_teams_em20 = dfEM20[~dfEM20['team'].isin(teams_ko_em20)]
@@ -18,7 +18,7 @@ df_group_teams_em20 = dfEM20[~dfEM20['team'].isin(teams_ko_em20)]
 
 dfWM22 = JSONtoDF.createDF(CONSTANTS.JSONSHOTEVALUATIONWM2022)
 
-teams_ko_wm22 = prepareDataframe.TeamsInStage(dfWM22, "Round of 16")
+teams_ko_wm22 = prepareDataframeStage.TeamsInStage(dfWM22, "Round of 16")
 
 df_KO_teams_wm22 = dfWM22[dfWM22['team'].isin(teams_ko_wm22)]
 df_group_teams_wm22 = dfWM22[~dfWM22['team'].isin(teams_ko_wm22)]

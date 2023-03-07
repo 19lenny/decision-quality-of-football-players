@@ -264,4 +264,55 @@ def createGoalMouth():
     plt.axis('off')
 
     return fig, ax
+def createGoalMouthSmall():
+    # Adopted from FC Python
+    # Create figure
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    linecolor = 'white'
+
+    # Pitch Outline & Centre Line
+    plt.plot([60, 120], [0, 0], color=linecolor)
+    plt.plot([60, 60], [80, 0], color=linecolor)
+    plt.plot([60, 120], [80, 80], color=linecolor)
+
+    # Right Penalty Area
+    plt.plot([102, 120], [18, 18], color=linecolor)
+    plt.plot([102, 102], [18, 62], color=linecolor)
+    plt.plot([102, 120], [62, 62], color=linecolor)
+
+    # Right 6-yard Box
+    plt.plot([114, 120], [30, 30], color=linecolor)
+    plt.plot([114, 114], [30, 50], color=linecolor)
+    plt.plot([114, 120], [50, 50], color=linecolor)
+
+    # Right Goal
+    plt.plot([122, 122], [36, 44], color=linecolor)
+    plt.plot([120, 122], [36, 36], color=linecolor)
+    plt.plot([120, 122], [44, 44], color=linecolor)
+
+    # Prepare Circles
+    centreCircle = plt.Circle((50, 40), 9.15, color=linecolor, fill=False)
+    centreSpot = plt.Circle((50, 40), 0.8, color=linecolor)
+
+    rightPenSpot = plt.Circle((108, 40), 0.8, color=linecolor)
+
+    # Draw Circles
+    ax.add_patch(centreCircle)
+    ax.add_patch(centreSpot)
+    ax.add_patch(rightPenSpot)
+
+    # Prepare Arcs
+
+    rightArc = Arc((102, 40), height=18.3, width=18.3, angle=0, theta1=130, theta2=230, color=linecolor)
+
+    # Draw Arcs
+
+    ax.add_patch(rightArc)
+
+    # Tidy Axes
+    plt.axis('off')
+
+    return fig, ax
 

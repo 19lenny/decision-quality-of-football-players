@@ -2,7 +2,7 @@ from typing import List
 
 from scipy.stats import ttest_ind
 from statistics import mean
-import prepareDataframe
+import prepareDataframeStage
 from SetUp import JSONtoDF, CONSTANTS
 import pandas as pd
 
@@ -22,8 +22,8 @@ for index in range(len(ko_stages)):
 
     # we manipulate the dataframes in a way that only the shots of the teams count,
     # that achieved the current highest competition round
-    dfEM20 = prepareDataframe.KOvsGroupStage(CONSTANTS.JSONSHOTEVALUATIONEM2020, ko_stages[index])
-    dfWM22 = prepareDataframe.KOvsGroupStage(CONSTANTS.JSONSHOTEVALUATIONWM2022, ko_stages[index])
+    dfEM20 = prepareDataframeStage.KOvsGroupStage(CONSTANTS.JSONSHOTEVALUATIONEM2020, ko_stages[index])
+    dfWM22 = prepareDataframeStage.KOvsGroupStage(CONSTANTS.JSONSHOTEVALUATIONWM2022, ko_stages[index])
     # the df are bundled together because the evaluation is done for both df
     dfShotEval = pd.concat([dfEM20, dfWM22])
 
