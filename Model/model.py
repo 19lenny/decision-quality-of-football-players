@@ -64,8 +64,8 @@ def show_info(regression):
 # filename: the file for which the prediction should be done, file has to be json
 # attributes on which x values the prediction should be based on
 
-def prediction(modelname, regression, filename, attributes):
-    df = JSONtoDF.createDF(filename)
+def prediction(modelname, regression, df, attributes):
+
     xReal = df[attributes]
     xGoal = regression.predict(xReal)
     df[modelname] = xGoal
