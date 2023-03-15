@@ -1,10 +1,49 @@
 import re
 from difflib import SequenceMatcher
+from typing import List
+from scipy.stats import ttest_ind
 import requests
 from bs4 import BeautifulSoup
 
 import pandas as pd
 
+
+def tTestMarketValue(df):
+    q = pd.DataFrame()
+    q['quantile'] = df['value'].quantile([0.25, 0.5, 0.75])
+    q.reset_index(drop=True, inplace=True)
+    median = df['value'].median()
+    mean = df['value'].mean()
+
+    # create empty lists, that can be filled later
+
+    value_separation: List[int] = [0] * len(q['quantile'])
+    t_stat: List[float] = [0.0] * len(q['quantile'])
+    p_values: List[float] = [0.0] * len(q['quantile'])
+    len_df_valuable: List[int] = [0] * len(q['quantile'])
+    len_df_in_cheaper: List[int] = [0] * len(q['quantile'])
+
+    for quant in range(len(q)):
+        # separate the dataframe according to the current shot separation
+        dfValuable = df.loc[df['value'] >= q['quantile'][quant]]
+        dfCheaper = df.loc[df['value'] < q['quantile'][quant]]
+
+        # could be that it is empty, since no shots from the leading team were taken
+        # therefore try as error handling
+        shotValuesOne = dfValuable['xG_Delta_decision_alternative'].values.tolist()
+        shotValuesTwo = dfCheaper['xG_Delta_decision_alternative'].values.tolist()
+
+        t_stat[quant], p_values[quant] = ttest_ind(shotValuesOne, shotValuesTwo)
+        value_separation[quant] = q['quantile'][quant]
+        len_df_valuable[quant] = len(dfValuable['xG_Delta_decision_alternative'])
+        len_df_in_cheaper[quant] = len(dfCheaper['xG_Delta_decision_alternative'])
+
+    dataMarketValue = {'value_separation': value_separation,
+                       'T-stat': t_stat,
+                       'P-Val': p_values,
+                       'number_shots_valuable': len_df_valuable,
+                       'number_shots_cheaper': len_df_in_cheaper}
+    return dataMarketValue
 def getPlayerValue(url):
     headers = {'User-Agent':
                    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'}
