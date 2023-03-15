@@ -1,3 +1,5 @@
+import re
+from difflib import SequenceMatcher
 import requests
 from bs4 import BeautifulSoup
 
@@ -83,3 +85,84 @@ def transfermarketValue(competition):
                           "nationality": PlayersNation})
     return df
 
+def exceptionCases(player_name, dfValues):
+    name_searched = None
+    if player_name == "Carlos Henrique Casimiro":
+        name_searched = "Casemiro"
+
+    elif player_name == "Raphael Dias Belloli":
+        name_searched = "Raphinha"
+    elif player_name == "Lucas Tolentino Coelho de Lima":
+        name_searched = "Lucas Paquetá"
+    elif player_name == "Saud Abdullah Abdul Hamid":
+        name_searched = "Saud Abdulhamid"
+    elif player_name == "Vitor Machado Ferreira":
+        name_searched = "Vitinha"
+    elif player_name == "İbrahim Halil Dervişoğlu":
+        name_searched = "Halil Dervisoglu"
+    elif player_name == "Tomáš Holeš":
+        name_searched = "Tomas Holes"
+    elif player_name == "Jorge Resurrección Merodio":
+        name_searched = "Koke"
+    elif player_name == "Mehmet Zeki Çelik":
+        name_searched = "Zeki Celik"
+    try:
+        value = dfValues['value'][dfValues['player'] == name_searched]
+        value.reset_index(drop=True, inplace=True)
+        value = value[0]
+    except KeyError:
+        value = None
+    return value
+def join(dfCompetition, dfValues):
+    values = []
+
+    for row in range(len(dfCompetition)):
+
+        value = None
+        for player in range(len(dfValues)):
+            # deb
+            x = dfValues['player'][player]
+            # if the player has not the same nationality, we don't have to calculate too much and cans save time
+            # skip then to the next player
+            if dfValues['nationality'][player].casefold() != dfCompetition['team'][row].casefold():
+                continue
+            # player with similar name has be found add his value
+            # this only works if the additional names are in the end
+            # break statement is used, because when we found the matching player we dont want to continue searching
+            elif dfValues['player'][player].casefold() in dfCompetition['player'][row].casefold():
+                value = dfValues['value'][player]
+                break
+            # but if the 3rd and 4th names are in the middle we have to use a trick
+            # if the name consists out of more than 3 words, than only keep the first and last name
+            elif len(re.findall(r'\w+', dfCompetition['player'][row])) >= 3:
+                name_of_player = dfCompetition['player'][row].split()
+                name_of_player = name_of_player[0] + " " + name_of_player[-1]
+                if dfValues['player'][player] in name_of_player:
+                    value = dfValues['value'][player]
+                    break
+                    # if the name is still not found in the database, but a name with +75% similiarity is found and the nationality is the same, the name is taken
+                elif SequenceMatcher(a=name_of_player, b=dfValues['player'][player]).ratio() >= 0.75:
+                    value = dfValues['value'][player]
+                    break
+                # if the player is still not found, then we only check if the last name of our player is in the name of the shooting player
+                # of course the nation has to be the same
+                # this is not optimal if the player has a name which cannot be compared and multiple players in the team have the same last name
+                # it is not guaranteed that we take the correct last name, we always take the last one with this implementation
+                elif dfValues['player'][player].split()[-1] in dfCompetition['player'][row]:
+                    value = dfValues['value'][player]
+
+
+            # if one has only two names but a lot of different special characters, his name should be compared
+            elif SequenceMatcher(a=dfCompetition['player'][row], b=dfValues['player'][player]).ratio() >= 0.75:
+                value = dfValues['value'][player]
+                break
+        if value is None:
+            value = exceptionCases(dfCompetition['player'][row], dfValues)
+        if value is None:
+            print(dfCompetition['player'][row])
+        # if a player has been found that is similar to the original player, then we add a value to it,
+        # otherwise a None entry is created
+        values.append(value)
+
+    dfCompetition['value'] = values
+    return dfCompetition
