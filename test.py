@@ -26,3 +26,5 @@ dfTest2 = dfTest2[(dfTest2['minute'] > 90) & (dfTest2['competition_stage'] == 'R
 dfEM20 = DataManipulation.score(dfEM20)
 
 
+#todo:
+#score is currently not working

@@ -51,6 +51,7 @@ def getPlayerValue(url):
     page = url
     pageTree = requests.get(page, headers=headers)
     pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
+    print(pageSoup)
     Players = pageSoup.findAll("img", {"class": "bilderrahmen-fixed lazy lazy"})
     Age = pageSoup.findAll("td", {"class": "zentriert"})
     Values = pageSoup.findAll("td", {"class": "rechts hauptlink"})
