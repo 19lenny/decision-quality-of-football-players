@@ -106,17 +106,19 @@ levels = np.linspace(Z.min(), Z.max(), 14)
 # Generate a color mapping of the levels we've specified
 import matplotlib.cm as cm  # matplotlib's color map library
 
-cpf = ax.contourf(X, Y, Z, len(levels), alpha=0.5, antialiased = True)
+cpf = ax.contourf(X, Y, Z, levels= [0,0.07, 0.15,0.3,1],
+                  colors=['#006F01','#49be25','#96be25', '#fb5f04', '#FF2300'], alpha=0.7, antialiased = True)
 
 # Set all level lines to black
 line_colors = ['white' for l in cpf.levels]
 
 # Make plot and customize axes
-cp = ax.contour(X, Y, Z, levels=levels, colors= line_colors)
+cp = ax.contour(X, Y, Z, levels= [0.07, 0.15,0.3], colors= line_colors)
 ax.clabel(cp, fontsize=12)
 ax.set_xlabel('x coordinate')
 _ = ax.set_ylabel('y coordinate')
 plt.title("xG Model", fontdict={'fontsize': 20})
 plt.colorbar(cpf, aspect=50)
 fig.tight_layout()
+plt.savefig("C:/Users/lenna/Downloads/test.png")
 plt.show()
