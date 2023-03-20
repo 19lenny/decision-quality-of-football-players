@@ -65,7 +65,7 @@ def show_info(regression):
 # attributes on which x values the prediction should be based on
 
 def prediction(modelname, regression, df, attributes):
-
+    x = attributes
     xReal = df[attributes]
     xGoal = regression.predict(xReal)
     df[modelname] = xGoal

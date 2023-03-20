@@ -1,5 +1,5 @@
 import model
-from SetUp import CONSTANTS
+from SetUp import CONSTANTS, JSONtoDF
 
 # Set Up
 
@@ -24,24 +24,24 @@ modelnameInt = CONSTANTS.MODELNAMEINTERCEPT
 modelnameNoInt = CONSTANTS.MODELNAMENOINTERCEPT
 
 # EM 2020
-dfEM2020 = model.prediction(modelnameInt, log_model_interc, CONSTANTS.JSONEM2020, attributes)
+dfEM2020 = model.prediction(modelnameInt, log_model_interc, JSONtoDF.createDF(CONSTANTS.JSONEM2020), attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfEM2020 = model.calculateAccuracy(modelnameInt, dfEM2020)
 
 dfEM2020.to_json(CONSTANTS.JSONEM2020)
 
-dfEM2020 = model.prediction(modelnameNoInt, log_model_no_interc, CONSTANTS.JSONEM2020, attributes)
+dfEM2020 = model.prediction(modelnameNoInt, log_model_no_interc,JSONtoDF.createDF(CONSTANTS.JSONEM2020), attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfEM2020 = model.calculateAccuracy(modelnameNoInt, dfEM2020)
 
 # WM 2022
-dfWM2022 = model.prediction(modelnameInt, log_model_interc, CONSTANTS.JSONWM2022, attributes)
+dfWM2022 = model.prediction(modelnameInt, log_model_interc, JSONtoDF.createDF(CONSTANTS.JSONWM2022), attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfWM2022 = model.calculateAccuracy(modelnameInt, dfWM2022)
 
 dfWM2022.to_json(CONSTANTS.JSONWM2022)
 
-dfWM2022 = model.prediction(modelnameNoInt, log_model_no_interc, CONSTANTS.JSONWM2022, attributes)
+dfWM2022 = model.prediction(modelnameNoInt, log_model_no_interc, JSONtoDF.createDF(CONSTANTS.JSONWM2022), attributes)
 # calculate the accuracy as the difference of statsbomb xg, and my calculation
 dfWM2022 = model.calculateAccuracy(modelnameNoInt, dfWM2022)
 
