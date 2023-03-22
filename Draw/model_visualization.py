@@ -101,7 +101,7 @@ def draw_xG_model(dfXGGrid, saving_location, title):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     img = plt.imread("half field.png")
-    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 119, 15, 64])
+    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 119, 16.5, 64])
     #levels = np.linspace(Z.min(), Z.max(), 14)
 
 
@@ -196,5 +196,5 @@ xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25, model
 #draw the xG histogram
 draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis.png", title="xGModel")
 
-#dfDivisioned = df_goals_divided_by_shots()
-#draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")
+dfDivisioned = df_goals_divided_by_shots()
+draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")
