@@ -26,5 +26,14 @@ dfTest2 = dfTest2[(dfTest2['minute'] > 90) & (dfTest2['competition_stage'] == 'R
 dfEM20 = DataManipulation.score(dfEM20)
 
 
-#todo:
-#score is currently not working
+square_meter_size = 1
+max_shot_distance = 40
+bin_size = 20
+print((CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size))
+print(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance)
+
+# -----------------------------------------------------------------------------------------------------------
+# create a grid with a certain amount of bins
+x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
+                          CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size,
+                            square_meter_size)
