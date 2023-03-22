@@ -17,14 +17,14 @@ import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from DecisionEvaluation import offside
 
-def calculate_xG_for_grid(square_meter_size, max_shot_distance):
+def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
     square_meter_size = square_meter_size
     max_shot_distance = max_shot_distance
     # -----------------------------------------------------------------------------------------------------------
     # create a grid which shows for every x and y combination the xGoal according to regression
 
     x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size,
+                              CONSTANTS.X_COORDINATE_GOALCENTRE,
                               square_meter_size)
     # create the y linspace of the pitch, the end value gets +square meter size,
     # such that the endpoint is still in the range
@@ -34,7 +34,7 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance):
                               square_meter_size)
     """
     y_range_pitch = np.arange(15,
-                              65+square_meter_size,
+                              65,
                               square_meter_size)
 
     xGList = []
@@ -56,7 +56,7 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance):
                 yList.append(y)
                 xGList.append(xgPrediction)
                 continue
-            logmodel = CONSTANTS.REGMODELINTERC
+            logmodel = modelname
             x_location = x
             y_location = y
 
@@ -101,7 +101,7 @@ def draw_xG_model(dfXGGrid, saving_location, title):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     img = plt.imread("half field.png")
-    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 120, 15, 65])
+    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 119, 15, 64])
     #levels = np.linspace(Z.min(), Z.max(), 14)
 
 
@@ -139,7 +139,7 @@ def df_goals_divided_by_shots():
 
     # create a grid with a certain amount of bins
     x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size,
+                              CONSTANTS.X_COORDINATE_GOALCENTRE,
                               square_meter_size)
     # create the y linspace of the pitch, the end value gets +square meter size,
     # such that the endpoint is still in the range
@@ -150,7 +150,7 @@ def df_goals_divided_by_shots():
     """
     # this means shots made from the corner flag are not included in the visualization
     y_range_pitch = np.arange(15,
-                              65 + square_meter_size,
+                              65,
                               square_meter_size)
 
     xGList = []
@@ -192,7 +192,7 @@ def df_goals_divided_by_shots():
 
 # calculate for every x and y coordinate the xGoal
 # shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25)
+xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25, modelname=CONSTANTS.REGMODELINTERC)
 #draw the xG histogram
 draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis.png", title="xGModel")
 

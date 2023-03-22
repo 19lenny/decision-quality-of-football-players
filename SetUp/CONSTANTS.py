@@ -54,8 +54,9 @@ PLAYER_SPEED = 19.8 * FROMKMHTOYPS
 # which attributes should be taken into account?
 ATTRIBUTES = ['angleInRadian', 'distance_to_goal_centre']
 #create the model without intercept
-MODELNAMEINTERCEPT = "xGAngleDistInterc"
-REGMODELNOINTERC = model.create_model_logit(JSONMODELALLSHOTS, ATTRIBUTES)
 MODELNAMENOINTERCEPT = "xGAngleDistNoInterc"
+REGMODELNOINTERC = model.create_model_logit(JSONMODELALLSHOTS, ATTRIBUTES)
+#create the model with intercept
+MODELNAMEINTERCEPT = "xGAngleDistInterc"
 REGMODELINTERC = model.create_model_glm(JSONMODELALLSHOTS, ATTRIBUTES)
 

@@ -83,8 +83,8 @@ def predictionOfSingleValues(values, attributes, regression):
 # the difference is saved to the data frame
 # the dataframe is updated and returned
 # the mean of the difference is printed out
-def calculateAccuracy(modelname, df):
+def calculateAccuracy(modelname, df, championship):
     nameOfColumn = "difference" + modelname
     df[nameOfColumn] = df[modelname] - df["shot_statsbomb_xg"]
-    print("the mean of the difference of ", modelname, " is: ", df[nameOfColumn].mean())
+    print("the mean of the difference of ", modelname,"at",championship,"is: ", df[nameOfColumn].mean())
     return df
