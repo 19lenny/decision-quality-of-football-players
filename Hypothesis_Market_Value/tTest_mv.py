@@ -1,12 +1,6 @@
 # import all shots EM2020
-from typing import List
-import re
-from SetUp import JSONtoDF, CONSTANTS
+from SetUp import JSONtoDF, CONSTANTS, TM_values
 import pandas as pd
-import ws_tm_values
-from scipy.stats import ttest_ind
-import ws_tm_values
-from difflib import SequenceMatcher
 
 # all competitions
 

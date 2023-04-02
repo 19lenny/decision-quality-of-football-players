@@ -51,7 +51,6 @@ def getPlayerValue(url):
     page = url
     pageTree = requests.get(page, headers=headers)
     pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
-    print(pageSoup)
     Players = pageSoup.findAll("img", {"class": "bilderrahmen-fixed lazy lazy"})
     Age = pageSoup.findAll("td", {"class": "zentriert"})
     Values = pageSoup.findAll("td", {"class": "rechts hauptlink"})
@@ -84,17 +83,28 @@ def getPlayerValue(url):
 
     return PlayersList, cleanedValues, NationalityList
 
-def transfermarketValue(competition):
-    if "EM" in competition:
+def transfermarketValue(dfCompetition, competition):
+    url = ""
+    season = ""
+    numberOfCompetitors = 0
+    if "EM20" in competition:
         url = "https://www.transfermarkt.com/europameisterschaft-2020/teilnehmer/pokalwettbewerb/EM20/saison_id/2020"
         season = "?saison_id=2020"
         numberOfCompetitors = 24
-    else:
+    elif "WM22" in competition:
         url = "https://www.transfermarkt.com/weltmeisterschaft-2022/teilnehmer/pokalwettbewerb/WM22/saison_id/2021"
         season = "?saison_id=2021"
         numberOfCompetitors = 32
+    elif "EM16" in competition:
+        url = "https://www.transfermarkt.com/europameisterschaft-2016/teilnehmer/pokalwettbewerb/EM16/saison_id/2015"
+        season = "?saison_id=2021"
+        numberOfCompetitors = 24
+    elif "WM18" in competition:
+        url = "https://www.transfermarkt.com/weltmeisterschaft-2018/teilnehmer/pokalwettbewerb/WM18/saison_id/2017"
+        season = "?saison_id=2017"
+        numberOfCompetitors = 32
 
-    # get all countries back
+    # get all countries back that participated in this championship
     headers = {'User-Agent':
                'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'}
 
@@ -102,7 +112,7 @@ def transfermarketValue(competition):
     pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
     url_country = pageSoup.findAll("td", {"class":"zentriert no-border-rechts"})
     url_countries = []
-    # get all the urls of all countries that participated in the wc 2022 (on transfermarkt this is scripted as season 2021)
+    # get all the urls of all countries that participated in the competition looked for (the season number is always one below of the competition year)
     for i in range(0, numberOfCompetitors):
         url_countries.append("https://www.transfermarkt.com"+str(url_country[i]).split('" title', 1)[0].split('<a href="',1)[1]+season)
 
@@ -120,16 +130,19 @@ def transfermarketValue(competition):
         PlayersNation = PlayersNation + nationality
         counter += 1
 
-    df = pd.DataFrame({"player": PlayersList,
+    dfValues = pd.DataFrame({"player": PlayersList,
                                "value": PlayerValues,
                           "nationality": PlayersNation})
-    return df
+    # todo:
+    #  maybe join has to go up
+    #  check for special cases and add them
+    dfCompetition, added_attributes = join(dfCompetition=dfCompetition, dfValues=dfValues)
+    return dfCompetition, added_attributes
 
 def exceptionCases(player_name, dfValues):
     name_searched = None
     if player_name == "Carlos Henrique Casimiro":
         name_searched = "Casemiro"
-
     elif player_name == "Raphael Dias Belloli":
         name_searched = "Raphinha"
     elif player_name == "Lucas Tolentino Coelho de Lima":
@@ -146,6 +159,18 @@ def exceptionCases(player_name, dfValues):
         name_searched = "Koke"
     elif player_name == "Mehmet Zeki Çelik":
         name_searched = "Zeki Celik"
+    elif player_name == "Fahad Mosaed Al Muwallad Al Harbi":
+        name_searched = "Fahad Al-Muwallad"
+    elif player_name == "Fernando Luiz Rosa":
+        name_searched = "Fernandinho"
+    elif player_name == "Ghilane Chalali":
+        name_searched = "Ghaylen Chaaleli"
+    elif player_name == "Papa Alioune N''Diaye":
+        name_searched = "Badou Ndiaye"
+    elif player_name == "Mohanad Aseri Abu Radiah":
+        name_searched = "Muhannad Assiri"
+    elif player_name == "Oghenekaro Etebo":
+        name_searched = "Peter Etebo"
     try:
         value = dfValues['value'][dfValues['player'] == name_searched]
         value.reset_index(drop=True, inplace=True)
@@ -155,32 +180,44 @@ def exceptionCases(player_name, dfValues):
     return value
 def join(dfCompetition, dfValues):
     values = []
-
+    # go through every player in the competition
     for row in range(len(dfCompetition)):
 
         value = None
+        # and check if there is a player with the same name in the value list
+        # this has to be done with a regex, since transfermarkt can save players with different spellings
         for player in range(len(dfValues)):
             # deb
             x = dfValues['player'][player]
-            # if the player has not the same nationality, we don't have to calculate too much and cans save time
+            y =  dfCompetition['player'][row]
+            # if the player has not the same nationality, we don't have to calculate too much and can save time
             # skip then to the next player
             if dfValues['nationality'][player].casefold() != dfCompetition['team'][row].casefold():
                 continue
-            # player with similar name has be found add his value
+            # player with similar name or same name has be found add his value
+            # it is guaranteed that the players have the same nationality.
+            # so here it could only generate a mix-up if two player of the same nationality have the same name
+            # similar, because it is checked with keyword 'in'
+            # example:
+            # dfValues Player = Max Mustermann | dfCompetition Player = Max Mustermann Peter
+            # this would give us true since Max Mustermann is in Max Mustermann Peter
             # this only works if the additional names are in the end
             # break statement is used, because when we found the matching player we dont want to continue searching
             elif dfValues['player'][player].casefold() in dfCompetition['player'][row].casefold():
                 value = dfValues['value'][player]
                 break
             # but if the 3rd and 4th names are in the middle we have to use a trick
+            # Example: Max Mustermann vs. Max Peter Mustermann, keyword 'in' gives false
             # if the name consists out of more than 3 words, than only keep the first and last name
             elif len(re.findall(r'\w+', dfCompetition['player'][row])) >= 3:
                 name_of_player = dfCompetition['player'][row].split()
                 name_of_player = name_of_player[0] + " " + name_of_player[-1]
+                # when the middle names are thrown away, check again Max Mustermann is in Max (Peter) Mustermann
                 if dfValues['player'][player] in name_of_player:
                     value = dfValues['value'][player]
                     break
-                    # if the name is still not found in the database, but a name with +75% similiarity is found and the nationality is the same, the name is taken
+                    # if the name is still not found in the database and the name consists out of three or more names,
+                    # it is searched for a name with +75% similiarity and the same nationality
                 elif SequenceMatcher(a=name_of_player, b=dfValues['player'][player]).ratio() >= 0.75:
                     value = dfValues['value'][player]
                     break
@@ -193,9 +230,12 @@ def join(dfCompetition, dfValues):
 
 
             # if one has only two names but a lot of different special characters, his name should be compared
+            # if the names match with over 75% the name is taken
+            # Example: Hakan Calhanoglu | Hakan Çalhanoğlu would match this case
             elif SequenceMatcher(a=dfCompetition['player'][row], b=dfValues['player'][player]).ratio() >= 0.75:
                 value = dfValues['value'][player]
                 break
+        # if we still couldn't find a player, we can add the value manually with an exception case
         if value is None:
             value = exceptionCases(dfCompetition['player'][row], dfValues)
         if value is None:
@@ -205,4 +245,4 @@ def join(dfCompetition, dfValues):
         values.append(value)
 
     dfCompetition['value'] = values
-    return dfCompetition
+    return dfCompetition, 'value'

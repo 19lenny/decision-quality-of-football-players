@@ -1,4 +1,5 @@
-from Model import model
+from Model import create_model
+from SetUp import JSONtoDF
 
 # File paths
 
@@ -8,9 +9,12 @@ JSONFILEPATH = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/T
 JSONBACKUPFOLDER = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/BackUp/"
 JSONDECEVA= "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/DecisionEvaluation/"
 JSONEM2020 = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsEM2020.json"
+JSONWM2018 = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2018.json"
 JSONWM2022 = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/JSON/ShotsWM2022.json"
-JSONMODELALLSHOTS = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" \
-                    "Masterarbeit/Thesis/thesis/JSON/allModelData.json"
+JSONTRAINSHOTS = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" \
+                    "Masterarbeit/Thesis/thesis/JSON/Train_Set_Shots.json"
+JSONTESTSHOTS = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" \
+                    "Masterarbeit/Thesis/thesis/JSON/Test_Set_Shots.json"
 JSONSHOTEVALUATIONEM2020 =\
     "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/" \
     "JSON/Evaluation/ShotEvaluationEM20INT.json"
@@ -53,10 +57,14 @@ PLAYER_SPEED = 19.8 * FROMKMHTOYPS
 #logmodel should also not change after it is calculated once
 # which attributes should be taken into account?
 ATTRIBUTES = ['angleInRadian', 'distance_to_goal_centre']
-#create the model without intercept
-MODELNAMENOINTERCEPT = "xGAngleDistNoInterc"
-REGMODELNOINTERC = model.create_model_logit(JSONMODELALLSHOTS, ATTRIBUTES)
-#create the model with intercept
-MODELNAMEINTERCEPT = "xGAngleDistInterc"
-REGMODELINTERC = model.create_model_glm(JSONMODELALLSHOTS, ATTRIBUTES)
+
+# model with intercept
+MODELNAMEINTERCEPT = "xG"
+#Todo: Update JSONTRAINSHOTS --> train_df
+df = JSONtoDF.createDF(JSONTRAINSHOTS)
+REGMODELINTERC = create_model.create_model_glm(JSONtoDF.createDF(JSONTRAINSHOTS), ATTRIBUTES)
+
+#this is the current Model
+MODELNAME = MODELNAMEINTERCEPT
+REGRESSION_MODEL = REGMODELINTERC
 

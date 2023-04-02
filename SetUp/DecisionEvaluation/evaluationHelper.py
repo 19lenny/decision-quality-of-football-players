@@ -6,7 +6,7 @@ from SetUp import CONSTANTS, DataManipulation
 from scipy.stats import expon
 from decimal import *
 import numpy as np
-from Model import model
+from Model import model_info
 
 
 # calculates the closest distance (in yards) of every player in a dataframe, for a given position
@@ -52,6 +52,7 @@ def getPlayersOfEvent(shot, keyword):
     # import it to a dataframe
     # this dataframe contains all data from all players that were in the frame during the shot
     dfOtherPlayers = pd.read_json(filename)
+    dfOtherPlayers.reset_index(drop=True, inplace=True)
 
     # clean up
     # sample.json is no longer needed and can be deleted
@@ -66,32 +67,36 @@ def getPlayersOfEvent(shot, keyword):
     idPosition = []
     namePosition = []
     # go through every player that was in the shot...
-    for rowPlayers in range(len(dfOtherPlayers['player'])):
-        # ...and add his personal id to a list
-        idOtherPlayer.append(dfOtherPlayers['player'][rowPlayers]['id'])
-        # ...and add his name to a list
-        nameOtherPlayer.append(dfOtherPlayers['player'][rowPlayers]['name'])
-        # ...and add his position id to a list
-        idPosition.append(dfOtherPlayers['position'][rowPlayers]['id'])
-        # ...and add the position name to a list
-        namePosition.append(dfOtherPlayers['position'][rowPlayers]['name'])
+    # if the dataframe of other players is empty, it generates a key error, this error has to be cathced
+    try:
+        for rowPlayers in range(len(dfOtherPlayers['player'])):
+            x = dfOtherPlayers['player']
+            # ...and add his personal id to a list
+            idOtherPlayer.append(dfOtherPlayers['player'][rowPlayers]['id'])
+            # ...and add his name to a list
+            nameOtherPlayer.append(dfOtherPlayers['player'][rowPlayers]['name'])
+            # ...and add his position id to a list
+            idPosition.append(dfOtherPlayers['position'][rowPlayers]['id'])
+            # ...and add the position name to a list
+            namePosition.append(dfOtherPlayers['position'][rowPlayers]['name'])
 
-    # the lists that were created before are now transformed back rows
-    dfOtherPlayers['id_player'] = idOtherPlayer
-    dfOtherPlayers['name_player'] = nameOtherPlayer
-    dfOtherPlayers['id_position'] = idPosition
-    dfOtherPlayers['name_position'] = namePosition
+        # the lists that were created before are now transformed back rows
+        dfOtherPlayers['id_player'] = idOtherPlayer
+        dfOtherPlayers['name_player'] = nameOtherPlayer
+        dfOtherPlayers['id_position'] = idPosition
+        dfOtherPlayers['name_position'] = namePosition
 
-    # the x and x coordinates of each player have in the df still a list like format
-    # change this, such that x and a are additional columns in the dataframe
+        # the x and x coordinates of each player have in the df still a list like format
+        # change this, such that x and a are additional columns in the dataframe
 
-    # for better readability are the x and y coordinates changed from a list setting to single rows setting in the df
-    dfOtherPlayers = DataManipulation.coordinates(dfOtherPlayers)
+        # for better readability are the x and y coordinates changed from a list setting to single rows setting in the df
+        dfOtherPlayers = DataManipulation.coordinates(dfOtherPlayers)
 
-    # remove the columns which have a dictionary / list like format
-    dfOtherPlayers = dfOtherPlayers.drop(columns=["location", "player", "position"])
-
-    # dataframe of every player in the freeze frame is prepared: return the df
+        # remove the columns which have a dictionary / list like format
+        dfOtherPlayers = dfOtherPlayers.drop(columns=["location", "player", "position"])
+    except KeyError:
+        print("Key Error")
+    # dataframe of every player in the freeze-frame is prepared: return the df
     return dfOtherPlayers
 
 
@@ -100,22 +105,22 @@ def getTimeForDistance(distance, speed):
     return seconds
 
 
-def getHighestXGFromAlternatives(time_teammate, time_opponent, time_ball, logmodel, x_location, y_location):
+def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_location):
     # cannot return none, but can return 0
     # 0 describes no chance of scoring
     xG = 0
-
+    xP = 0
     # cases where the defender clears the ball
 
     # if the opponent is there before the teammate is there, then the opponent will clear the ball
     if time_opponent < time_teammate:
         # no further calculation needed, return the none value and close method
-        return xG
+        return xG, xP
     # case opponent is slower than the teammate, but is there before the ball arrives,
     # therefore the opponent can clear the ball
     elif time_ball > time_opponent:
         # no further calculation needed, return the none value and close method
-        return xG
+        return xG, xP
 
     # cases where the offensive player can shoot the ball
 
@@ -168,12 +173,12 @@ def getHighestXGFromAlternatives(time_teammate, time_opponent, time_ball, logmod
     # based on the angle of the location to the goal and the distance of the location to the goal
     # the prediction has to be multiplied with the xPass prediction
     # (the longer the teammate has time, the higher will be xP)
-    xgPrediction = model.predictionOfSingleValues([angle_in_rad, distance_in_yards], CONSTANTS.ATTRIBUTES, logmodel)
+    xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards])
     xG = xgPrediction * xP
     # predict returns as a dataframe
     # we only need first value out of dataframe
 
-    return xG
+    return xG, xP
 
 
 def xPModel(time_bigger, time_smaller):
@@ -193,17 +198,18 @@ def xPModel(time_bigger, time_smaller):
     # these are the possibilities to control the ball for a certain time span
     # todo: explain CDF function
     possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 4.32)
-    # find the index where the ball control time is closest to in the possible range of sec
-    for index in range(len(possible_range_of_sec)):
-        bc = possible_range_of_sec[index]
+    # find the position where the ball control time is closest to in the possible range of sec
+    position = 0
+    for position in range(len(possible_range_of_sec)):
+        bc = possible_range_of_sec[position]
         # math is close compares floats
         # if abs(ball control time - bc) is less than 1e-9 * max(abs(ball control time), abs(bc)),
         # then ball control time and bc are considered "close" to each other.
         # This guarantees that a and b are equal to about nine decimal places.
         # https://davidamos.dev/the-right-way-to-compare-floats-in-python/
         if math.isclose(ball_control_time, bc):
-            # if the index is found, stop the loop
-            # the index is still saved as a variable
+            # if the position is found, stop the loop
+            # the position is still saved as a variable
             break
-    xP = possible_xP_values[index]
+    xP = possible_xP_values[position]
     return xP

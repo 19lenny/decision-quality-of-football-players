@@ -1,6 +1,7 @@
 from statsbombpy import sb
 import pandas as pd
-import DataManipulation, CONSTANTS
+from SetUp import DataManipulation, CONSTANTS
+from tqdm import tqdm
 
 """
 modelDF: prepare the dataset of all Competition, expect EM2020 & WM2022, such a model can be created from the data.
@@ -25,19 +26,27 @@ print(seasonIDs)
 dfShotModelData = pd.DataFrame()
 dfAllMatches = pd.DataFrame()
 counter = 0
+#set up
+dfMatches = pd.DataFrame()
+comp = []
+seas = []
 
 # go through every season in every competition, except the one that are getting evaluated
-for index in range(len(competitionIDs)):
+for index in tqdm(range(len(competitionIDs)), colour='green'):
+
+
     # lets get all the matches of all seasons, except the ones we defined for our evaluation
     # EM2020: compID: 55, seasonID: 43
     # WM2022: compID: 43, seasonID: 106
+    # WM2018: compID: 43, seasonID: 3
 
     currentCompetition = competitionIDs[index]
     currentSeason = seasonIDs[index]
-    print("progress bar: ", index, "/", len(competitionIDs))
+    #print("progress bar getting the data for the model: ", index, "/", len(competitionIDs))
     try:
-        if (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106):
-            print("comp: ", currentCompetition, " season: ", currentSeason)
+        # todo: debug if this is correct
+        if (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106) and (currentCompetition != 43 or currentSeason != 3):
+            #print("comp: ", currentCompetition, " season: ", currentSeason)
             # get all matches of the current competition / season
             dfMatches = pd.DataFrame(sb.matches(currentCompetition, currentSeason))
             # all MatchIDs of the current season
@@ -52,18 +61,24 @@ for index in range(len(competitionIDs)):
             # here go through every event in every match
             for event in matchIDs:
                 getEventsInMatch = sb.events(event)
-                print("i am still working, nothing to worry")
+                #print("i am still working, nothing to worry")
                 # only keep the necessary rows,
                 # which have something to do with shots and are not from penalties or freekicks
                 getEventsInMatch = getEventsInMatch.query(
                     "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
                 # add them to the current model
                 dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])
+                # add to every shot the current competition and current season
+                comp.append(currentCompetition)
+                seas.append(currentSeason)
 
     except AttributeError:
         counter += 1
         print("fail counter: ", counter)
-        print("fail happened in comp: ", currentCompetition, " in season: ", currentSeason)
+        print("data cannot be retrieved in comp: ", currentCompetition, " in season: ", currentSeason)
+# add the competition and the season to the df
+dfShotModelData['competition_id'] = comp
+dfShotModelData['season_id'] = seas
 
 # join Shots and Matches
 # therefore we know from every score the competition stage, the competition and additional information
@@ -89,7 +104,7 @@ dfModelData = dfModelData[
     ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "angleInRadian", "distance_to_goal_centre",
      "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
      "minute", "shot_type", "match_date", "competition",
-     "season", "home_team", "away_team", "home_score", "away_score", "competition_stage"]]
+     "season", "home_team", "away_team", "home_score", "away_score", "competition_stage", "match_id", "competition_id", "season_id"]]
 
 # reset the index, so a new index is created
 dfModelData.reset_index(inplace=True)
@@ -99,6 +114,6 @@ dfModelData.reset_index(inplace=True)
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
-dfModelData.to_json(CONSTANTS.JSONMODELALLSHOTS)
+dfModelData.to_json(CONSTANTS.JSONTRAINSHOTS)
 
-print("i am finished")
+print("i am finished with downloading the training set")

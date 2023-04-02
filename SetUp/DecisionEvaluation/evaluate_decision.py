@@ -1,15 +1,16 @@
 from typing import List
-from SetUp import JSONtoDF, DataManipulation, CONSTANTS
+from SetUp import DataManipulation, CONSTANTS
 import numpy as np
-from DecisionEvaluation import evaluationHelper
-from DecisionEvaluation import offside
+from SetUp.DecisionEvaluation import evaluationHelper, offside
 
 
-def XGdifference(dfSeason, eventname):
+def decisionEvaluation(dfSeason, eventname):
     # create a list to fill the alternative xG Values
     xG_best_alternative: List[float] = [0.0] * len(dfSeason)
     # create a list to fill the difference between the shooters decision and the best alternative
     xG_difference: List[float] = [0.0] * len(dfSeason)
+    # create a list to fill the xPass to the best alternatives
+    xP_best_alternative: List[float] = [0.0] * len(dfSeason)
     # create a list to track if the players make the right decisions
     shot_correct_decision: List[bool] = [True] * len(dfSeason)
     # create a list to save the location of the best alternative solution
@@ -24,11 +25,13 @@ def XGdifference(dfSeason, eventname):
         # if shot freeze frame is empty, it still works, but returns 0 for x and y best alternative
         # get all players that were in the frame during the current shot and put in to a df
         dfOtherPlayers = evaluationHelper.getPlayersOfEvent(dfSeason['shot_freeze_frame'][currentShot], eventname)
-
+        #if no other players are in the dataframe nothing is to fill out and this shot can be skipped
+        if dfOtherPlayers.empty:
+            continue
         # now the dataset is ready to check if the player originally made a good decision with shooting
 
         # get the calculated xG value for the current shot
-        shooting_player_xG = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][currentShot]
+        shooting_player_xG = dfSeason[CONSTANTS.MODELNAME][currentShot]
         x_shooting_player = dfSeason['x_coordinate'][currentShot]
         y_shooting_player = dfSeason['y_coordinate'][currentShot]
 
@@ -43,7 +46,7 @@ def XGdifference(dfSeason, eventname):
         # all Teammates which are offside are not taken in to account and are therefore thrown out of the df
         dfTeammates = dfOtherPlayers.loc[
             (dfOtherPlayers['teammate'] == True) & (dfOtherPlayers['isOffside'] == False)]
-        # the index has to be reseted, otherwise we cannot go through with a for loop
+        # the index has to be reset, otherwise we cannot go through with a for loop
         dfTeammates.reset_index(inplace=True)
         dfOpponents = dfOtherPlayers.loc[dfOtherPlayers['teammate'] == False]
         dfOpponents.reset_index(inplace=True)
@@ -67,6 +70,9 @@ def XGdifference(dfSeason, eventname):
 
         for x in x_range_pitch:
             for y in y_range_pitch:
+                # the player cannot shoot, when the ball is in the post --> the posts should be skipped
+                if (x == 120) and (y == 36 or y == 44):
+                    continue
                 # debug
                 # find the distance the ball has to travel to get from its current location to the location looked at
                 ball_distance = DataManipulation.distanceObjectToPoint(x_shooting_player, y_shooting_player, x, y)
@@ -85,7 +91,7 @@ def XGdifference(dfSeason, eventname):
                     # check if the goalkeeper has the longer distance to the square than our team member
                     # if not (goalkeeper has shorter way) everything's ok
                     if distance_closest_opponent > distance_closest_teammate:
-                        # if the opponent goal keeper has the longer way than our team member,
+                        # if the opponent goalkeeper has the longer way than our team member,
                         # take goalkeeper out of the opponent dataframe and calculate again for another player of the opponent
                         dfOpponentsNoGK = dfOpponents.loc[dfOpponents['name_position'] != 'Goalkeeper']
                         dfOpponentsNoGK.reset_index(inplace=True)
@@ -102,77 +108,46 @@ def XGdifference(dfSeason, eventname):
                                                                        CONSTANTS.PLAYER_SPEED)
 
                 # calculate xG for current location, if xG is higher as the last calculated xG, save the value
-                highest_alternative_xG_for_current_Location = \
-                    evaluationHelper.getHighestXGFromAlternatives(time_team_member,
-                                                                  time_opponent,
-                                                                  time_ball,
-                                                                  logmodel=CONSTANTS.REGMODELINTERC,
-                                                                  x_location=x, y_location=y)
+
+                xG_for_current_location, xP_for_current_location = \
+                evaluationHelper.xGFromAlternative(time_team_member,
+                                                   time_opponent,
+                                                   time_ball,
+                                                   x_location=x, y_location=y)
+
 
                 # if the alternative xG value for this current location is higher than for the other ones,
                 # than update for the current shot the highest xG alternative
-                if highest_alternative_xG_for_current_Location > xG_best_alternative[currentShot]:
-                    xG_best_alternative[currentShot] = highest_alternative_xG_for_current_Location
-                    xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAMEINTERCEPT][
-                                                     currentShot] - highest_alternative_xG_for_current_Location
-                    if xG_difference[currentShot] <= 0:
-                        shot_correct_decision[currentShot] = False
-                    else:
-                        shot_correct_decision[currentShot] = True
+                if xG_for_current_location > xG_best_alternative[currentShot]:
+                    xG_best_alternative[currentShot] = xG_for_current_location
+                    # if the difference is negative, the player took the wrong decision
+                    xG_difference[currentShot] = dfSeason[CONSTANTS.MODELNAME][
+                                                     currentShot] - xG_for_current_location
+                    # add the xP of the best alternative
+                    xP_best_alternative[currentShot] = xP_for_current_location
                     # if x_alternative == 0 and y_alternative == 0 then no other teammate is in the current frame
                     x_alternative[currentShot] = x
                     y_alternative[currentShot] = y
                     # create a list to save the player from the best alternative solution
                     alternative_player[currentShot] = name_closest_teammate
+                    # add xPass
+                    if xG_difference[currentShot] < 0:
+                        shot_correct_decision[currentShot] = False
+                    else:
+                        shot_correct_decision[currentShot] = True
 
-        print("progress bar: ", currentShot, " / ", len(dfSeason) - 1, " | ", currentShot / (len(dfSeason) - 1) * 100,
+
+        print("progress bar of xG alternatives: ", currentShot, " / ", len(dfSeason) - 1, " | ", currentShot / (len(dfSeason) - 1) * 100,
               "%")
 
     dfSeason['xG_best_alternative'] = xG_best_alternative
     dfSeason['xG_Delta_decision_alternative'] = xG_difference
     dfSeason['shot_decision_correct'] = shot_correct_decision
+    dfSeason['xP_best_alternative'] = xP_best_alternative
     dfSeason['x_best_alt'] = x_alternative
     dfSeason['y_best_alt'] = y_alternative
     dfSeason['player_name_alt'] = alternative_player
 
-    # dfSeason.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM20INT.json")
-    # todo: drop shot_statsbomb xg
-    attributes_to_drop = ["index", "shot_end_location", "shot_outcome", "shot_body_part", "play_pattern",
-                          "shot_freeze_frame", "shot_type", "season"]
-
-    dfSeason = dfSeason.drop(columns=attributes_to_drop)
-    return dfSeason
-"""
-    dfReadability = dfSeason[
-        ["angle", "distance_to_goal_centre", CONSTANTS.MODELNAMEINTERCEPT, "xG_best_alternative",
-         "shot_decision_correct",
-         "x_best_alt", "y_best_alt", "match_id", "player", "minute"]]
-    # dfReadability.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM20ReadableINT.json")
-    print("number of x_coordinate == 120: ", len(dfReadability[dfReadability['x_best_alt'] == 120]))
-    print("number of x_coordinate == 0: ", len(dfReadability[dfReadability['x_best_alt'] == 0]))
-    print("number of all shots at", eventname, ": ", len(dfReadability['minute']))
-    print("number of right decision: ", len(dfReadability[dfReadability['shot_decision_correct'] == True]))
-    print("number of wrong decision: ", len(dfReadability[dfReadability['shot_decision_correct'] == False]))
-"""
-
-
-
-
-# get the season for which the evaluation should be done for
-"""
-dfSeasonEM = JSONtoDF.createDF(CONSTANTS.JSONEM2020)
-dfSeasonEM = XGdifference(dfSeasonEM, "EM20")
-attributes_to_drop = ["index", "shot_end_location", "shot_outcome", "shot_body_part", "play_pattern",
-                      "shot_freeze_frame", "shot_type", "season"]
-
-dfSeasonEM = dfSeasonEM.drop(columns=attributes_to_drop)
-dfSeasonEM.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationEM20INT.json")
-
-dfSeasonWM = JSONtoDF.createDF(CONSTANTS.JSONWM2022)
-dfSeasonWM = XGdifference(dfSeasonWM, "WM22")
-attributes_to_drop = ["index", "shot_end_location", "shot_outcome", "shot_body_part", "play_pattern",
-                      "shot_freeze_frame", "shot_type", "season"]
-
-dfSeasonWM = dfSeasonWM.drop(columns=attributes_to_drop)
-dfSeasonWM.to_json(CONSTANTS.JSONFILEPATH + "ShotEvaluationWM22INT.json")
-"""
+    attributes_added = 'xG_best_alternative', 'xG_Delta_decision_alternative', 'shot_decision_correct', \
+        'xP_best_alternative', 'x_best_alt', 'y_best_alt', 'player_name_alt'
+    return dfSeason, attributes_added

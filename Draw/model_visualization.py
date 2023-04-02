@@ -1,21 +1,14 @@
 # create a test model for 10 particular shot not for a whole dataframe
 # here it can be shown hot the model works
 
-from typing import List
 import pandas as pd
-
-from Draw import FCPython
-from Model import model
+from Model import model_info
 from SetUp import JSONtoDF, DataManipulation, CONSTANTS
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from DecisionEvaluation import evaluationHelper
-from IPython.display import set_matplotlib_formats
 
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-from DecisionEvaluation import offside
+
 
 def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
     square_meter_size = square_meter_size
@@ -72,7 +65,7 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
             # based on the angle of the location to the goal and the distance of the location to the goal
             # the prediction has to be multiplied with the xPass prediction
             # (the longer the teammate has time, the higher will be xP)
-            xgPrediction = model.predictionOfSingleValues([angle_in_rad, distance_in_yards], CONSTANTS.ATTRIBUTES, logmodel)
+            xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards])
 
             xList.append(x)
             yList.append(y)
@@ -106,7 +99,6 @@ def draw_xG_model(dfXGGrid, saving_location, title):
 
 
     # Generate a color mapping of the levels we've specified
-    import matplotlib.cm as cm  # matplotlib's color map library
 
     cpf = ax.contourf(X, Y, Z, levels= [0,0.07, 0.15,0.3,1],
                       colors=['#006F01','#49be25','#96be25', '#fb5f04', '#FF2300'], alpha=0.7, antialiased = True)
@@ -192,7 +184,7 @@ def df_goals_divided_by_shots():
 
 # calculate for every x and y coordinate the xGoal
 # shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25, modelname=CONSTANTS.REGMODELINTERC)
+xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
 #draw the xG histogram
 draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis.png", title="xGModel")
 

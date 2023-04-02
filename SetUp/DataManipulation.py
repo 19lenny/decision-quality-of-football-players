@@ -94,6 +94,32 @@ def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
     return dataframe
 
+"""
+isWinning determines if a team is currently (before the current shot decision) winning, drawing or loosing
+if the team that takes the shot is winning, the function returns 1, is drawing returns 0, is loosing returns -1
+"""
+def isWinning(shooting_team, home_team, home_team_score, away_team_score):
+    if shooting_team == home_team:
+        if home_team_score > away_team_score:
+            return 1
+        elif home_team_score == away_team_score:
+            return  0
+        elif home_team_score < away_team_score:
+            return -1
+    else:
+        if home_team_score > away_team_score:
+            return -1
+        elif home_team_score == away_team_score:
+            return 0
+        elif home_team_score < away_team_score:
+            return 1
+
+"""
+calculates the score of every shot in the whole dataframe
+the score is always the score before the actual shot happened
+this is done like this because the previous result has influence on the player and his shot 
+and NOT the score after the shot!
+"""
 def score(df):
     # first extract all match id of dataframe in a unique list
     match_id = df[["match_id"]].drop_duplicates()
@@ -101,50 +127,98 @@ def score(df):
     dfUpdated = pd.DataFrame()
     # the scores are seen from the home team perspective
 
-    for match in match_id:
+    for match in range(len(match_id)):
         # set up for every match
-        dfCurrentMatch = df[df['match_id'] == match[0]].sort_values(by = ['minute'])
+        # get all shots that happened for the current match id,
+        # sort all these shot according to minutes
+        # 0 hast to be there since match id is a double list
+        dfCurrentMatch = df.loc[df['match_id'] == match_id[match][0]].sort_values(by = ['minute'])
         # reset index to go through in the for loop
         dfCurrentMatch.reset_index(inplace=True)
-        index = 0
+        # create helper lists that should be filled
+        position = 0
+        # scores determines if the current shooting team is before the current shot either winning, drawing or loosing
+        # if it is positive the shooting team is winning before taking the current shot
+        # if it is 0 the shooting team is drawing before the current shot
+        # if it is negative the shooting team is loosing before the current shot
         scores: List[int] = [0] * len(dfCurrentMatch)
+        # determines the scoring difference between the two opponents
+        # previous_overall_scoring_difference is the scoring difference between the two opponents,
+        # if it is 0 the result is a draw
+        # if it is positive the home team is winning
+        # if it is negative the away team is winning
+        scoring_difference: List[int] = [0] * len(dfCurrentMatch)
+        # the score of the home team, before a shot is taken
         score_home_team: List[int] = [0] * len(dfCurrentMatch)
+        # the score of the away team, before the shot is taken
         score_away_team: List[int] = [0] * len(dfCurrentMatch)
-        previous_score = 0
+
+        # helper variables that calculate the scores
+
+        previous_overall_scoring_difference = 0
+        # these two variables show the live result during the shots
+        # if the score in 67th minute is 2:1 in Germany vs Switzerland,
+        # then the shot that is following after the 67th minute shows this result with
+        # previous_home_team_score = 2, previous_away_team_score = 1
         previous_home_team_score = 0
         previous_away_team_score = 0
-        for shot in range(len(dfCurrentMatch)):
-            home_team = dfCurrentMatch['home_team'][shot]
-            away_team = dfCurrentMatch['away_team'][shot]
-            shooting_team = dfCurrentMatch['team'][shot]
 
+        # go through every shot in the current match (the shots are sorted by minute)
+        for shot in range(len(dfCurrentMatch)):
+            # who is the home team of the game
+            home_team = dfCurrentMatch['home_team'][shot]
+            # who is the away team of the game
+            away_team = dfCurrentMatch['away_team'][shot]
+            # which team fired the shot
+            shooting_team = dfCurrentMatch['team'][shot]
+            # did the current shot lead to a goal? then we have to adjust the score
             if dfCurrentMatch['goal'][shot] == 1:
                 # home team scored
                 if shooting_team == home_team:
-                    previous_score += 1
+
+                    # all the scores are updated with the last score in the game
+                    # they are not updated with the new score, because the player made the decision to shoot, under the old score
+                    # the next decision taken is influenced by the new result, BUT the shot that was taken to shoot the goal was taken influenced by the old score
+                    scoring_difference[position] = previous_overall_scoring_difference
+                    score_home_team[position] = previous_home_team_score
+                    score_away_team[position] = previous_away_team_score
+                    # scores evaluates
+                    scores[position] = isWinning(shooting_team=shooting_team, home_team=home_team,
+                                                 home_team_score=previous_home_team_score, away_team_score=previous_away_team_score)
+                    # add the goal to the scoring line
+                    # it is added to the dataframe with the next shot, because the next shot is influenced by the new score
                     previous_home_team_score += 1
+                    previous_overall_scoring_difference += previous_home_team_score - previous_away_team_score
 
-                    scores[index] = previous_score
-                    score_home_team[index] = previous_home_team_score
-                    score_away_team[index] = previous_away_team_score
-                # away team score
+                # away team scores
                 else:
-                    previous_score -= 1
-                    previous_away_team_score += 1
 
-                    scores[index] = previous_score
-                    score_home_team[index] = previous_home_team_score
-                    score_away_team[index] = previous_away_team_score
+                    #same as home team score
+                    scoring_difference[position] = previous_overall_scoring_difference
+                    score_home_team[position] = previous_home_team_score
+                    score_away_team[position] = previous_away_team_score
+                    scores[position] = isWinning(shooting_team=shooting_team, home_team=home_team,
+                                              home_team_score=previous_home_team_score,
+                                              away_team_score=previous_away_team_score)
+
+                    previous_away_team_score += 1
+                    previous_overall_scoring_difference += previous_home_team_score - previous_away_team_score
+
             # no goal happened
             else:
 
-                scores[index] = previous_score
-                score_home_team[index] = previous_home_team_score
-                score_away_team[index] = previous_away_team_score
-            index += 1
-        dfCurrentMatch['score'] = scores
+                scoring_difference[position] = previous_overall_scoring_difference
+                score_home_team[position] = previous_home_team_score
+                score_away_team[position] = previous_away_team_score
+                scores[position] = isWinning(shooting_team=shooting_team, home_team=home_team,
+                                          home_team_score=previous_home_team_score,
+                                          away_team_score=previous_away_team_score)
+            position += 1
+
+        dfCurrentMatch['scoring_difference'] = scoring_difference
         dfCurrentMatch['home_score'] = score_home_team
         dfCurrentMatch['away_score'] = score_away_team
+        dfCurrentMatch['score'] = scores
         dfUpdated = pd.concat([dfUpdated, dfCurrentMatch])
     dfUpdated.reset_index(drop=True, inplace=True)
     return dfUpdated

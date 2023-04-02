@@ -1,18 +1,10 @@
 # create a test model for 10 particular shot not for a whole dataframe
 # here it can be shown hot the model works
 
-from typing import List
 import pandas as pd
-
-from Draw import FCPython
-from Model import model
-from SetUp import JSONtoDF, DataManipulation, CONSTANTS
+from Model import model_info
+from SetUp import DataManipulation, CONSTANTS
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-from DecisionEvaluation import evaluationHelper
-
-from DecisionEvaluation import offside
 
 square_meter_size = 1
 max_shot_distance = 20
@@ -44,7 +36,7 @@ for x in x_range_pitch:
             yList.append(y)
             xGList.append(xgPrediction)
             continue
-        logmodel = CONSTANTS.REGMODELINTERC
+        logmodel = CONSTANTS.REGRESSION_MODEL
         x_location = x
         y_location = y
 
@@ -60,7 +52,7 @@ for x in x_range_pitch:
         # based on the angle of the location to the goal and the distance of the location to the goal
         # the prediction has to be multiplied with the xPass prediction
         # (the longer the teammate has time, the higher will be xP)
-        xgPrediction = model.predictionOfSingleValues([angle_in_rad, distance_in_yards], CONSTANTS.ATTRIBUTES, logmodel)
+        xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards], CONSTANTS.ATTRIBUTES, logmodel)
 
         xList.append(x)
         yList.append(y)
