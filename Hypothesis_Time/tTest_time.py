@@ -2,7 +2,7 @@ from typing import List
 from scipy.stats import ttest_ind
 import pandas as pd
 
-from SetUp import JSONtoDF, CONSTANTS
+from SetUp import JSONtoDF, CONSTANTS, DataManipulation
 from scipy.stats import levene
 """
 this file tests the time hypotheses based on tTests.
@@ -32,8 +32,14 @@ Der Levene-Test verwendet die Nullhypothese, dass sich die beiden Varianzen nich
 Daher bedeutet ein nicht signifikantes Ergebnis, dass sich die Varianzen nicht unterscheiden und somit Varianzhomogenität vorliegt. 
 Ist der Test signifikant, so wird von Varianzheterogenität ausgegangen.
 source: https://www.methodenberatung.uzh.ch/de/datenanalyse_spss/unterschiede/zentral/ttestunabh.html#3.4._Ergebnisse_des_t-Tests_f%C3%BCr_unabh%C3%A4ngige_Stichproben
+https://www.statisticshowto.com/t-statistic/
 """
-#todo: levene test correct, ttest correct?
+
+# check if the assumption of normal distribution is given
+normal_dist = DataManipulation.check_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+if not normal_dist:
+    normal_dist = DataManipulation.tranf_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+
 
 # H0: the decisions in the first half are the same as the ones in the second half
 # H1: first half decisions are better than second half ones
@@ -88,7 +94,7 @@ result_first_vs_second_ot, pVal = ttest_ind(xG_Delta_first_half_ot, xG_Delta_sec
 t_Test.append(result_first_vs_second_ot)
 p_val.append(pVal)
 
-# todo: unterschied in den Gruppen wahrscheinlich zu gross
+
 # H0: the decisions in the regular time are the same as the ones in the overtime
 # H1: regular time decisions are better than overtime decisions
 # reject H0 if pval < alpha
@@ -106,7 +112,7 @@ factor_two.append("over time")
 median_two.append(mean_over_time)
 nr_shots_two.append(len(xG_Delta_over_time))
 
-lev, p = levene(xG_Delta_first_half_ot, xG_Delta_second_half_ot)
+lev, p = levene(xG_Delta_regular_time, xG_Delta_regular_time)
 levene_test.append(lev)
 p_val_levene.append(p)
 result_regular_vs_over, pVal = ttest_ind(xG_Delta_regular_time, xG_Delta_over_time)
@@ -120,11 +126,12 @@ data = pd.DataFrame({"factor one" : factor_one,
                      "median one": median_one,
                      "median two": median_two,
                      "tTest" : t_Test,
-                     "p_val" : pVal,
+                     "p_val" : p_val,
                      "number of shots one": nr_shots_one,
                      "number of shots two": nr_shots_two,
                      "levene val": levene_test,
                      "p_val levene": p_val_levene})
+
 
 
 data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Time/results/tTest_time.json")

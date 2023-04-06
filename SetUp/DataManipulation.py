@@ -4,7 +4,9 @@ import pandas as pd
 import numpy as np
 from statsbombpy import sb
 from SetUp import CONSTANTS
-
+import math
+from scipy.stats import shapiro, kstest
+import matplotlib.pyplot as plt
 """
 DataManipulationAngleDistance: all methods receive a dataframe.
 This dataframe is manipulated. 
@@ -222,3 +224,52 @@ def score(df):
         dfUpdated = pd.concat([dfUpdated, dfCurrentMatch])
     dfUpdated.reset_index(drop=True, inplace=True)
     return dfUpdated
+
+"""
+normal distibution is not mandatory.
+Some researchers say the test is robust enough to work without the normal distribution:
+https://statistikguru.de/spss/ungepaarter-t-test/normalverteilung-verletzt-4.html#:~:text=Simulationsstudien%20haben%20gezeigt%2C%20dass%20der,%2DU%2DTest%20genannt).
+Kubinger, Rasch, und Moder (2009) gehen sogar noch einen Schritt weiter und empfehlen ab einer Stichprobengröße von 30
+gar nicht erst die Normalverteilung zu überprüfen, dafür aber den t-Test für ungleiche Varianzen (auch Welch-Test genannt)
+stattdessen zu interpretieren, was wir auf den nachfolgenden Seiten auch noch ausführlicher besprechen werden.
+Die Alternative zu einem tTest wäre: Wilcoxon-Mann-Whitney-Test (auch Mann-Whitney-U-Test genannt)
+"""
+def check_normal_distribution(df):
+    plt.hist(df[CONSTANTS.EVALUATION_VARIABLE], edgecolor='black', bins=20)
+    plt.show()
+
+    kolmo_val, p_val = shapiro(df[CONSTANTS.EVALUATION_VARIABLE])
+    if p_val > 0.05:
+        print("data is normal distributed")
+        return True
+    else:
+        print("data is not normal distributed")
+        return False
+
+def tranf_normal_distribution(df):
+    #first try to transform the data to a x_log
+    x_log = pd.DataFrame()
+    x_log[CONSTANTS.EVALUATION_VARIABLE] = np.log(abs(df[CONSTANTS.EVALUATION_VARIABLE])+0.0000001)
+    normal_distr = check_normal_distribution(x_log)
+
+    x_square = pd.DataFrame()
+    x_square[CONSTANTS.EVALUATION_VARIABLE] = np.sqrt(abs(df[CONSTANTS.EVALUATION_VARIABLE]))
+    normal_distr_square = check_normal_distribution(x_square)
+
+    #cube root transformation
+    x_cube = pd.DataFrame()
+    x_cube[CONSTANTS.EVALUATION_VARIABLE] = np.cbrt(abs(df[CONSTANTS.EVALUATION_VARIABLE]))
+    normal_distr_cube = check_normal_distribution(x_cube)
+
+    if normal_distr:
+        print("data is normal distributed when transformed to log")
+        return True
+    elif normal_distr_square:
+        print("data is normal distributed when transformed with square root")
+        return True
+    elif normal_distr_cube:
+        print("data is normal distributed when transformed with cube root")
+        return True
+    else:
+        print("data is NOT normal distributed")
+        return False

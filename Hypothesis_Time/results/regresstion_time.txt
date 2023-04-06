@@ -1,0 +1,25 @@
+                                  OLS Regression Results                                 
+=========================================================================================
+Dep. Variable:     xG_Delta_decision_alternative   R-squared:                       0.000
+Model:                                       OLS   Adj. R-squared:                 -0.000
+Method:                            Least Squares   F-statistic:                    0.6469
+Date:                           Thu, 06 Apr 2023   Prob (F-statistic):              0.421
+Time:                                   14:58:12   Log-Likelihood:                 1815.2
+No. Observations:                           2739   AIC:                            -3626.
+Df Residuals:                               2737   BIC:                            -3615.
+Df Model:                                      1                                         
+Covariance Type:                       nonrobust                                         
+===================================================================================
+                      coef    std err          t      P>|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept          -0.0596      0.003    -18.459      0.000      -0.066      -0.053
+is_first_period     0.0039      0.005      0.804      0.421      -0.006       0.013
+==============================================================================
+Omnibus:                      982.949   Durbin-Watson:                   2.005
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            12262.103
+Skew:                          -1.339   Prob(JB):                         0.00
+Kurtosis:                      13.014   Cond. No.                         2.53
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

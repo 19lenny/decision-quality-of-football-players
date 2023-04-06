@@ -12,6 +12,7 @@ GLM is a generalized linear model and Logit Model is specific to models with bin
 While using GLM model you have to mention the parameter family which can be binomial (logit model), Poisson etc. 
 This parameter is not required in Logit model as its only for binary output. 
 source: https://stackoverflow.com/questions/62622779/what-is-the-difference-between-glm-and-logit-model-with-statsmodels#:~:text=GLM%20is%20a%20generalized%20linear,its%20only%20for%20binary%20output.
+https://en.wikipedia.org/wiki/Generalized_linear_model
 the output is the same as with 
 log_reg = smf.logit("goal ~ angleInRadian + distance_to_goal_centre", data = df).fit()
 i tested it"""

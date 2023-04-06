@@ -137,7 +137,7 @@ def transfermarketValue(dfCompetition, competition):
     #  maybe join has to go up
     #  check for special cases and add them
     dfCompetition, added_attributes = join(dfCompetition=dfCompetition, dfValues=dfValues)
-    return dfCompetition, added_attributes
+    return dfCompetition
 
 def exceptionCases(player_name, dfValues):
     name_searched = None

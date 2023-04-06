@@ -11,6 +11,18 @@ def decisionEvaluation(dfSeason, eventname):
     xG_difference: List[float] = [0.0] * len(dfSeason)
     # create a list to fill the xPass to the best alternatives
     xP_best_alternative: List[float] = [0.0] * len(dfSeason)
+    # add the times from xP so a better debug check can happen
+    time_ball_list: List[float] = [0.0] * len(dfSeason)
+    time_teammember_list:List[float] = [0.0] * len(dfSeason)
+    time_opponent_list: List[float] = [0.0] * len(dfSeason)
+    ball_control_time_list: List[float] = [0.0] * len(dfSeason)
+    x_opponent: List[float] = [0.0] * len(dfSeason)
+    y_opponent: List[float] = [0.0] * len(dfSeason)
+    x_ball: List[float] = [0.0] * len(dfSeason)
+    y_ball: List[float] = [0.0] * len(dfSeason)
+    ball_distance_list: List[float] = [0.0] * len(dfSeason)
+    teammate_distance: List[float] = [0.0] * len(dfSeason)
+    opponent_distance: List[float] = [0.0] * len(dfSeason)
     # create a list to track if the players make the right decisions
     shot_correct_decision: List[bool] = [True] * len(dfSeason)
     # create a list to save the location of the best alternative solution
@@ -109,7 +121,7 @@ def decisionEvaluation(dfSeason, eventname):
 
                 # calculate xG for current location, if xG is higher as the last calculated xG, save the value
 
-                xG_for_current_location, xP_for_current_location = \
+                xG_for_current_location, xP_for_current_location, ball_control_time = \
                 evaluationHelper.xGFromAlternative(time_team_member,
                                                    time_opponent,
                                                    time_ball,
@@ -125,9 +137,21 @@ def decisionEvaluation(dfSeason, eventname):
                                                      currentShot] - xG_for_current_location
                     # add the xP of the best alternative
                     xP_best_alternative[currentShot] = xP_for_current_location
+                    time_ball_list[currentShot] = time_ball
+                    time_opponent_list[currentShot] = time_opponent
+                    time_teammember_list[currentShot] = time_team_member
+                    ball_control_time_list[currentShot] = ball_control_time
                     # if x_alternative == 0 and y_alternative == 0 then no other teammate is in the current frame
-                    x_alternative[currentShot] = x
-                    y_alternative[currentShot] = y
+                    x_alternative[currentShot] = closest_teammate_x
+                    y_alternative[currentShot] = closest_teammate_y
+                    x_ball[currentShot] = x
+                    y_ball[currentShot] = y
+                    x_opponent[currentShot] = closest_opponent_x
+                    y_opponent[currentShot] = closest_opponent_y
+                    ball_distance_list[currentShot] = ball_distance
+                    teammate_distance[currentShot] = distance_closest_teammate
+                    opponent_distance[currentShot] = distance_closest_opponent
+
                     # create a list to save the player from the best alternative solution
                     alternative_player[currentShot] = name_closest_teammate
                     # add xPass
@@ -144,10 +168,19 @@ def decisionEvaluation(dfSeason, eventname):
     dfSeason['xG_Delta_decision_alternative'] = xG_difference
     dfSeason['shot_decision_correct'] = shot_correct_decision
     dfSeason['xP_best_alternative'] = xP_best_alternative
+    dfSeason['ball_control_time'] = ball_control_time_list
+    dfSeason['time_ball'] = time_ball_list
+    dfSeason['time_teammember'] = time_teammember_list
+    dfSeason['time_opponent'] = time_opponent_list
+    dfSeason['distance_ball'] = ball_distance_list
+    dfSeason['distance_teammember'] = teammate_distance
+    dfSeason['distance_opponent'] = opponent_distance
+    dfSeason['x_ball'] = x_ball
+    dfSeason['y_ball'] = y_ball
     dfSeason['x_best_alt'] = x_alternative
     dfSeason['y_best_alt'] = y_alternative
+    dfSeason['x_opponent'] = x_opponent
+    dfSeason['y_opponent'] = y_opponent
     dfSeason['player_name_alt'] = alternative_player
 
-    attributes_added = 'xG_best_alternative', 'xG_Delta_decision_alternative', 'shot_decision_correct', \
-        'xP_best_alternative', 'x_best_alt', 'y_best_alt', 'player_name_alt'
-    return dfSeason, attributes_added
+    return dfSeason

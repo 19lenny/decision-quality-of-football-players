@@ -110,17 +110,18 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
     # 0 describes no chance of scoring
     xG = 0
     xP = 0
+    ball_control_time = 0
     # cases where the defender clears the ball
 
     # if the opponent is there before the teammate is there, then the opponent will clear the ball
     if time_opponent < time_teammate:
         # no further calculation needed, return the none value and close method
-        return xG, xP
+        return xG, xP, ball_control_time
     # case opponent is slower than the teammate, but is there before the ball arrives,
     # therefore the opponent can clear the ball
     elif time_ball > time_opponent:
         # no further calculation needed, return the none value and close method
-        return xG, xP
+        return xG, xP, ball_control_time
 
     # cases where the offensive player can shoot the ball
 
@@ -136,7 +137,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
         # the limitation factor for time is when the ball is arriving
         # the opponent is arriving after the ball
         # therefore time to control the ball = time_opponent - time_ball
-        xP = xPModel(time_opponent, time_ball)
+        xP, ball_control_time = xPModel(time_opponent, time_ball)
 
         # since the xG is calculated the same for every case, it is calculated in the end
         # the only thing that changes is the xP value based on the time
@@ -153,7 +154,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
         # this means the teammate doesn't have to wait for the ball and
         # has time until the opponent is arriving to control the ball
         # therefore time to control the ball = time_opponent - time_teammate
-        xP = xPModel(time_opponent, time_teammate)
+        xP, ball_control_time = xPModel(time_opponent, time_teammate)
 
         # since the xG is calculated the same for every case, it is calculated in the end
         # the only thing that changes is the xP value based on the time
@@ -178,7 +179,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
     # predict returns as a dataframe
     # we only need first value out of dataframe
 
-    return xG, xP
+    return xG, xP, ball_control_time
 
 
 def xPModel(time_bigger, time_smaller):
@@ -213,4 +214,4 @@ def xPModel(time_bigger, time_smaller):
             # the position is still saved as a variable
             break
     xP = possible_xP_values[position]
-    return xP
+    return xP, ball_control_time
