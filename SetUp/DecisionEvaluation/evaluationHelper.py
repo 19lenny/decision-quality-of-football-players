@@ -182,6 +182,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
 
 
 def xPModel(time_bigger, time_smaller):
+    # todo: values are way too small. adjust this function
     # source: william spearman 2018, beyond expected goals
     # the ball control time can be between 0 and 5, if it is higher than 5, the xP = 100% (according to the formula)
 

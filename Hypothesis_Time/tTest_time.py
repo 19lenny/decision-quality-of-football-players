@@ -1,7 +1,7 @@
 from typing import List
 from scipy.stats import ttest_ind
 import pandas as pd
-import tTestExecution
+
 from SetUp import JSONtoDF, CONSTANTS
 from scipy.stats import levene
 """

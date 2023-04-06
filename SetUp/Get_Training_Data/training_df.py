@@ -30,6 +30,7 @@ counter = 0
 dfMatches = pd.DataFrame()
 comp = []
 seas = []
+debugging = 0
 
 # go through every season in every competition, except the one that are getting evaluated
 for index in tqdm(range(len(competitionIDs)), colour='green'):
@@ -66,23 +67,29 @@ for index in tqdm(range(len(competitionIDs)), colour='green'):
                 # which have something to do with shots and are not from penalties or freekicks
                 getEventsInMatch = getEventsInMatch.query(
                     "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
+
                 # add them to the current model
                 dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])
+                dfShotModelData.reset_index(drop=True, inplace=True)
                 # add to every shot the current competition and current season
-                comp.append(currentCompetition)
-                seas.append(currentSeason)
+                debugging += 1
+
+                # add the competition and the season for every event to a list
+                for x in range(len(getEventsInMatch)):
+                    comp.append(currentCompetition)
+                    seas.append(currentSeason)
 
     except AttributeError:
         counter += 1
         print("fail counter: ", counter)
         print("data cannot be retrieved in comp: ", currentCompetition, " in season: ", currentSeason)
-# add the competition and the season to the df
-dfShotModelData['competition_id'] = comp
-dfShotModelData['season_id'] = seas
 
 # join Shots and Matches
 # therefore we know from every score the competition stage, the competition and additional information
-dfModelData = dfShotModelData.join(dfMatches.set_index('match_id'), on='match_id')
+dfModelData = dfShotModelData.join(dfAllMatches.set_index('match_id'), on='match_id')
+
+# reset the index, so a new index is created
+dfModelData.reset_index(drop=True, inplace=True)
 
 # before we save the df, we want to add crucial information to the shot,
 # with this information we can later create a better model
@@ -99,21 +106,28 @@ dfModelData = DataManipulation.distancePlayerToGoal(dfModelData)
 # binary solution of goal or no goal, so the model can easier be created
 dfModelData = DataManipulation.addGoalBinary(dfModelData)
 
+#add season and competition id
+# add the competition and the season to the df
+dfModelData['competition_id'] = comp
+dfModelData['season_id'] = seas
+
 # only keep the interesting columns
 dfModelData = dfModelData[
     ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "angleInRadian", "distance_to_goal_centre",
-     "shot_statsbomb_xg", "match_id", "shot_body_part", "period",
+     "shot_statsbomb_xg", "shot_body_part", "period",
      "minute", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage", "match_id", "competition_id", "season_id"]]
 
 # reset the index, so a new index is created
-dfModelData.reset_index(inplace=True)
+dfModelData.reset_index(drop=True, inplace=True)
 
 # convert the dfModelData to a JSON.
 # this is done for two reasons:
 # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
+
 dfModelData.to_json(CONSTANTS.JSONTRAINSHOTS)
+
 
 print("i am finished with downloading the training set")
