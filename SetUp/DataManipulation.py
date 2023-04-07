@@ -121,7 +121,24 @@ calculates the score of every shot in the whole dataframe
 the score is always the score before the actual shot happened
 this is done like this because the previous result has influence on the player and his shot 
 and NOT the score after the shot!
+There are several columns added to the dataframe. They are explained here:
+
+dfCurrentMatch['scoring_difference'] = scoring_difference:
+            # determines the scoring difference between the two opponents
+            # if it is 0 the result is a draw
+            # if it is positive the home team is winning
+            # if it is negative the away team is winning
+dfCurrentMatch['home_score'] = score_home_team
+            # this is the live score of the home_team
+dfCurrentMatch['away_score'] = score_away_team:
+            #this is the live score of the away team
+dfCurrentMatch['score'] = scores:
+            # scores determines if the current shooting team is before the current shot either winning, drawing or loosing
+            # if it is 1 the shooting team is winning before taking the current shot
+            # if it is 0 the shooting team is drawing before the current shot
+            # if it is -1 the shooting team is loosing before the current shot
 """
+#TODO: debug if this is done correctly
 def score(df):
     # first extract all match id of dataframe in a unique list
     match_id = df[["match_id"]].drop_duplicates()

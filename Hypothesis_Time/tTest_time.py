@@ -23,6 +23,7 @@ t_Test = []
 p_val = []
 levene_test = []
 p_val_levene = []
+interpretation = []
 
 """
 Der t-Test für unabhängige Gruppen setzt Varianzhomogenität voraus. 
@@ -60,6 +61,11 @@ factor_two.append("second half regular time")
 median_two.append(mean_second_half)
 nr_shots_two.append(len(xG_Delta_second_half))
 
+# add the interpretation for the current calculations
+if mean_first_half > mean_second_half:
+    interpretation.append("The decisions were in average "+ str(mean_first_half-mean_second_half)+" better in the first half than in the second half.")
+else: interpretation.append("The decisions were in average "+ str(mean_second_half-mean_first_half)+" better in the second half than in the first half.")
+
 lev, p = levene(xG_Delta_first_half, xG_Delta_second_half)
 levene_test.append(lev)
 p_val_levene.append(p)
@@ -87,6 +93,11 @@ factor_two.append("second half over time")
 median_two.append(mean_second_half_ot)
 nr_shots_two.append(len(xG_Delta_second_half_ot))
 
+# add the interpretation for the current calculations
+if mean_first_half_ot > mean_second_half_ot:
+    interpretation.append("The decisions were in average "+ str(mean_first_half_ot-mean_second_half_ot)+" better in the first half of ot than in the second half of ot")
+else: interpretation.append("The decisions were in average "+ str(mean_second_half_ot-mean_first_half_ot)+" better in the second half of ot than in the first half of ot.")
+
 lev, p = levene(xG_Delta_first_half_ot, xG_Delta_second_half_ot)
 levene_test.append(lev)
 p_val_levene.append(p)
@@ -112,6 +123,11 @@ factor_two.append("over time")
 median_two.append(mean_over_time)
 nr_shots_two.append(len(xG_Delta_over_time))
 
+# add the interpretation for the current calculations
+if mean_regular_time > mean_over_time:
+    interpretation.append("The decisions were in average "+ str(mean_regular_time-mean_over_time)+" better in the regular time than in ot")
+else: interpretation.append("The decisions were in average "+ str(mean_over_time-mean_regular_time)+" better in the ot than in regular time")
+
 lev, p = levene(xG_Delta_regular_time, xG_Delta_regular_time)
 levene_test.append(lev)
 p_val_levene.append(p)
@@ -119,14 +135,25 @@ result_regular_vs_over, pVal = ttest_ind(xG_Delta_regular_time, xG_Delta_over_ti
 t_Test.append(result_regular_vs_over)
 p_val.append(pVal)
 
+"""
+"Je nach Fragestellung kann es interessant sein, die Differenz zwischen den beiden Variablen zusätzlich anzugeben. " \
+"Sie steht in der Spalte Mittlere Differenz. " \
+"Aus der Tabelle mit den deskriptiven Statistiken wissen wir, dass die Gruppe ohne Alkohol kürzere Reaktionszeiten hatten" \
+" als die Gruppe mit. Wenn wir die Differenz berichten wollen, sollten wir noch ein Maß für die Variabilität dieser Differenz angeben," \
+" da der Wert alleine betrachtet nur wenig aussagekräftig ist."
 
-# todo: add interpretation
+The greater the T, the more evidence you have that your team’s scores are significantly different from average. 
+A smaller T value is evidence that your team’s score is not significantly different from average. 
+The p-value tells you what the odds are that your results could have happened by chance.
+https://www.statisticshowto.com/t-statistic/
+"""
 data = pd.DataFrame({"factor one" : factor_one,
                      "factor two" :factor_two,
                      "median one": median_one,
                      "median two": median_two,
                      "tTest" : t_Test,
                      "p_val" : p_val,
+                     "interpretation" : interpretation,
                      "number of shots one": nr_shots_one,
                      "number of shots two": nr_shots_two,
                      "levene val": levene_test,

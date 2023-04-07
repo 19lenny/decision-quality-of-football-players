@@ -72,34 +72,6 @@ def getDF(competition_id, season_id, competition, save_path):
     # - the xP of the pass that would be needed to go to the best alternative
     df_return = evaluate_decision.decisionEvaluation(df_return, competition)
 
-    # save only the needed columns
-    attributes_to_drop = ["50_50", "ball_receipt_outcome", "ball_recovery_recovery_failure", "block_deflection",
-                          "block_offensive", "block_save_block", "carry_end_location", "clearance_aerial_won",
-                          "clearance_body_part", "clearance_head", "clearance_left_foot", "clearance_right_foot",
-                          "counterpress", "dribble_outcome", "duel_outcome", "duel_type", "duration",
-                          "foul_committed_card", "foul_committed_advantage",
-                          "foul_committed_offensive", "foul_committed_penalty", "foul_committed_type",
-                          "foul_won_advantage", "foul_won_defensive", "foul_won_penalty", "goalkeeper_body_part",
-                          "goalkeeper_end_location", "goalkeeper_outcome", "goalkeeper_position",
-                          "goalkeeper_punched_out", "goalkeeper_technique", "goalkeeper_type",
-                          "injury_stoppage_in_chain",
-                          "interception_outcome", "miscontrol_aerial_won", "off_camera", "out", "pass_aerial_won",
-                          "pass_angle", "pass_assisted_shot_id", "pass_body_part", "pass_cross",
-                          "pass_cut_back", "pass_deflected", "pass_end_location", "pass_goal_assist", "pass_height",
-                          "pass_inswinging", "pass_length", "pass_miscommunication", "pass_no_touch",
-                          "pass_outcome", "pass_outswinging", "pass_recipient", "pass_shot_assist", "pass_straight",
-                          "pass_switch", "pass_technique", "pass_type", "player_id", "position", "possession",
-                          "possession_team", "possession_team_id", "related_events", "second", "shot_aerial_won",
-                          "shot_body_part",
-                          "shot_end_location", "shot_first_time", "shot_key_pass_id",
-                          "shot_technique", "shot_type", "substitution_outcome", "substitution_replacement", "tactics",
-                          "timestamp", "type", "under_pressure", "dribble_nutmeg", "pass_through_ball",
-                          "shot_deflected", "shot_redirect", "kick_off", "match_status", "match_status_360",
-                          "last_updated", "last_updated_360", "match_week", "stadium", "referee",
-                          "home_managers", "away_managers", "data_version", "shot_fidelity_version",
-                          "xy_fidelity_version"]
-    df_return = df_return.drop(columns=attributes_to_drop)
-
     # todo: these tasks
     # other file, add all analyzing files to one file
     # on the hypothesis folder only the hypothesis should happen and bedingungen für hypothesis
@@ -115,13 +87,12 @@ def getDF(competition_id, season_id, competition, save_path):
     # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
     # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
     # Therefore this code only has to be running once, the output is saved in a JSON file
-    #TODO: UNCOMMENT HERE
     df_return.to_json(save_path)
 
     print("i am finished with competition: ", competition)
 
 #get EM20
-getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
+#getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
 
 #get WM18
 getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)

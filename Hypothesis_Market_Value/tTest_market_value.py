@@ -33,7 +33,6 @@ https://www.statisticshowto.com/t-statistic/
 """
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-df_all = df_all.loc[df_all['score'] != 0]
 
 # check if the assumption of normal distribution is given
 normal_dist = DataManipulation.check_normal_distribution(df_all)
@@ -41,35 +40,38 @@ if not normal_dist:
     normal_dist = DataManipulation.tranf_normal_distribution(df_all)
 
 
-# H0: the decisions when winning are equal to the decisions when loosing
-# H1: the decisions when winning are not equal to the decisions when loosing
+# H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
+# H1: the decisions of players with a transfermarket value above mean are better than decisions of players with a transfermarket value below mean.
 # reject H0 if pval < alpha
+#todo: mean or median?
+#with median the groups are not the same size
+mean_tm_val = df_all['value'].median()
 
 # if the column score is bigger than 0 the team of the shooting player was currently winning, before the shot was fired
-df_winning = df_all.loc[df_all['score'] > 0]
-mean_winning = df_winning['xG_Delta_decision_alternative'].mean()
-xG_Delta_winning = df_winning['xG_Delta_decision_alternative'].values.tolist()
-factor_one.append("teams winning")
-median_one.append(mean_winning)
-nr_shots_one.append(len(xG_Delta_winning))
+df_expensive = df_all.loc[df_all['value'] >= mean_tm_val]
+mean_expensive = df_expensive['xG_Delta_decision_alternative'].mean()
+xG_expensive = df_expensive['xG_Delta_decision_alternative'].values.tolist()
+factor_one.append("player value above mean")
+median_one.append(mean_expensive)
+nr_shots_one.append(len(xG_expensive))
 
 # if the score is smaller than 0 the team of the shooting player was currently loosing, before the shot was fired
-df_loosing = df_all.loc[df_all['score'] < 0]
-mean_loosing = df_loosing['xG_Delta_decision_alternative'].mean()
-xG_Delta_loosing = df_loosing['xG_Delta_decision_alternative'].values.tolist()
-factor_two.append("teams loosing")
-median_two.append(mean_loosing)
-nr_shots_two.append(len(xG_Delta_loosing))
+df_cheap = df_all.loc[df_all['value'] < mean_tm_val]
+mean_cheap = df_cheap['xG_Delta_decision_alternative'].mean()
+xG_Delta_cheap = df_cheap['xG_Delta_decision_alternative'].values.tolist()
+factor_two.append("player value below mean")
+median_two.append(mean_cheap)
+nr_shots_two.append(len(xG_Delta_cheap))
 
 # add the interpretation for the current calculations
-if mean_winning > mean_loosing:
-    interpretation.append("The decisions were in average " + str(mean_winning - mean_loosing) + " better when winning than when loosing.")
-else: interpretation.append("The decisions were in average " + str(mean_loosing - mean_winning) + " better when loosing than when winning.")
+if mean_expensive > mean_cheap:
+    interpretation.append("The decisions were in average " + str(mean_expensive - mean_cheap) + " better when a player with a market value above mean took the shot.")
+else: interpretation.append("The decisions were in average " + str(mean_cheap - mean_expensive) + " better when a player with a market value below mean took the shot.")
 
-lev, p = levene(xG_Delta_winning, xG_Delta_loosing)
+lev, p = levene(xG_expensive, xG_Delta_cheap)
 levene_test.append(lev)
 p_val_levene.append(p)
-result_winning_vs_loosing, pVal = ttest_ind(xG_Delta_winning, xG_Delta_loosing)
+result_winning_vs_loosing, pVal = ttest_ind(xG_expensive, xG_Delta_cheap)
 t_Test.append(result_winning_vs_loosing)
 p_val.append(pVal)
 
@@ -99,4 +101,4 @@ data = pd.DataFrame({"factor one" : factor_one,
 
 
 
-data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Score/results/tTest_score.json")
+data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Market_Value/results/tTest_market_value.json")
