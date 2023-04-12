@@ -92,7 +92,7 @@ def getDF(competition_id, season_id, competition, save_path):
     print("i am finished with competition: ", competition)
 
 #get EM20
-#getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
+getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
 
 #get WM18
 getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)

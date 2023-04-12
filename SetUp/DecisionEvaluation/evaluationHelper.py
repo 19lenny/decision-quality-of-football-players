@@ -187,10 +187,8 @@ def xPModel(time_bigger, time_smaller):
     # source: william spearman 2018, beyond expected goals
     # the ball control time can be between 0 and 5, if it is higher than 5, the xP = 100% (according to the formula)
 
-    # the comparison of the decimal number will be made three places after the dot
-    getcontext().prec = 3
     # this calculates the ball control time for three decimals after the dot
-    ball_control_time = Decimal(time_bigger) - Decimal(time_smaller)
+    ball_control_time = time_bigger - time_smaller
     # if the ball contol time is bigger than 4.99, it will be set to 4.99
     # there is near to none movement in xP after 4.99
     if ball_control_time > 4.99:
@@ -209,7 +207,8 @@ def xPModel(time_bigger, time_smaller):
         # then ball control time and bc are considered "close" to each other.
         # This guarantees that a and b are equal to about nine decimal places.
         # https://davidamos.dev/the-right-way-to-compare-floats-in-python/
-        if math.isclose(ball_control_time, bc):
+        # the comparison should be done in the third spot after the dot
+        if math.isclose(ball_control_time, bc, abs_tol=1e-3):
             # if the position is found, stop the loop
             # the position is still saved as a variable
             break
