@@ -40,7 +40,6 @@ attributes_to_drop = ["dribble_overrun", "bad_behaviour_card", "clearance_other"
 dfEM20 = drop_attributes(df=JSONtoDF.createDF(CONSTANTS.JSONEM2020), attributes=attributes_to_drop)
 
 #WM18
-
 attributes_to_drop = [ "level_0", "bad_behaviour_card", "ball_recovery_offensive", "dribble_overrun", "index", "pass_backheel", "shot_open_goal",
                        "shot_one_on_one", "shot_follows_dribble",
                        "50_50", "ball_receipt_outcome", "ball_recovery_recovery_failure", "block_deflection",
@@ -105,6 +104,7 @@ dfWM22 = drop_attributes(df=JSONtoDF.createDF(CONSTANTS.JSONWM2022), attributes=
 # concat the testing data
 dfAll = joinDF.concat([dfEM20, dfWM18, dfWM22])
 dfAll.reset_index(drop=True, inplace=True)
+
 dfDescription = dfAll.describe()
 # save it
 dfAll.to_json(CONSTANTS.JSONTESTSHOTS)

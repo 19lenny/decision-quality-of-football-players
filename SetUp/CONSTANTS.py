@@ -60,7 +60,7 @@ ATTRIBUTES = ['angleInRadian', 'distance_to_goal_centre']
 
 # model with intercept
 MODELNAMEINTERCEPT = "xG"
-#Todo: Update JSONTRAINSHOTS --> train_df
+
 df = JSONtoDF.createDF(JSONTRAINSHOTS)
 REGMODELINTERC = create_model.create_model_glm(JSONtoDF.createDF(JSONTRAINSHOTS), ATTRIBUTES)
 

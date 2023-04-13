@@ -2,6 +2,7 @@ from typing import List
 from SetUp import DataManipulation, CONSTANTS
 import numpy as np
 from SetUp.DecisionEvaluation import evaluationHelper, offside
+from tqdm import tqdm
 
 
 def decisionEvaluation(dfSeason, eventname):
@@ -30,6 +31,7 @@ def decisionEvaluation(dfSeason, eventname):
     y_alternative: List[float] = [0.0] * len(dfSeason)
     # create a list to save the player from the best alternative solution
     alternative_player: List[str] = ["None"] * len(dfSeason)
+    alternative_player_opponent: List[str] = ["None"] * len(dfSeason)
 
     # for every shot of the competition
     # this for loop gets every shot from a competition, starting with the first shot
@@ -154,6 +156,7 @@ def decisionEvaluation(dfSeason, eventname):
 
                     # create a list to save the player from the best alternative solution
                     alternative_player[currentShot] = name_closest_teammate
+                    alternative_player_opponent[currentShot] = name_closest_opponent
                     # add xPass
                     if xG_difference[currentShot] < 0:
                         shot_correct_decision[currentShot] = False
@@ -161,8 +164,7 @@ def decisionEvaluation(dfSeason, eventname):
                         shot_correct_decision[currentShot] = True
 
 
-        print("progress bar of xG alternatives: ", currentShot, " / ", len(dfSeason) - 1, " | ", currentShot / (len(dfSeason) - 1) * 100,
-              "%")
+        print("progress bar of xG alternatives: ", currentShot, " / ", len(dfSeason) - 1, " | ", currentShot / (len(dfSeason) - 1) * 100, "%")
 
     dfSeason['xG_best_alternative'] = xG_best_alternative
     dfSeason['xG_Delta_decision_alternative'] = xG_difference
@@ -182,5 +184,6 @@ def decisionEvaluation(dfSeason, eventname):
     dfSeason['x_opponent'] = x_opponent
     dfSeason['y_opponent'] = y_opponent
     dfSeason['player_name_alt'] = alternative_player
+    dfSeason['player_namer_opponent'] = alternative_player_opponent
 
     return dfSeason

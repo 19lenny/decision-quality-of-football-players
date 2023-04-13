@@ -17,7 +17,7 @@ source: https://www.statlect.com/fundamentals-of-statistics/dummy-variable
 """
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-#todo: this must be done in orchestrator
+
 #https://timeseriesreasoning.com/contents/dummy-variables-in-a-regression-model/
 conditions = [
 (df_all['score'] == 1),

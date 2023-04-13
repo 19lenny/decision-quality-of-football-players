@@ -1,192 +1,131 @@
-# create a test model for 10 particular shot not for a whole dataframe
-# here it can be shown hot the model works
-
-import pandas as pd
-from Model import model_info
-from SetUp import JSONtoDF, DataManipulation, CONSTANTS
-import numpy as np
-
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
+from SetUp import CONSTANTS, JSONtoDF
+from matplotlib.patches import FancyArrowPatch
+
+from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
+
+#todo: save the picture and decide on one
+df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+#sort by the shots that were the farthest away, game is the world cup final 22
+df_test = df_test.loc[df_test['match_id'] == 3869685].sort_values(by=['xG_Delta_decision_alternative'], ascending=True).head(1)
+df_test.reset_index(drop=True, inplace=True)
+# x and y coordinates of the points to be plotted
+x_original = df_test['x_coordinate']
+y_original = df_test['y_coordinate']
+x_alternative = df_test['x_best_alt']
+y_alternative = df_test['y_best_alt']
+x_alt_opponent = df_test['x_opponent']
+y_alt_opponent = df_test['y_opponent']
+x_ball = df_test['x_ball']
+y_ball = df_test['y_ball']
 
 
-def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
-    square_meter_size = square_meter_size
-    max_shot_distance = max_shot_distance
-    # -----------------------------------------------------------------------------------------------------------
-    # create a grid which shows for every x and y combination the xGoal according to regression
 
-    x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE,
-                              square_meter_size)
-    # create the y linspace of the pitch, the end value gets +square meter size,
-    # such that the endpoint is still in the range
-    """
-    y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE1,
-                              CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
-                              square_meter_size)
-    """
-    y_range_pitch = np.arange(15,
-                              65,
-                              square_meter_size)
+# Create a new figure and axis
+fig, ax = plt.subplots(figsize= (10,8))
+img = plt.imread("penalty_box.png")
+ax.imshow(img, alpha=0.7, extent=[95, 120, 16.5, 64])
 
-    xGList = []
-    xList = []
-    yList = []
-    for x in x_range_pitch:
-        for y in y_range_pitch:
-            # if it hit left post go to next iteration
-            if (x == 120) & (y == 36):
-                xgPrediction = 0
-                xList.append(x)
-                yList.append(y)
-                xGList.append(xgPrediction)
-                continue
-            # if it hit right post go to next iteration
-            elif (x == 120) & (y == 44):
-                xgPrediction = 0
-                xList.append(x)
-                yList.append(y)
-                xGList.append(xgPrediction)
-                continue
-            logmodel = modelname
-            x_location = x
-            y_location = y
+#labels for the points
+#passing player
+label_original = df_test['player']
+label_xG_original = df_test['xG']
+#shooting player
+label_alternative_player = df_test['player_name_alt']
+#todo: add here the name of the alternative opponent
+#distance from the teammate to the shooting location,
+#*0.9144 is there to convert from yards to meter
+#todo: check if in the dataframe are yards or meters
+label_alternative_teammate_distance = df_test['distance_teammember'] * 0.9144
+label_alternative_opponent_distance = df_test['distance_opponent'] * 0.9144
+label_pass_distance = df_test['distance_ball'] * 0.9144
+#xG from new location
+label_xG_new_loca = df_test['xG_best_alternative']
+#line values are the xP values
+label_xPass = df_test['xP_best_alternative']
 
-            angle_in_rad = DataManipulation.angleInRadianFromObjectToPoints(x_object=x_location, y_object=y_location,
-                                                                            x_point1=CONSTANTS.X_COORDINATE_POST1,
-                                                                            y_point1=CONSTANTS.Y_COORDINATE_POST1,
-                                                                            x_point2=CONSTANTS.X_COORDINATE_POST2,
-                                                                            y_point2=CONSTANTS.Y_COORDINATE_POST2)
-            distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
-                                                                       x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
-                                                                       y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
-            # xG on the current location is the prediction of the expected goal from this location,
-            # based on the angle of the location to the goal and the distance of the location to the goal
-            # the prediction has to be multiplied with the xPass prediction
-            # (the longer the teammate has time, the higher will be xP)
-            xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards])
+#get all the opponents and other teammembers
+df_to_plot = getPlayersOfEvent(df_test['shot_freeze_frame'][0], "drawing")
+x_teammates_to_plot = df_to_plot["x_coordinate"][df_to_plot['teammate'] == True]
+y_teammates_to_plot = df_to_plot["y_coordinate"][df_to_plot['teammate'] == True]
+x_opponents_to_plot = df_to_plot["x_coordinate"][df_to_plot['teammate'] == False]
+y_opponents_to_plot = df_to_plot["y_coordinate"][df_to_plot['teammate'] == False]
+#plot all teammates
+ax.plot(x_teammates_to_plot, y_teammates_to_plot, 'o', color='#89CFF0', label="location teammate")
+#plot all opponents
+ax.plot(x_opponents_to_plot, y_opponents_to_plot, 'o', color='#FF6961', label="location opponent")
 
-            xList.append(x)
-            yList.append(y)
-            xGList.append(xgPrediction)
-    data = {'x': xList,
-            'y': yList,
-            'xGPrediction': xGList,
-            }
-    dfXGGrid = pd.DataFrame(data)
-    return dfXGGrid
-"""
-What’s going on here? Looking at the Z data first, I’ve merely used the pivot_table method from pandas to cast my data 
-into a matrix format, where the columns/rows correspond to the values of Z for each of the points in the range of the 
-x-y-axes.
-"""
-def draw_xG_model(dfXGGrid, saving_location, title):
-    Z = dfXGGrid.pivot_table(index='x', columns='y', values='xGPrediction').T.values
-
-    X_unique = np.sort(dfXGGrid.x.unique())
-    Y_unique = np.sort(dfXGGrid.y.unique())
-    X, Y = np.meshgrid(X_unique, Y_unique)
-    # Initialize plot objects
-    rcParams['figure.figsize'] = 8, 11  # sets plot size
-    plt.rcParams["figure.autolayout"] = True
-
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    img = plt.imread("half field.png")
-    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 119, 16.5, 64])
-    #levels = np.linspace(Z.min(), Z.max(), 14)
+#plot the most important points
+#this is the player which initially took the shot
+ax.plot(x_original, y_original, 'o', color='black', label="location player")
+#this is the best alternative
+ax.plot(x_alternative, y_alternative, 'o', color='blue', label="location best teammate")
+#this is the closest opponent
+ax.plot(x_alt_opponent, y_alt_opponent, 'o', color='red', label="location best opponent")
+#this is the location where the new shot will happen
+ax.plot(x_ball, y_ball, 'o', markersize=6, markeredgecolor='black', markerfacecolor='none', label="shot position")
 
 
-    # Generate a color mapping of the levels we've specified
+# plot the labels
+for i in range(len(x_original)):
+    #add the name of the original player and its original xG value (show 2 decimal values)
+    name = label_original[i]
+    all_names = name.split()
+    last_name = all_names[-1]
+    text =  str(last_name+": " "{: .2f}".format(label_xG_original[i])+"xG")
+    ax.text(x_original[i] + 0.1, y_original[i] + 0.1,text, fontsize=8)
+    #add the name of the alternative player
+    name = label_alternative_player[i]
+    all_names = name.split()
+    last_name = all_names[-1]
+    ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
+    #add the xG value of the new shooting position (show 2 decimal values)
+    text = str("{: .2f}".format(label_xG_new_loca[i])+"xG")
+    ax.text(x_ball[i] + 0.1, y_ball[i] + 0.1, text , fontsize=8)
 
-    cpf = ax.contourf(X, Y, Z, levels= [0,0.07, 0.15,0.3,1],
-                      colors=['#006F01','#49be25','#96be25', '#fb5f04', '#FF2300'], alpha=0.7, antialiased = True)
 
-    # Set all level lines to black
-    line_colors = ['white' for l in cpf.levels]
 
-    # Make plot and customize axes
-    cp = ax.contour(X, Y, Z, levels= [0.07, 0.15,0.3], colors= line_colors)
-    ax.clabel(cp, fontsize=12)
-    ax.set_xlabel('x coordinate')
-    _ = ax.set_ylabel('y coordinate')
-    plt.title(title, fontdict={'fontsize': 20})
-    plt.colorbar(cpf, aspect=50)
-    fig.tight_layout()
-    plt.savefig(saving_location)
-    plt.show()
+# Connect the points with lines
+for i in range(len(x_original)):
+    #show the pass in the diagram
+    arrow = FancyArrowPatch((x_original[i], y_original[i]), (x_ball[i], y_ball[i]), arrowstyle='->', linestyle='dotted', mutation_scale=10, color='grey', label='pass, xP')
+    ax.add_patch(arrow)
+    dx = x_ball[i] - x_original[i]
+    dy = y_ball[i] - y_original[i]
+    text = str("{: .2f}".format(label_xPass[i])+"xP, "+ "{: .2f}".format(label_pass_distance[i]) + "m")
+    ax.annotate(text, xy=(x_original[i] + dx / 2, y_original[i] + dy / 2), xytext=(-5, 5),
+                textcoords='offset points', fontsize=8, ha='center')
 
-def df_goals_divided_by_shots():
-    shots_model = JSONtoDF.createDF("../JSON/allModelData.json")
+    #show the run of the teammate in the diagram
+    arrow = FancyArrowPatch((x_alternative[i], y_alternative[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
+                            mutation_scale=10, color='grey', label='run, distance')
+    dx = x_ball[i] - x_alternative[i]
+    dy = y_ball[i] - y_alternative[i]
+    ax.add_patch(arrow)
+    text = str("{: .2f}".format(label_alternative_teammate_distance[i]) + "m")
+    ax.annotate(text, xy=(x_alternative[i] + dx / 2, y_alternative[i] + dy / 2), xytext=(-5, 5),
+                textcoords='offset points', fontsize=8, ha='center')
 
-    # dataframe where all the shots happened
-    shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',
-                               'angleInRadian', 'distance_to_goal_centre', 'shot_statsbomb_xg']]
+    #show the run of the opponent in the diagram
+    arrow = FancyArrowPatch((x_alt_opponent[i], y_alt_opponent[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
+                            mutation_scale=10, color='grey', label='run, distance')
+    dx = x_ball[i] - x_alt_opponent[i]
+    dy = y_ball[i] - y_alt_opponent[i]
+    ax.add_patch(arrow)
+    text = str("{: .2f}".format(label_alternative_opponent_distance[i]) + "m")
+    ax.annotate(text, xy=(x_alt_opponent[i] + dx / 2, y_alt_opponent[i] + dy / 2), xytext=(-5, 5),
+                textcoords='offset points', fontsize=8, ha='center')
 
-    square_meter_size = 1
-    max_shot_distance = 40
-    # -----------------------------------------------------------------------------------------------------------
-    # create a grid which shows for every x and y combination the xGoal according to regression
+# Set x and y axis labels
+# Add legend
+handles, labels = ax.get_legend_handles_labels()
+unique_labels = list(set(labels))
+handles = [handles[labels.index(label)] for label in unique_labels]
+legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(1.3, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
 
-    # create a grid with a certain amount of bins
-    x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE,
-                              square_meter_size)
-    # create the y linspace of the pitch, the end value gets +square meter size,
-    # such that the endpoint is still in the range
-    """
-    y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE1,
-                              CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
-                              square_meter_size)
-    """
-    # this means shots made from the corner flag are not included in the visualization
-    y_range_pitch = np.arange(15,
-                              65,
-                              square_meter_size)
+ax.set_xlabel('x_coordinate')
+ax.set_ylabel('y_coordinate')
+ax.set_title("Decision Visualization")
 
-    xGList = []
-    xList = []
-    yList = []
-
-    for x in range(len(x_range_pitch) - 1):
-        for y in range(len(y_range_pitch) - 1):
-            number_of_shots_current_location = 0
-            number_of_goals_current_location = 0
-            xList_current = []
-            yList_current = []
-            xGList_current = []
-            for shot in range(len(shots_model)):
-                if (shots_model['x_coordinate'][shot] >= x_range_pitch[x]) and (
-                        shots_model['x_coordinate'][shot] < x_range_pitch[x + 1]):
-                    if (shots_model['y_coordinate'][shot] >= y_range_pitch[y]) and (
-                            shots_model['y_coordinate'][shot] < y_range_pitch[y + 1]):
-                        print("now the shot is good")
-                        number_of_shots_current_location += 1
-                        if shots_model['goal'][shot] == 1:
-                            print("golazooo")
-                            number_of_goals_current_location += 1
-                        xList_current.append(int(shots_model['x_coordinate'][shot]))
-                        yList_current.append(int(shots_model['y_coordinate'][shot]))
-            for prob in range(len(xList_current)):
-                xGList_current.append(number_of_goals_current_location / number_of_shots_current_location)
-
-            xList = xList + xList_current
-            yList = yList + yList_current
-            xGList = xGList + xGList_current
-
-    data = {'x': xList,
-            'y': yList,
-            'xGPrediction': xGList,
-            }
-    dfXGGrid = pd.DataFrame(data)
-    return dfXGGrid
-
-# calculate for every x and y coordinate the xGoal
-# shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=1, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
-#draw the xG histogram
-draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis.png", title="xGModel")
-
-dfDivisioned = df_goals_divided_by_shots()
-draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")
+# Show the plot
+plt.show()

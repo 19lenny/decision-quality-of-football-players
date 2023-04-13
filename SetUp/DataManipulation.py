@@ -138,7 +138,7 @@ dfCurrentMatch['score'] = scores:
             # if it is 0 the shooting team is drawing before the current shot
             # if it is -1 the shooting team is loosing before the current shot
 """
-#TODO: debug if this is done correctly
+
 def score(df):
     # first extract all match id of dataframe in a unique list
     match_id = df[["match_id"]].drop_duplicates()
@@ -207,7 +207,7 @@ def score(df):
                     # add the goal to the scoring line
                     # it is added to the dataframe with the next shot, because the next shot is influenced by the new score
                     previous_home_team_score += 1
-                    previous_overall_scoring_difference += previous_home_team_score - previous_away_team_score
+                    previous_overall_scoring_difference = previous_home_team_score - previous_away_team_score
 
                 # away team scores
                 else:
@@ -221,7 +221,7 @@ def score(df):
                                               away_team_score=previous_away_team_score)
 
                     previous_away_team_score += 1
-                    previous_overall_scoring_difference += previous_home_team_score - previous_away_team_score
+                    previous_overall_scoring_difference = previous_home_team_score - previous_away_team_score
 
             # no goal happened
             else:

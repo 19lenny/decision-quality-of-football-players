@@ -45,7 +45,6 @@ for index in tqdm(range(len(competitionIDs)), colour='green'):
     currentSeason = seasonIDs[index]
     #print("progress bar getting the data for the model: ", index, "/", len(competitionIDs))
     try:
-        # todo: debug if this is correct
         if (currentCompetition != 55 or currentSeason != 43) and (currentCompetition != 43 or currentSeason != 106) and (currentCompetition != 43 or currentSeason != 3):
             #print("comp: ", currentCompetition, " season: ", currentSeason)
             # get all matches of the current competition / season

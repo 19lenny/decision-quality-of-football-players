@@ -30,7 +30,6 @@ df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 
 def regression_time(period1, period2, name_period1, name_period2):
     # only split in to the periods wished
-    #todo: this must be done in orchestrator
     df = df_all.loc[(df_all["period"] == period1) | (df_all["period"] == period2)]
     conditions = [
         (df['period'] == period1),

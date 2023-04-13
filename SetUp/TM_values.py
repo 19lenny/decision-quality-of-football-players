@@ -133,9 +133,7 @@ def transfermarketValue(dfCompetition, competition):
     dfValues = pd.DataFrame({"player": PlayersList,
                                "value": PlayerValues,
                           "nationality": PlayersNation})
-    # todo:
-    #  maybe join has to go up
-    #  check for special cases and add them
+
     dfCompetition, added_attributes = join(dfCompetition=dfCompetition, dfValues=dfValues)
     return dfCompetition
 

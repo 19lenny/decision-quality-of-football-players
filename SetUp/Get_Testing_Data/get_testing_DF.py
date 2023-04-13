@@ -6,6 +6,7 @@ from SetUp.DecisionEvaluation import evaluate_decision
 from SetUp import TM_values
 
 def getDF(competition_id, season_id, competition, save_path):
+
     df_matches = pd.DataFrame(sb.matches(competition_id, season_id))
 
     # all matchID's of the current competition
@@ -64,6 +65,7 @@ def getDF(competition_id, season_id, competition, save_path):
     df_return = TM_values.transfermarketValue(dfCompetition=df_return, competition=competition)
     print("TM Value is added")
 
+
     # calculates
     # - the xG of the best alternative
     # - the x and y coordinate of the best alternative
@@ -72,12 +74,6 @@ def getDF(competition_id, season_id, competition, save_path):
     # - the xP of the pass that would be needed to go to the best alternative
     df_return = evaluate_decision.decisionEvaluation(df_return, competition)
 
-    # todo: these tasks
-    # other file, add all analyzing files to one file
-    # on the hypothesis folder only the hypothesis should happen and bedingungen für hypothesis
-    # DEBUG SCORE, CHECK IF THE SCORES ARE TRUE
-    # EXCEPTIONS MV 16, 18
-    # UPDATE ALLMODELDATA.JSON
 
     # reset the index, so a new index is created
     df_return.reset_index(drop=True, inplace=True)
@@ -92,10 +88,10 @@ def getDF(competition_id, season_id, competition, save_path):
     print("i am finished with competition: ", competition)
 
 #get EM20
-getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
+#getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
 
 #get WM18
-getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)
+#getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)
 
 #getWM22
 getDF(competition_id=43, season_id=106, competition="WM22", save_path=CONSTANTS.JSONWM2022)

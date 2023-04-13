@@ -183,7 +183,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
 
 
 def xPModel(time_bigger, time_smaller):
-    # todo: values are way too small. adjust this function
+    # todo: test xP Model function, with help of get_testing_DF
     # source: william spearman 2018, beyond expected goals
     # the ball control time can be between 0 and 5, if it is higher than 5, the xP = 100% (according to the formula)
 
@@ -196,7 +196,14 @@ def xPModel(time_bigger, time_smaller):
     # this is the time span a footballer can control the ball
     possible_range_of_sec = np.arange(0, 5, 0.001)
     # these are the possibilities to control the ball for a certain time span
-    # todo: explain CDF function
+    """
+    To convert the time difference into a probability, an exponential cumulative distribution function (CDF) is used. 
+    Spearman (2018) assumes a lambda in the function of 4.32/second. 
+    This would mean that an average professional footballer needs 0.23 seconds to control the ball. 
+    On the y-axis of the distribution function, the cumulative probability is described. 
+    This means, for example, for the point (x) delta 1 second, that 98% of professional football players can control the ball within this one second.
+    source: Spearman, W. (2018). Beyond Expected Goals. MIT SLOAN Sports Analytics Conference.
+    """
     possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 4.32)
     # find the position where the ball control time is closest to in the possible range of sec
     position = 0
