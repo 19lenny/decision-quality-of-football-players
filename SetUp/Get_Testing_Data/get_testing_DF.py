@@ -58,7 +58,7 @@ def getDF(competition_id, season_id, competition, save_path):
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
     # this way some time is saved in the next call
     df_return = df_return.query(
-        "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
+        "type == 'Shot' & shot_body_part != 'Head' & shot_type != 'Free Kick' & shot_type != 'Penalty'")
     df_return.reset_index(drop=True, inplace=True)
 
     # add the transfer value of every shooting player
@@ -88,10 +88,10 @@ def getDF(competition_id, season_id, competition, save_path):
     print("i am finished with competition: ", competition)
 
 #get EM20
-#getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
+getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
 
 #get WM18
-#getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)
+getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)
 
 #getWM22
 getDF(competition_id=43, season_id=106, competition="WM22", save_path=CONSTANTS.JSONWM2022)

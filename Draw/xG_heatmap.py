@@ -109,6 +109,7 @@ def draw_xG_model(dfXGGrid, saving_location, title):
     # Make plot and customize axes
     cp = ax.contour(X, Y, Z, levels= [0.07, 0.15,0.3], colors= line_colors)
     ax.clabel(cp, fontsize=12)
+    ax.invert_yaxis()
     ax.set_xlabel('x coordinate')
     _ = ax.set_ylabel('y coordinate')
     plt.title(title, fontdict={'fontsize': 20})

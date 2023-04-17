@@ -1,6 +1,6 @@
 from scipy.stats import stats
 
-from SetUp import JSONtoDF
+from SetUp import JSONtoDF, CONSTANTS
 import numpy as np
 
 # Plotting
@@ -11,7 +11,7 @@ from Draw import FCPython
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
-shots_model = JSONtoDF.createDF("../JSON/allModelData.json")
+shots_model = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
 
 #dataframe where all the shots happened
 shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',

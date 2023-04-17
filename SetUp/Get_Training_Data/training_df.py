@@ -65,7 +65,7 @@ for index in tqdm(range(len(competitionIDs)), colour='green'):
                 # only keep the necessary rows,
                 # which have something to do with shots and are not from penalties or freekicks
                 getEventsInMatch = getEventsInMatch.query(
-                    "type == 'Shot' & shot_body_part != 'Head' & play_pattern != 'From Free Kick' & shot_type != 'Penalty'")
+                    "type == 'Shot' & shot_body_part != 'Head' & shot_type != 'Free Kick' & shot_type != 'Penalty'")
 
                 # add them to the current model
                 dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])

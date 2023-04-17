@@ -4,10 +4,10 @@ from matplotlib.patches import FancyArrowPatch
 
 from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
 
-#todo: save the picture and decide on one
+#todo: save the picture and decide on one shot
 df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-#sort by the shots that were the farthest away, game is the world cup final 22
-df_test = df_test.loc[df_test['match_id'] == 3869685].sort_values(by=['xG_Delta_decision_alternative'], ascending=True).head(1)
+#saved shot during the wm2018 world cup final
+df_test = df_test.loc[(df_test['match_id'] == 3869685) & (df_test['minute'] ==122)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 # x and y coordinates of the points to be plotted
 x_original = df_test['x_coordinate']
@@ -20,11 +20,10 @@ x_ball = df_test['x_ball']
 y_ball = df_test['y_ball']
 
 
-
 # Create a new figure and axis
 fig, ax = plt.subplots(figsize= (10,8))
 img = plt.imread("penalty_box.png")
-ax.imshow(img, alpha=0.7, extent=[95, 120, 16.5, 64])
+ax.imshow(img, alpha=0.3, extent=[95, 120, 16.5, 64])
 
 #labels for the points
 #passing player
@@ -32,10 +31,9 @@ label_original = df_test['player']
 label_xG_original = df_test['xG']
 #shooting player
 label_alternative_player = df_test['player_name_alt']
-#todo: add here the name of the alternative opponent
+label_alternative_opponent = df_test['player_namer_opponent']
 #distance from the teammate to the shooting location,
 #*0.9144 is there to convert from yards to meter
-#todo: check if in the dataframe are yards or meters
 label_alternative_teammate_distance = df_test['distance_teammember'] * 0.9144
 label_alternative_opponent_distance = df_test['distance_opponent'] * 0.9144
 label_pass_distance = df_test['distance_ball'] * 0.9144
@@ -79,8 +77,13 @@ for i in range(len(x_original)):
     all_names = name.split()
     last_name = all_names[-1]
     ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
+    # add the name of the alternative opponent
+    name = label_alternative_opponent[i]
+    all_names = name.split()
+    last_name = all_names[-1]
+    ax.text(x_alt_opponent[i] + 0.1, y_alt_opponent[i] + 0.1, last_name, fontsize=8)
     #add the xG value of the new shooting position (show 2 decimal values)
-    text = str("{: .2f}".format(label_xG_new_loca[i])+"xG")
+    text = str("{: .2f}".format(label_xG_new_loca[i])+"xP*xG")
     ax.text(x_ball[i] + 0.1, y_ball[i] + 0.1, text , fontsize=8)
 
 
@@ -121,8 +124,9 @@ for i in range(len(x_original)):
 handles, labels = ax.get_legend_handles_labels()
 unique_labels = list(set(labels))
 handles = [handles[labels.index(label)] for label in unique_labels]
-legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(1.3, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
+legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.5, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
 
+ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')
 ax.set_ylabel('y_coordinate')
 ax.set_title("Decision Visualization")
