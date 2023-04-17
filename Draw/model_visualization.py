@@ -6,8 +6,8 @@ from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
 
 #todo: save the picture and decide on one shot
 df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-#saved shot during the wm2018 world cup final
-df_test = df_test.loc[(df_test['match_id'] == 3869685) & (df_test['minute'] ==122)].head(1)
+#wm 22 switzerland vs brazil
+df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 # x and y coordinates of the points to be plotted
 x_original = df_test['x_coordinate']
@@ -71,12 +71,13 @@ for i in range(len(x_original)):
     all_names = name.split()
     last_name = all_names[-1]
     text =  str(last_name+": " "{: .2f}".format(label_xG_original[i])+"xG")
-    ax.text(x_original[i] + 0.1, y_original[i] + 0.1,text, fontsize=8)
+    ax.text(x_original[i] + 0.3, y_original[i] + 0.1,text, fontsize=8)
     #add the name of the alternative player
     name = label_alternative_player[i]
     all_names = name.split()
     last_name = all_names[-1]
-    ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
+    #ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
+    ax.text(x_alternative[i] + 0.3, y_alternative[i] + 0.2, "Richarlison", fontsize=8)
     # add the name of the alternative opponent
     name = label_alternative_opponent[i]
     all_names = name.split()
@@ -106,7 +107,7 @@ for i in range(len(x_original)):
     dy = y_ball[i] - y_alternative[i]
     ax.add_patch(arrow)
     text = str("{: .2f}".format(label_alternative_teammate_distance[i]) + "m")
-    ax.annotate(text, xy=(x_alternative[i] + dx / 2, y_alternative[i] + dy / 2), xytext=(-5, 5),
+    ax.annotate(text, xy=(0.4+x_alternative[i] + dx / 2, 0.7+y_alternative[i] + dy / 2), xytext=(-5, 5),
                 textcoords='offset points', fontsize=8, ha='center')
 
     #show the run of the opponent in the diagram
@@ -124,7 +125,7 @@ for i in range(len(x_original)):
 handles, labels = ax.get_legend_handles_labels()
 unique_labels = list(set(labels))
 handles = [handles[labels.index(label)] for label in unique_labels]
-legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.5, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
+legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.3, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
 
 ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')

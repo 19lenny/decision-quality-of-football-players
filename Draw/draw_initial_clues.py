@@ -6,12 +6,12 @@ import numpy as np
 # Plotting
 import matplotlib.pyplot as plt
 from Draw import FCPython
-
+import pandas as pd
 # Statistical fitting of models
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
-shots_model = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
+shots_model = pd.concat([JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS), JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)])
 
 #dataframe where all the shots happened
 shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',
@@ -37,6 +37,9 @@ fig, ax = FCPython.createGoalMouth()
 histogram = ax.hist2d(x, y, bins=(50, 50))
 pos = ax.imshow(histogram[0], aspect='auto')
 fig.colorbar(pos, ax=ax)
+ax.invert_yaxis()
+ax.set_xlabel('x_coordinate')
+ax.set_ylabel('y_coordinate')
 ax.set_title('Number of shots')
 #fig.gca().set_aspect('equal', adjustable='box')
 fig.tight_layout()
@@ -44,10 +47,15 @@ plt.show()
 
 # Plot the number of GOALS from different points
 # histogram where and how many goals happened
+#todo change away from create goal mouth, instead put image in background
+#todo use same color as the other histograms
 fig, ax = FCPython.createGoalMouth()
 histogram = ax.hist2d(x_goals_only, y_goals_only, bins=(25, 25))
 pos = ax.imshow(histogram[0], aspect='auto')
 fig.colorbar(pos, ax=ax)
+ax.invert_yaxis()
+ax.set_xlabel('x_coordinate')
+ax.set_ylabel('y_coordinate')
 ax.set_title('Number of goals')
 #fig.gca().set_aspect('equal', adjustable='box')
 fig.tight_layout()

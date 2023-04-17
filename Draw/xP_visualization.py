@@ -60,6 +60,7 @@ for cluster, data in df.groupby('cluster'):
 #ax.set_ylim([min(df['y_coordinate']), max(df['y_ball'])])
 
 # Set axis labels
+ax.invert_yaxis()
 ax.set_xlabel('X Coordinate')
 ax.set_ylabel('Y Coordinate')
 
