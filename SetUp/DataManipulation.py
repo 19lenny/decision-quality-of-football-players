@@ -62,6 +62,18 @@ def angleInRadian(dataframe):
                                   / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, np.pi,
                                   np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
                                             / (2 * dataframe["b"] * dataframe["c"])))
+    angleList = []
+    bList = []
+    cList = []
+    for shot in range(len(dataframe)):
+        b = ((dataframe["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
+                      (dataframe["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+        bList.append(b)
+        c = ((dataframe["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
+                      (dataframe["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+        cList.append(c)
+        angleRad = 1
+
     return dataframe
 
 
@@ -94,6 +106,7 @@ def distanceObjectToPoint(x_object, y_object, x_point, y_point):
 
 def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
+    dataframe['goal'] = np.where(dataframe['type'] == "Own Goal Against", -1, dataframe['goal'])
     return dataframe
 
 """
@@ -151,7 +164,8 @@ def score(df):
         # get all shots that happened for the current match id,
         # sort all these shot according to minutes
         # 0 hast to be there since match id is a double list
-        dfCurrentMatch = df.loc[df['match_id'] == match_id[match][0]].sort_values(by = ['minute'])
+        dfCurrentMatch = df.loc[df['match_id'] == match_id[match][0]].sort_values(by = ['minute', 'second'])
+
         # reset index to go through in the for loop
         dfCurrentMatch.reset_index(inplace=True)
         # create helper lists that should be filled
@@ -221,6 +235,39 @@ def score(df):
                                               away_team_score=previous_away_team_score)
 
                     previous_away_team_score += 1
+                    previous_overall_scoring_difference = previous_home_team_score - previous_away_team_score
+            #other possibility could be own goal
+            elif dfCurrentMatch['goal'][shot] == -1:
+                #check who produced the own goal, either home team or away team
+                #the shooting team is the home team, therefore the home team scored the own goal
+                if shooting_team == home_team:
+
+                    # all the scores are updated with the last score in the game
+                    # they are not updated with the new score, because the player made the decision to shoot, under the old score
+                    # the next decision taken is influenced by the new result, BUT the shot that was taken to shoot the goal was taken influenced by the old score
+                    scoring_difference[position] = previous_overall_scoring_difference
+                    score_home_team[position] = previous_home_team_score
+                    score_away_team[position] = previous_away_team_score
+                    # scores evaluates
+                    scores[position] = isWinning(shooting_team=shooting_team, home_team=home_team,
+                                                 home_team_score=previous_home_team_score, away_team_score=previous_away_team_score)
+                    # add the goal to the scoring line
+                    # it is added to the dataframe with the next shot, because the next shot is influenced by the new score
+                    previous_away_team_score += 1
+                    previous_overall_scoring_difference = previous_home_team_score - previous_away_team_score
+
+                # away team scores own goal
+                else:
+
+                    #same as home team score
+                    scoring_difference[position] = previous_overall_scoring_difference
+                    score_home_team[position] = previous_home_team_score
+                    score_away_team[position] = previous_away_team_score
+                    scores[position] = isWinning(shooting_team=shooting_team, home_team=home_team,
+                                              home_team_score=previous_home_team_score,
+                                              away_team_score=previous_away_team_score)
+
+                    previous_home_team_score += 1
                     previous_overall_scoring_difference = previous_home_team_score - previous_away_team_score
 
             # no goal happened

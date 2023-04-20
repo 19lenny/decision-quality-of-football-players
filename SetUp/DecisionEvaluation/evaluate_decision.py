@@ -2,6 +2,7 @@ from typing import List
 from SetUp import DataManipulation, CONSTANTS
 import numpy as np
 from SetUp.DecisionEvaluation import evaluationHelper, offside
+import pandas as pd
 from tqdm import tqdm
 
 
@@ -185,5 +186,6 @@ def decisionEvaluation(dfSeason, eventname):
     dfSeason['y_opponent'] = y_opponent
     dfSeason['player_name_alt'] = alternative_player
     dfSeason['player_namer_opponent'] = alternative_player_opponent
+
 
     return dfSeason

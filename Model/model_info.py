@@ -7,7 +7,6 @@ from SetUp import CONSTANTS
 
 
 
-
 # this method prints the information about a given regression
 def show_info(regression):
     print(regression.summary())
@@ -29,6 +28,10 @@ def prediction(df):
 
 
 def predictionOfSingleValues(values):
+    """
+    formular of prediction is: exp(regression*values)/(1+exp(regression*values))
+    source: https://stats.stackexchange.com/questions/441561/get-equation-from-glm-coefficients-calculate-y-manually
+    """
     data = [values]
     predictionDf = pd.DataFrame(data, columns=CONSTANTS.ATTRIBUTES)
     pred = CONSTANTS.REGRESSION_MODEL.predict(predictionDf)
@@ -44,3 +47,6 @@ def calculateAccuracy(df, championship):
     df[nameOfColumn] = df[CONSTANTS.MODELNAME] - df["shot_statsbomb_xg"]
     print("the mean of the difference of ", CONSTANTS.MODELNAME,"at", championship,"is: ", df[nameOfColumn].mean())
     return df
+
+
+show_info(CONSTANTS.REGRESSION_MODEL)
