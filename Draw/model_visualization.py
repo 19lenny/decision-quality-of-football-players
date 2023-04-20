@@ -22,8 +22,8 @@ y_ball = df_test['y_ball']
 
 # Create a new figure and axis
 fig, ax = plt.subplots(figsize= (10,8))
-img = plt.imread("penalty_box.png")
-ax.imshow(img, alpha=0.3, extent=[95, 120, 16.5, 64])
+img = plt.imread("big_penalty_box.png")
+ax.imshow(img, alpha=0.3, extent=[80, 120, 10, 70])
 
 #labels for the points
 #passing player
@@ -125,7 +125,7 @@ for i in range(len(x_original)):
 handles, labels = ax.get_legend_handles_labels()
 unique_labels = list(set(labels))
 handles = [handles[labels.index(label)] for label in unique_labels]
-legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.3, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
+legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.4, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
 
 ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')

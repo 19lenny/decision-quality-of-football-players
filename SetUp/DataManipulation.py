@@ -37,50 +37,70 @@ def coordinates(dataframe):
 # return the adjusted df
 # visualized in powerpoint 'calculation angle and distance.pptx'
 # angle in degree
-def angle(dataframe):
+def angle(df):
     # Morales cesar a "A mathematics-based new penalty area in football: tackling diving", Journal of sports sciences
     # cosinussatz
-    dataframe["b"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
-                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
-    dataframe["c"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
-                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
-    dataframe["angle"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                  / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, 180,
-                                  np.rad2deg(
-                                      np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                                / (2 * dataframe["b"] * dataframe["c"]))))
-    return dataframe
 
-
-# angle in radian
-def angleInRadian(dataframe):
-    dataframe["b"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
-                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
-    dataframe["c"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
-                      (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
-    dataframe["angleInRadian"] = np.where((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                  / (2 * dataframe["b"] * dataframe["c"]) < -0.99999999, np.pi,
-                                  np.arccos((dataframe["b"] ** 2 + dataframe["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                            / (2 * dataframe["b"] * dataframe["c"])))
     angleList = []
     bList = []
     cList = []
-    for shot in range(len(dataframe)):
-        b = ((dataframe["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
-                      (dataframe["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+    for shot in range(len(df)):
+        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
         bList.append(b)
-        c = ((dataframe["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
-                      (dataframe["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
         cList.append(c)
-        angleRad = 1
+        # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
+        # we define the angles when playing to the post as 0, as we should not play the ball to the post
+        if b == 0 or c == 0:
+            angleList.append(0)
+        else:
+            angleList.append( np.rad2deg(np.arccos((df["b"] ** 2 + df["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                       / (2 * df["b"] * df["c"]))))
+    df['b'] = bList
+    df['c'] = cList
+    df['angleDeg'] = angleList
 
-    return dataframe
+    return df
+
+
+
+# angle in radian
+def angleInRadian(df):
+
+    angleList = []
+    bList = []
+    cList = []
+    for shot in range(len(df)):
+        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+        bList.append(b)
+        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+        cList.append(c)
+        # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
+        # we define the angles when playing to the post as 0, as we should not play the ball to the post
+        if b == 0 or c == 0:
+            angleList.append(0)
+        else:
+            angleList.append(np.arccos((df["b"] ** 2 + df["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                       / (2 * df["b"] * df["c"])))
+    df['b'] = bList
+    df['c'] = cList
+    df['angleInRadian'] = angleList
+
+    return df
 
 
 def angleInRadianFromObjectToPoints(x_object, y_object, x_point1, y_point1, x_point2, y_point2):
     b = ((x_object - x_point1) ** 2 + (y_object - y_point1) ** 2) ** 0.5
     c = ((x_object - x_point2) ** 2 + (y_object - y_point2) ** 2) ** 0.5
     a = ((x_point1 - x_point2) ** 2 + (y_point1 - y_point2) ** 2) ** 0.5
+    if b == 0 or c == 0:
+    # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
+    # we define the angles when playing to the post as 0, as we should not play the ball to the post
+        return 0
     angle_in_rad = np.arccos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))
 
     return angle_in_rad
@@ -88,12 +108,12 @@ def angleInRadianFromObjectToPoints(x_object, y_object, x_point1, y_point1, x_po
 
 # calculate distance and write it to the df
 # return the adjusted df
-def distancePlayerToGoal(dataframe):
+def distancePlayerToGoal(df):
     # distance
     # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
-    dataframe["distance_to_goal_centre"] = ((dataframe["x_coordinate"] - CONSTANTS.X_COORDINATE_GOALCENTRE) ** 2 +
-                                            (dataframe["y_coordinate"] - CONSTANTS.Y_COORDINATE_GOALCENTRE) ** 2) ** 0.5
-    return dataframe
+    df["distance_to_goal_centre"] = ((df["x_coordinate"] - CONSTANTS.X_COORDINATE_GOALCENTRE) ** 2 +
+                                     (df["y_coordinate"] - CONSTANTS.Y_COORDINATE_GOALCENTRE) ** 2) ** 0.5
+    return df
 
 
 # calculate distance
@@ -337,3 +357,26 @@ def tranf_normal_distribution(df):
     else:
         print("data is NOT normal distributed")
         return False
+def log_penalty(df):
+    penaltyList = []
+    for shot in range(len(df)):
+        # if the shot is equal to 0, then the penalty has to be limited
+        # the reason for that is that log(0) is undefined,
+        # we therefore limit the penalty to maximal -5 --> log(0.00001)
+        if df['angleInRadian'][shot] < 0.000001:
+            penaltyList.append(-np.log10(0.001))
+        else:
+            # else create a penalty
+            #if df['match_id'][shot] == 266254 and df['minute'][shot] == 74:
+            w = shot
+            x = df['angleInRadian'][shot]
+            y = np.log(df['angleInRadian'][shot])
+            z = -np.log(df['angleInRadian'][shot])
+            #(-) weil kleine Winkel führen zu negativen penalties, der penalty soll aber je höher desto schlimmer sein
+            penaltyList.append(-np.log10(df['angleInRadian'][shot]))
+    df['log_pen_angle'] = penaltyList
+    return df
+def log_penalty_for_single_values(angle):
+    if angle < 0.00000001:
+        return -np.log(0.001)
+    else: return -np.log10(angle)

@@ -161,7 +161,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
 
     # calculate xG and return it
 
-    # before we can calculate the xG, we have to know the angle and distance from the current location to the goal
+    # before we can calculate the xG, we have to know the angle, the penalty for bad angles and distance from the current location to the goal
     angle_in_rad = DataManipulation.angleInRadianFromObjectToPoints(x_object=x_location, y_object=y_location,
                                                                     x_point1=CONSTANTS.X_COORDINATE_POST1,
                                                                     y_point1=CONSTANTS.Y_COORDINATE_POST1,
@@ -170,11 +170,12 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
     distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
                                                                x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
                                                                y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
+    penalty_log = DataManipulation.log_penalty_for_single_values(angle=angle_in_rad)
     # xG on the current location is the prediction of the expected goal from this location,
     # based on the angle of the location to the goal and the distance of the location to the goal
     # the prediction has to be multiplied with the xPass prediction
     # (the longer the teammate has time, the higher will be xP)
-    xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards])
+    xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards, penalty_log])
     xG = xgPrediction * xP
     # predict returns as a dataframe
     # we only need first value out of dataframe

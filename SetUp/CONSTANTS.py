@@ -56,7 +56,7 @@ PLAYER_SPEED = 19.8 * FROMKMHTOYPS
 
 #logmodel should also not change after it is calculated once
 # which attributes should be taken into account?
-ATTRIBUTES = ['angleInRadian', 'distance_to_goal_centre']
+ATTRIBUTES = ['angleInRadian', 'distance_to_goal_centre', 'log_pen_angle']
 
 # model with intercept
 MODELNAMEINTERCEPT = "xG"

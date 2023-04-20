@@ -63,9 +63,9 @@ for index in tqdm(range(len(competitionIDs)), colour='green'):
                 getEventsInMatch = sb.events(event)
                 #print("i am still working, nothing to worry")
                 # only keep the necessary rows,
-                # which have something to do with shots and are not from penalties or freekicks
+                # which have something to do with shots and are not from penalties or freekicks, or straight corners
                 getEventsInMatch = getEventsInMatch.query(
-                    "type == 'Shot' & shot_body_part != 'Head' & shot_type != 'Free Kick' & shot_type != 'Penalty'")
+                    "type == 'Shot' & shot_body_part != 'Head' & shot_type == 'Open Play'")
 
                 # add them to the current model
                 dfShotModelData = pd.concat([dfShotModelData, getEventsInMatch])
@@ -100,6 +100,8 @@ dfModelData = DataManipulation.coordinates(dfModelData)
 dfModelData = DataManipulation.angle(dfModelData)
 # add angle in rad
 dfModelData = DataManipulation.angleInRadian(dfModelData)
+#add the penalty for bad radians
+dfModelData = DataManipulation.log_penalty(dfModelData)
 # add distance
 dfModelData = DataManipulation.distancePlayerToGoal(dfModelData)
 # binary solution of goal or no goal, so the model can easier be created
@@ -112,7 +114,7 @@ dfModelData['season_id'] = seas
 
 # only keep the interesting columns
 dfModelData = dfModelData[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "angleInRadian", "distance_to_goal_centre",
+    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angle", "angleInRadian", "log_pen_angle", "distance_to_goal_centre",
      "shot_statsbomb_xg", "shot_body_part", "period",
      "minute", "shot_type", "match_date", "competition",
      "season", "home_team", "away_team", "home_score", "away_score", "competition_stage", "match_id", "competition_id", "season_id"]]

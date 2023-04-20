@@ -1,21 +1,18 @@
-import math
-import os
-import json
+
 import pandas as pd
-from SetUp import CONSTANTS, JSONtoDF
-from scipy.stats import expon
-from decimal import *
+from SetUp import DataManipulation
 import numpy as np
-from scipy.stats import pearsonr
-from statsbombpy import sb
-from Model import model_info
-from SetUp.DecisionEvaluation import evaluationHelper, evaluate_decision
 
-df_train = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
 
-df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-coeff = pearsonr(df_test["shot_statsbomb_xg"], df_test["xG"])
-print(coeff)
+df_train = pd.read_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" 
+                    "Masterarbeit/Thesis/thesis/JSON/Train_Set_Shots.json")
 
-x = np.arccos(1.1)
+
+
+
+
+df_train = DataManipulation.log_penalty(df_train)
+
+df_train.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" 
+                    "Masterarbeit/Thesis/thesis/JSON/Train_Set_Shots.json")
 

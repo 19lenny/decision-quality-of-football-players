@@ -50,6 +50,8 @@ def getDF(competition_id, season_id, competition, save_path):
     df_return = DataManipulation.angle(df_return)
     # add angle in rad
     df_return = DataManipulation.angleInRadian(df_return)
+    # add the penalty for bad radians
+    df_return = DataManipulation.log_penalty(df_return)
     # add distance
     df_return = DataManipulation.distancePlayerToGoal(df_return)
 
@@ -59,7 +61,7 @@ def getDF(competition_id, season_id, competition, save_path):
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
     # this way some time is saved in the next call
     df_return = df_return.query(
-        "type == 'Shot' & shot_body_part != 'Head' & shot_type != 'Free Kick' & shot_type != 'Penalty'")
+        "type == 'Shot' & shot_body_part != 'Head' & shot_type == 'Open Play'")
     df_return.reset_index(drop=True, inplace=True)
 
     # add the transfer value of every shooting player

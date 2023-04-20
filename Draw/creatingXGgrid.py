@@ -52,7 +52,10 @@ for x in x_range_pitch:
         # based on the angle of the location to the goal and the distance of the location to the goal
         # the prediction has to be multiplied with the xPass prediction
         # (the longer the teammate has time, the higher will be xP)
-        xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards], CONSTANTS.ATTRIBUTES, logmodel)
+        if angle_in_rad < 0.000001:
+            angle_in_rad = 0.00001
+        log_pen = -np.log(angle_in_rad)
+        xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards, log_pen], CONSTANTS.ATTRIBUTES, logmodel)
 
         xList.append(x)
         yList.append(y)
