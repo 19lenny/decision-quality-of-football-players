@@ -51,7 +51,7 @@ for index in range(len(competitionIDs)):
 
 
 # reset the index, so a new index is created
-dfAllEvents.reset_index(inplace=True)
+dfAllEvents.reset_index(drop=True, inplace=True)
 
 # convert the dfModelData to a JSON.
 # this is done for two reasons:

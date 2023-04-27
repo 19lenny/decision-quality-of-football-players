@@ -27,13 +27,13 @@ def prediction(df):
     return df
 
 
-def predictionOfSingleValues(values):
+def predictionOfSingleValues(values, attributes):
     """
     formular of prediction is: exp(regression*values)/(1+exp(regression*values))
     source: https://stats.stackexchange.com/questions/441561/get-equation-from-glm-coefficients-calculate-y-manually
     """
     data = [values]
-    predictionDf = pd.DataFrame(data, columns=CONSTANTS.ATTRIBUTES)
+    predictionDf = pd.DataFrame(data, columns=attributes)
     pred = CONSTANTS.REGRESSION_MODEL.predict(predictionDf)
     return pred[0]
 

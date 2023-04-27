@@ -56,8 +56,8 @@ def angle(df):
         if b == 0 or c == 0:
             angleList.append(0)
         else:
-            angleList.append( np.rad2deg(np.arccos((df["b"] ** 2 + df["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                       / (2 * df["b"] * df["c"]))))
+            angleList.append(np.rad2deg(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                       / (2 * b * c))))
     df['b'] = bList
     df['c'] = cList
     df['angleDeg'] = angleList
@@ -84,8 +84,8 @@ def angleInRadian(df):
         if b == 0 or c == 0:
             angleList.append(0)
         else:
-            angleList.append(np.arccos((df["b"] ** 2 + df["c"] ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                       / (2 * df["b"] * df["c"])))
+            angleList.append(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                       / (2 * b * c)))
     df['b'] = bList
     df['c'] = cList
     df['angleInRadian'] = angleList
@@ -120,10 +120,26 @@ def distancePlayerToGoal(df):
 # return the distance in yards
 def distanceObjectToPoint(x_object, y_object, x_point, y_point):
     # pythagoras --> ((x1-x2)^2+(y1-y2)^2)^0.5
+    first = (x_object - x_point)
+    second = (y_object - y_point)
     distance = ((x_object - x_point) ** 2 + (y_object - y_point) ** 2) ** 0.5
     return distance
 
-
+def intersection_point_GK_Shot(goalkeeper, shot):
+    x0, y0 = goalkeeper
+    x1, y1 = shot
+    x2, y2 = (CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE)
+    dx, dy = x2 - x1, y2 - y1
+    dot = dx * (x0 - x1) + dy * (y0 - y1)
+    mag = dx ** 2 + dy ** 2
+    if mag == 0:
+        return None
+    else:
+        t = dot / mag
+        t = max(0, min(1, t))
+        xi = x1 + t * dx
+        yi = y1 + t * dy
+        return xi, yi
 def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
     dataframe['goal'] = np.where(dataframe['type'] == "Own Goal Against", -1, dataframe['goal'])
@@ -187,7 +203,7 @@ def score(df):
         dfCurrentMatch = df.loc[df['match_id'] == match_id[match][0]].sort_values(by = ['minute', 'second'])
 
         # reset index to go through in the for loop
-        dfCurrentMatch.reset_index(inplace=True)
+        dfCurrentMatch.reset_index(drop=True, inplace=True)
         # create helper lists that should be filled
         position = 0
         # scores determines if the current shooting team is before the current shot either winning, drawing or loosing
@@ -357,14 +373,14 @@ def tranf_normal_distribution(df):
     else:
         print("data is NOT normal distributed")
         return False
-def log_penalty(df):
-    penaltyList = []
+def log_angle(df):
+    logAngleList = []
     for shot in range(len(df)):
         # if the shot is equal to 0, then the penalty has to be limited
         # the reason for that is that log(0) is undefined,
         # we therefore limit the penalty to maximal -5 --> log(0.00001)
         if df['angleInRadian'][shot] < 0.000001:
-            penaltyList.append(-np.log10(0.001))
+            logAngleList.append(np.log(0.001))
         else:
             # else create a penalty
             #if df['match_id'][shot] == 266254 and df['minute'][shot] == 74:
@@ -373,10 +389,10 @@ def log_penalty(df):
             y = np.log(df['angleInRadian'][shot])
             z = -np.log(df['angleInRadian'][shot])
             #(-) weil kleine Winkel führen zu negativen penalties, der penalty soll aber je höher desto schlimmer sein
-            penaltyList.append(-np.log10(df['angleInRadian'][shot]))
-    df['log_pen_angle'] = penaltyList
+            logAngleList.append(np.log(df['angleInRadian'][shot]))
+    df['log_angle'] = logAngleList
     return df
 def log_penalty_for_single_values(angle):
     if angle < 0.00000001:
-        return -np.log(0.001)
-    else: return -np.log10(angle)
+        return np.log(0.001)
+    else: return np.log(angle)

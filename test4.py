@@ -1,14 +1,40 @@
-# create a test model for 10 particular shot not for a whole dataframe
-# here it can be shown hot the model works
+from matplotlib import rcParams, pyplot as plt
 
-import pandas as pd
-from Model import model_info
+from Model import create_model, model_info
 from SetUp import JSONtoDF, DataManipulation, CONSTANTS
 import numpy as np
+import pandas as pd
+import statsmodels.formula.api as smf
 
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
+#df = JSONtoDF.createDF("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/test.json")
+df = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
+#df2 = df.loc[df['shot_type'] != 'Open Play']
+df = df.loc[df['shot_type'] == 'Open Play']
+#df = df.loc[df['competition'] != "England - FA Women's Super League"]
+#df = df.loc[df['competition'] != "International - Women's World Cup"]
+#df = df.loc[df['competition'] != "Unites States of America - NWSL"]
 
+df.reset_index(drop=True, inplace=True)
+df = DataManipulation.log_angle(df)
+# summary of training data
+attributes = ['distance_to_goal_centre', 'angleInRadian']
+# create the model
+regression = create_model.create_model_glm(df, attributes = attributes)
+# show the info of the model
+print("This is the correct info")
+model_info.show_info(regression=regression)
+description = df.describe()
+print(description)
+
+def predictionOfSingleValues(values, attributes):
+    """
+    formular of prediction is: exp(regression*values)/(1+exp(regression*values))
+    source: https://stats.stackexchange.com/questions/441561/get-equation-from-glm-coefficients-calculate-y-manually
+    """
+    data = [values]
+    predictionDf = pd.DataFrame(data, columns=attributes)
+    pred = regression.predict(predictionDf)
+    return pred[0]
 
 def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
     square_meter_size = square_meter_size
@@ -90,7 +116,7 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
             # based on the angle of the location to the goal and the distance of the location to the goal
             # the prediction has to be multiplied with the xPass prediction
             # (the longer the teammate has time, the higher will be xP)
-            xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, penalty_log], attributes=CONSTANTS.ATTRIBUTES)
+            xgPrediction = predictionOfSingleValues([distance_in_yards, angle_in_rad], attributes=attributes)
 
             xList.append(x)
             yList.append(y)
@@ -148,82 +174,6 @@ def draw_xG_model(dfXGGrid, saving_location, title):
     plt.savefig(saving_location)
     plt.show()
 
-def df_goals_divided_by_shots():
-    df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-    df_train = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
-    shots_model = pd.concat([df_train, df_test])
-    shots_model.reset_index(drop=True, inplace=True)
-
-    # dataframe where all the shots happened
-    shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',
-                               'angleInRadian', 'distance_to_goal_centre', 'shot_statsbomb_xg']]
-
-    square_meter_size = 1
-    max_shot_distance = 40
-    # -----------------------------------------------------------------------------------------------------------
-    # create a grid which shows for every x and y combination the xGoal according to regression
-
-    # create a grid with a certain amount of bins
-    x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE,
-                              square_meter_size)
-    # create the y linspace of the pitch, the end value gets +square meter size,
-    # such that the endpoint is still in the range
-    """
-    y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE1,
-                              CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
-                              square_meter_size)
-    """
-    # this means shots made from the corner flag are not included in the visualization
-    y_range_pitch = np.arange(15,
-                              65,
-                              square_meter_size)
-
-    xGList = []
-    xList = []
-    yList = []
-
-    for x in range(len(x_range_pitch) - 1):
-        for y in range(len(y_range_pitch) - 1):
-            number_of_shots_current_location = 0
-            number_of_goals_current_location = 0
-            xList_current = []
-            yList_current = []
-            xGList_current = []
-
-            for shot in range(len(shots_model)):
-                a = shots_model['x_coordinate'][shot]
-                b = x_range_pitch[x]
-                c = x_range_pitch[x+1]
-                if (shots_model['x_coordinate'][shot] >= x_range_pitch[x]) and (shots_model['x_coordinate'][shot] < x_range_pitch[x + 1]):
-                    if (shots_model['y_coordinate'][shot] >= y_range_pitch[y]) and (
-                            shots_model['y_coordinate'][shot] < y_range_pitch[y + 1]):
-                        #print("now the shot is good")
-                        number_of_shots_current_location += 1
-                        if shots_model['goal'][shot] == 1:
-                            print("golazooo")
-                            number_of_goals_current_location += 1
-                        xList_current.append(int(shots_model['x_coordinate'][shot]))
-                        yList_current.append(int(shots_model['y_coordinate'][shot]))
-            for prob in range(len(xList_current)):
-                xGList_current.append(number_of_goals_current_location / number_of_shots_current_location)
-
-            xList = xList + xList_current
-            yList = yList + yList_current
-            xGList = xGList + xGList_current
-
-    data = {'x': xList,
-            'y': yList,
-            'xGPrediction': xGList,
-            }
-    dfXGGrid = pd.DataFrame(data)
-    return dfXGGrid
-
-# calculate for every x and y coordinate the xGoal
-# shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
+xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=regression)
 #draw the xG histogram
-draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis_0_001.png", title="xGModel")
-
-#dfDivisioned = df_goals_divided_by_shots()
-#draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")
+draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/test.png", title="xGModel")

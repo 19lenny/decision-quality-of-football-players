@@ -33,8 +33,8 @@ dfMatchesWM2022.set_index("match_id")
 
 
 # reset the index, so a new index is created
-dfEventsEM2020.reset_index(inplace=True)
-dfEventsWM2022.reset_index(inplace=True)
+dfEventsEM2020.reset_index(drop=True, inplace=True)
+dfEventsWM2022.reset_index(drop=True, inplace=True)
 
 # convert the dfEM2020 & dfWM2022 to a JSON.
 # this is done for two reasons:

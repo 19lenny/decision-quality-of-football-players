@@ -62,9 +62,9 @@ def decisionEvaluation(dfSeason, eventname):
         dfTeammates = dfOtherPlayers.loc[
             (dfOtherPlayers['teammate'] == True) & (dfOtherPlayers['isOffside'] == False)]
         # the index has to be reset, otherwise we cannot go through with a for loop
-        dfTeammates.reset_index(inplace=True)
+        dfTeammates.reset_index(drop=True, inplace=True)
         dfOpponents = dfOtherPlayers.loc[dfOtherPlayers['teammate'] == False]
-        dfOpponents.reset_index(inplace=True)
+        dfOpponents.reset_index(drop=True, inplace=True)
 
         # go through all 0.5 square meters on the pitch
         # but start from 40 yards from the goal away, everything farther away creates not higher xG values
@@ -109,7 +109,7 @@ def decisionEvaluation(dfSeason, eventname):
                         # if the opponent goalkeeper has the longer way than our team member,
                         # take goalkeeper out of the opponent dataframe and calculate again for another player of the opponent
                         dfOpponentsNoGK = dfOpponents.loc[dfOpponents['name_position'] != 'Goalkeeper']
-                        dfOpponentsNoGK.reset_index(inplace=True)
+                        dfOpponentsNoGK.reset_index(drop=True, inplace=True)
                         closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_opponent_teammate, name_closest_opponent = \
                             evaluationHelper.findClosestPlayer(dfOpponentsNoGK, x, y)
 

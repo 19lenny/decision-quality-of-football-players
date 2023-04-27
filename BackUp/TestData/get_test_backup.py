@@ -1,11 +1,11 @@
 from statsbombpy import sb
 import pandas as pd
-from SetUp import DataManipulation, CONSTANTS
+from SetUp import DataManipulation, CONSTANTS, joinDF
 from Model import model_info
 from SetUp.DecisionEvaluation import evaluate_decision
 from SetUp import TM_values
 
-def getDF(competition_id, season_id, competition, save_path):
+def getDF(competition_id, season_id, competition):
     df_matches = pd.DataFrame(sb.matches(competition_id, season_id))
     df_matches = df_matches.sort_values(by=['match_id'])
     df_matches.reset_index(drop=True, inplace=True)
@@ -56,7 +56,7 @@ def getDF(competition_id, season_id, competition, save_path):
     df_return = DataManipulation.distancePlayerToGoal(df_return)
 
     # add xGoal, calculated by me
-    df_return = model_info.prediction(df_return)
+    #df_return = model_info.prediction(df_return)
 
     # only keep the necessery rows, which have something to do with shots and are not from penalties or freekicks
     # this way some time is saved in the next call
@@ -74,26 +74,27 @@ def getDF(competition_id, season_id, competition, save_path):
     # - the difference of the shooting players decision and the decision of the best alternative
     # - if the shooting player made the best decision
     # - the xP of the pass that would be needed to go to the best alternative
-    df_return = evaluate_decision.decisionEvaluation(df_return, competition)
+    #df_return = evaluate_decision.decisionEvaluation(df_return, competition)
 
     # reset the index, so a new index is created
     df_return.reset_index(drop=True, inplace=True)
 
-    # convert the df_return to a JSON.
-    # this is done for two reasons:
-    # 1) security: the provider can change the data all the time, in  downloading to JSON, we work on a hard copy
-    # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
-    # Therefore this code only has to be running once, the output is saved in a JSON file
-    df_return.to_json(save_path)
+
 
     print("i am finished with competition: ", competition)
     return df_return
 
 #get EM20
-dfEM = getDF(competition_id=55, season_id=43, competition="EM20", save_path=CONSTANTS.JSONEM2020)
+dfEM = getDF(competition_id=55, season_id=43, competition="EM20")
 
 #get WM18
-dfWM18 = getDF(competition_id=43, season_id=3, competition="WM18", save_path=CONSTANTS.JSONWM2018)
+dfWM18 = getDF(competition_id=43, season_id=3, competition="WM18")
 
 #getWM22
-dfWM22 = getDF(competition_id=43, season_id=106, competition="WM22", save_path=CONSTANTS.JSONWM2022)
+dfWM22 = getDF(competition_id=43, season_id=106, competition="WM22")
+# concat the testing data
+dfAll = joinDF.concat([dfEM, dfWM18, dfWM22])
+dfAll.reset_index(drop=True, inplace=True)
+
+# save it
+dfAll.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/BackUp/TestData/dfTest_backup.json")

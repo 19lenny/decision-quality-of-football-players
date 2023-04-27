@@ -44,6 +44,6 @@ def xP_heatmap(correct_decision, title):
     plt.show()
 
 #todo change color code
-#todo auf ganze Spielfläche vergrössern
+
 xP_heatmap(correct_decision=False, title="xP heatmap wrong decisions")
 xP_heatmap(correct_decision=True, title="xP heatmap all decisions")

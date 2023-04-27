@@ -175,7 +175,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
     # based on the angle of the location to the goal and the distance of the location to the goal
     # the prediction has to be multiplied with the xPass prediction
     # (the longer the teammate has time, the higher will be xP)
-    xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards, penalty_log])
+    xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, penalty_log], attributes=CONSTANTS.ATTRIBUTES)
     xG = xgPrediction * xP
     # predict returns as a dataframe
     # we only need first value out of dataframe

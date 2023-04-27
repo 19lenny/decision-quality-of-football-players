@@ -55,7 +55,7 @@ for x in x_range_pitch:
         if angle_in_rad < 0.000001:
             angle_in_rad = 0.00001
         log_pen = -np.log(angle_in_rad)
-        xgPrediction = model_info.predictionOfSingleValues([angle_in_rad, distance_in_yards, log_pen], CONSTANTS.ATTRIBUTES, logmodel)
+        xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, log_pen], CONSTANTS.ATTRIBUTES, logmodel)
 
         xList.append(x)
         yList.append(y)

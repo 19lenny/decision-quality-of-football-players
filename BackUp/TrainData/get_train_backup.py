@@ -113,11 +113,6 @@ dfModelData['competition_id'] = comp
 dfModelData['season_id'] = seas
 
 # only keep the interesting columns
-dfModelData = dfModelData[
-    ["x_coordinate", "y_coordinate", "shot_end_location", "shot_outcome", "goal", "angleDeg", "angleInRadian", "log_pen_angle", "distance_to_goal_centre",
-     "shot_statsbomb_xg", "shot_body_part", "period",
-     "minute", "shot_type", "match_date", "competition",
-     "season", "home_team", "away_team", "home_score", "away_score", "competition_stage", "match_id", "competition_id", "season_id"]]
 
 # reset the index, so a new index is created
 dfModelData.reset_index(drop=True, inplace=True)
@@ -128,7 +123,7 @@ dfModelData.reset_index(drop=True, inplace=True)
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
 
-dfModelData.to_json(CONSTANTS.JSONTRAINSHOTS)
+dfModelData.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/BackUp/TrainData/dfTrain.json")
 
 
 print("i am finished with downloading the training set")
