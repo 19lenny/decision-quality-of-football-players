@@ -45,5 +45,5 @@ def xP_heatmap(correct_decision, title):
 
 #todo change color code
 
-xP_heatmap(correct_decision=False, title="xP heatmap wrong decisions")
+xP_heatmap(correct_decision=False, title="xP heatmap only false decisions")
 xP_heatmap(correct_decision=True, title="xP heatmap all decisions")

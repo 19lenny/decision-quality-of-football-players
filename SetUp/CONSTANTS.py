@@ -32,15 +32,15 @@ JSONSHOTEVALUATIONWM2022 =\
 # https://github.com/statsbomb/statsbombpy/blob/master/doc/StatsBomb%20Open%20Data%20Specification%20v1.1.pdf
 # all values in yards
 GOAL_LENGTH = 8
-X_COORDINATE_POST1 = 120
-Y_COORDINATE_POST1 = 36
-X_COORDINATE_POST2 = 120
-Y_COORDINATE_POST2 = 44
+X_COORDINATE_POST_L = 120
+Y_COORDINATE_POST_L = 36
+X_COORDINATE_POST_R = 120
+Y_COORDINATE_POST_R = 44
 X_COORDINATE_GOALCENTRE = 120
 Y_COORDINATE_GOALCENTRE = 40
 X_MIDDLE_LINE = 60
-Y_MIDDLE_LINE1 = 0
-Y_MIDDLE_LINE2 = 80
+Y_MIDDLE_LINE_TOP = 0
+Y_MIDDLE_LINE_BOTTOM = 80
 
 
 # speed (in yards / second)
@@ -56,7 +56,7 @@ PLAYER_SPEED = 19.8 * FROMKMHTOYPS
 
 #logmodel should also not change after it is calculated once
 # which attributes should be taken into account?
-ATTRIBUTES = ['distance_to_goal_centre', 'log_angle']
+ATTRIBUTES = ['distance_to_goal_centre', 'log_angle', 'delta_distance_GK_to_optimal_line']
 
 # model with intercept
 MODELNAMEINTERCEPT = "xG"

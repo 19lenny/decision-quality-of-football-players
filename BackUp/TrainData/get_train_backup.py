@@ -123,7 +123,7 @@ dfModelData.reset_index(drop=True, inplace=True)
 # 2) speed: it is way faster to work with data from a JSON file instead of always calling the API
 # Therefore this code only has to be running once, the output is saved in a JSON file
 
-dfModelData.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/BackUp/TrainData/dfTrain.json")
+dfModelData.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/BackUp/TrainData/dfTrain_backup.json")
 
 
 print("i am finished with downloading the training set")

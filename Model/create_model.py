@@ -51,6 +51,8 @@ def create_model_glm(df, attributes):
     for v in attributes[:-1]:
         model = model + v + ' + '
     model = model + attributes[-1]
+    # -1 to take away the intercetp
+    model = model + ' - 1'
 
     # Fit the model
     # the model is based on the binary y value 'goal',

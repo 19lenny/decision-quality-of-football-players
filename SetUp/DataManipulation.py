@@ -4,9 +4,11 @@ import pandas as pd
 import numpy as np
 from statsbombpy import sb
 from SetUp import CONSTANTS
+from SetUp.DecisionEvaluation import evaluationHelper
 import math
 from scipy.stats import shapiro, kstest
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 """
 DataManipulationAngleDistance: all methods receive a dataframe.
 This dataframe is manipulated. 
@@ -45,11 +47,11 @@ def angle(df):
     bList = []
     cList = []
     for shot in range(len(df)):
-        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
-             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST_L) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST_L) ** 2) ** 0.5
         bList.append(b)
-        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
-             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST_R) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST_R) ** 2) ** 0.5
         cList.append(c)
         # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
         # we define the angles when playing to the post as 0, as we should not play the ball to the post
@@ -73,11 +75,11 @@ def angleInRadian(df):
     bList = []
     cList = []
     for shot in range(len(df)):
-        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST1) ** 2 +
-             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST1) ** 2) ** 0.5
+        b = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST_L) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST_L) ** 2) ** 0.5
         bList.append(b)
-        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST2) ** 2 +
-             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST2) ** 2) ** 0.5
+        c = ((df["x_coordinate"][shot] - CONSTANTS.X_COORDINATE_POST_R) ** 2 +
+             (df["y_coordinate"][shot] - CONSTANTS.Y_COORDINATE_POST_R) ** 2) ** 0.5
         cList.append(c)
         # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
         # we define the angles when playing to the post as 0, as we should not play the ball to the post
@@ -143,6 +145,38 @@ def intersection_point_GK_Shot(goalkeeper, shot):
 def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
     dataframe['goal'] = np.where(dataframe['type'] == "Own Goal Against", -1, dataframe['goal'])
+    return dataframe
+
+def addDeltaGKToOptimalLine(dataframe):
+    distance_from_line = []
+
+    for shot in tqdm(range(len(dataframe))):
+        # check if dfTraining every shot has a freeze-frame, if not it can be forgotten to take players movement in to account
+        # kann in backup datei nachgeschaut werden
+        # other possbility would be to throw out the shots that have no freeze frame
+        dfOtherPlayers = evaluationHelper.getPlayersOfEvent(dataframe['shot_freeze_frame'][shot], "Train")
+        # we only need the opponents. the goalkeeper of the own team is not important
+        dfOtherPlayers = dfOtherPlayers.loc[dfOtherPlayers['teammate'] == False]
+        # find GK of current shot
+        there_is_goalkeeper = False
+        distance = None
+        for athlete in range(len(dfOtherPlayers)):
+            player = dfOtherPlayers.iloc[athlete]
+            if player['name_position'] == "Goalkeeper":
+                there_is_goalkeeper = True
+                # location GK
+                GK = (player['x_coordinate'], player['y_coordinate'])
+                # location of the Shot
+                S = (dataframe['x_coordinate'][shot], dataframe['y_coordinate'][shot])
+                intersection = intersection_point_GK_Shot(GK, S)
+                distance = distanceObjectToPoint(x_object=GK[0], y_object=GK[1], x_point=intersection[0],
+                                                 y_point=intersection[1])
+        if there_is_goalkeeper:
+            distance_from_line.append(distance)
+        else:
+            distance_from_line.append(None)
+
+    dataframe['delta_distance_GK_to_optimal_line'] = distance_from_line
     return dataframe
 
 """
@@ -338,7 +372,7 @@ def check_normal_distribution(df):
     plt.hist(df[CONSTANTS.EVALUATION_VARIABLE], edgecolor='black', bins=20)
     plt.show()
 
-    kolmo_val, p_val = shapiro(df[CONSTANTS.EVALUATION_VARIABLE])
+    shapiro_val, p_val = shapiro(df[CONSTANTS.EVALUATION_VARIABLE])
     if p_val > 0.05:
         print("data is normal distributed")
         return True
@@ -392,7 +426,8 @@ def log_angle(df):
             logAngleList.append(np.log(df['angleInRadian'][shot]))
     df['log_angle'] = logAngleList
     return df
-def log_penalty_for_single_values(angle):
+def log_angle_single_values(angle):
     if angle < 0.00000001:
         return np.log(0.001)
     else: return np.log(angle)
+

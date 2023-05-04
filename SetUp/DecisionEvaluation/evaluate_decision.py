@@ -33,6 +33,10 @@ def decisionEvaluation(dfSeason, eventname):
     # create a list to save the player from the best alternative solution
     alternative_player: List[str] = ["None"] * len(dfSeason)
     alternative_player_opponent: List[str] = ["None"] * len(dfSeason)
+    #the features of the alternative
+    feature_distance: List[float] = [0.0] * len(dfSeason)
+    feature_angle: List[float] = [0.0] * len(dfSeason)
+    feature_GK_distance: List[float] = [0.0] * len(dfSeason)
 
     # for every shot of the competition
     # this for loop gets every shot from a competition, starting with the first shot
@@ -67,35 +71,35 @@ def decisionEvaluation(dfSeason, eventname):
         dfOpponents.reset_index(drop=True, inplace=True)
 
         # go through all 0.5 square meters on the pitch
-        # but start from 40 yards from the goal away, everything farther away creates not higher xG values
+        # but start from 33 yards (=30 meters) from the goal away, everything farther away is not expected to create high xG values
 
         square_meter_size = 0.5
-        max_shot_distance = 40
+        max_shot_distance = 33
         # create the x linspace of the pitch, the end value gets +square meter size,
         # such that the endpoint is still in the range
-        # this creates a range from 80 to 120 with step size 0.5
+        # this creates a range from 90 to 120 with step size 0.5
         x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
                                   CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size,
                                   square_meter_size)
         # create the y linspace of the pitch, the end value gets +square meter size,
         # such that the endpoint is still in the range
-        y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE1,
-                                  CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
+        y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE_TOP,
+                                  CONSTANTS.Y_MIDDLE_LINE_BOTTOM + square_meter_size,
                                   square_meter_size)
-
+        # check every 0.5 square meter of the pitch
         for x in x_range_pitch:
             for y in y_range_pitch:
-                # the player cannot shoot, when the ball is in the post --> the posts should be skipped
+                # the player cannot shoot, when the ball is on the post --> the posts should be skipped
                 if (x == 120) and (y == 36 or y == 44):
                     continue
-                # debug
+
                 # find the distance the ball has to travel to get from its current location to the location looked at
                 ball_distance = DataManipulation.distanceObjectToPoint(x_shooting_player, y_shooting_player, x, y)
                 # find the distance of the teammate, which is the closest to the current position looked at
                 closest_teammate_x, closest_teammate_y, distance_closest_teammate, position_closest_teammate, name_closest_teammate = \
                     evaluationHelper.findClosestPlayer(dfTeammates, x, y)
                 # find the distance of the opponent, which is the closest to the current position looked at
-                # the closest opponent is only the goalkeeper, if and only if the keeper is the first on the ball
+                # the closest opponent is only the goalkeeper, if and only if the keeper is the first on the ball, otherwise the algorithm checks for other opponents which are close
                 closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_opponent_teammate, name_closest_opponent = \
                     evaluationHelper.findClosestPlayer(dfOpponents, x, y)
 
@@ -122,12 +126,15 @@ def decisionEvaluation(dfSeason, eventname):
                 time_team_member = evaluationHelper.getTimeForDistance(distance_closest_teammate,
                                                                        CONSTANTS.PLAYER_SPEED)
 
+
+
                 # calculate xG for current location, if xG is higher as the last calculated xG, save the value
 
-                xG_for_current_location, xP_for_current_location, ball_control_time = \
-                evaluationHelper.xGFromAlternative(time_team_member,
+                xG_for_current_location, xP_for_current_location, ball_control_time, angle_alternative, distance_alternative, delta_GK_alternative\
+                    = evaluationHelper.xGFromAlternative(time_team_member,
                                                    time_opponent,
                                                    time_ball,
+                                                   df_opponents=dfOpponents,
                                                    x_location=x, y_location=y)
 
 
@@ -158,7 +165,11 @@ def decisionEvaluation(dfSeason, eventname):
                     # create a list to save the player from the best alternative solution
                     alternative_player[currentShot] = name_closest_teammate
                     alternative_player_opponent[currentShot] = name_closest_opponent
-                    # add xPass
+                    #add the new features to the dataframe
+                    feature_angle[currentShot] = angle_alternative
+                    feature_distance[currentShot] = distance_alternative
+                    feature_GK_distance[currentShot] = delta_GK_alternative
+
                     if xG_difference[currentShot] < 0:
                         shot_correct_decision[currentShot] = False
                     else:
@@ -186,6 +197,9 @@ def decisionEvaluation(dfSeason, eventname):
     dfSeason['y_opponent'] = y_opponent
     dfSeason['player_name_alt'] = alternative_player
     dfSeason['player_namer_opponent'] = alternative_player_opponent
+    dfSeason['distance_alternative'] = feature_distance
+    dfSeason['angle_alternative'] = feature_angle
+    dfSeason['delta_GK_to_optimal_line'] = feature_GK_distance
 
 
     return dfSeason

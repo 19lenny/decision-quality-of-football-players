@@ -41,10 +41,10 @@ for x in x_range_pitch:
         y_location = y
 
         angle_in_rad = DataManipulation.angleInRadianFromObjectToPoints(x_object=x_location, y_object=y_location,
-                                                                        x_point1=CONSTANTS.X_COORDINATE_POST1,
-                                                                        y_point1=CONSTANTS.Y_COORDINATE_POST1,
-                                                                        x_point2=CONSTANTS.X_COORDINATE_POST2,
-                                                                        y_point2=CONSTANTS.Y_COORDINATE_POST2)
+                                                                        x_point1=CONSTANTS.X_COORDINATE_POST_L,
+                                                                        y_point1=CONSTANTS.Y_COORDINATE_POST_L,
+                                                                        x_point2=CONSTANTS.X_COORDINATE_POST_R,
+                                                                        y_point2=CONSTANTS.Y_COORDINATE_POST_R)
         distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
                                                                    x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
                                                                    y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
@@ -54,8 +54,8 @@ for x in x_range_pitch:
         # (the longer the teammate has time, the higher will be xP)
         if angle_in_rad < 0.000001:
             angle_in_rad = 0.00001
-        log_pen = -np.log(angle_in_rad)
-        xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, log_pen], CONSTANTS.ATTRIBUTES, logmodel)
+        log_angle = np.log(angle_in_rad)
+        xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, log_angle], CONSTANTS.ATTRIBUTES)
 
         xList.append(x)
         yList.append(y)

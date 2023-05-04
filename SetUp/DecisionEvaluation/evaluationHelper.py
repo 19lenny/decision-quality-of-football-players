@@ -7,6 +7,7 @@ from scipy.stats import expon
 from decimal import *
 import numpy as np
 from Model import model_info
+import random
 
 
 # calculates the closest distance (in yards) of every player in a dataframe, for a given position
@@ -45,7 +46,8 @@ def getPlayersOfEvent(shot, keyword):
     # transform it to a real json
     jsonOtherPlayers = json.dumps(shot)
     # save the json (name = sample.json), so we can import it to a dataframe
-    filename = keyword + ".json"
+    random_number = random.randint(1, 100000)
+    filename = keyword + str(random_number) + ".json"
     with open(filename, "w") as outfile:
         outfile.write(jsonOtherPlayers)
 
@@ -104,24 +106,71 @@ def getTimeForDistance(distance, speed):
     seconds = distance / speed
     return seconds
 
+def deltaDistanceGKToOptimalLine(df_opponents, shot_location, time_ball, time_teammember):
+    #if there is no GK in the dataframe the method should return none
+    x = df_opponents.loc[df_opponents['name_position'] == 'Goalkeeper'].empty
+    if df_opponents.loc[df_opponents['name_position'] == 'Goalkeeper'].empty:
+        return None
+    # a value error could happen if the coordinates of the GK are corrupted, catch this error, print the dataframe of the error and return 0
+    try:
+        # search for the GK location.
+        #iloc[0] returns the value instead of a dataframe
+        x_loc_GK = df_opponents['x_coordinate'][df_opponents['name_position'] == 'Goalkeeper'].iloc[0]
+        #x_loc_GK.reset_index(drop=True, inplace=True)
+        y_loc_GK = df_opponents['y_coordinate'][df_opponents['name_position'] == 'Goalkeeper'].iloc[0]
+        GK_location = (x_loc_GK, y_loc_GK)
+        # If the goalkeeper is not in the frame, the method will return 0, such that the GK doesnt play a role in the xG calculation
+        # searches the closest point for the GK to the optimal line (angle line)
+        intersection = DataManipulation.intersection_point_GK_Shot(GK_location, shot_location)
+        if intersection is None:
+            return None
+        # calculates the distance to this optimal location
+        distance_to_optimal_line = DataManipulation.distanceObjectToPoint(x_object=GK_location[0], y_object=GK_location[1], x_point=intersection[0], y_point=intersection[1])
+        # time to achieve this distance for the GK
+        time_to_optimal_line = getTimeForDistance(distance=distance_to_optimal_line, speed=CONSTANTS.PLAYER_SPEED)
+        # search for the limiting factor (how much time does the goalkeeper have to move before the shot is arriving)
+        # if the ball is slower than the teammember of the shooting player, than the time of the ball is the limiting factor
+        if time_ball >= time_teammember:
+            time_limit = time_ball
+        #else the time limit is when the teammember arrives
+        #if the opponent is faster than the teammember we don't care, since the GK still has to move to the correct position
+        else: time_limit = time_teammember
+        # we have now every factor, to calculate how far the goalkeeper is coming in the limiting time factor
+        distance_limit = time_limit * CONSTANTS.PLAYER_SPEED
+        # calculate the difference, between what the GK can achieve in time and what he should achieve in this time
 
-def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_location):
+        #if the distance to the optimal line is bigger than the distance_limit, the delta is distance to optimal line - what the GK can achieve in this time
+        if distance_to_optimal_line > distance_limit:
+            delta = distance_to_optimal_line - distance_limit
+        # if the GK achieves more yards than needed the function returns 0, since the GK has time to achieve a optimal point
+        else: delta = 0
+        return delta
+    except TypeError:
+        print(df_opponents.loc[df_opponents['name_position'] == 'Goalkeeper'])
+        return None
+
+
+
+def xGFromAlternative(time_teammate, time_opponent, time_ball, df_opponents, x_location, y_location):
     # cannot return none, but can return 0
     # 0 describes no chance of scoring
     xG = 0
     xP = 0
     ball_control_time = 0
+    angle_in_rad = 0
+    distance_in_yards = 0
+    delta_distance_GK_to_optimal_position = 0
     # cases where the defender clears the ball
 
     # if the opponent is there before the teammate is there, then the opponent will clear the ball
     if time_opponent < time_teammate:
         # no further calculation needed, return the none value and close method
-        return xG, xP, ball_control_time
+        return xG, xP, ball_control_time, angle_in_rad, distance_in_yards, delta_distance_GK_to_optimal_position
     # case opponent is slower than the teammate, but is there before the ball arrives,
     # therefore the opponent can clear the ball
     elif time_ball > time_opponent:
         # no further calculation needed, return the none value and close method
-        return xG, xP, ball_control_time
+        return xG, xP, ball_control_time, angle_in_rad, distance_in_yards, delta_distance_GK_to_optimal_position
 
     # cases where the offensive player can shoot the ball
 
@@ -163,24 +212,32 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, x_location, y_loc
 
     # before we can calculate the xG, we have to know the angle, the penalty for bad angles and distance from the current location to the goal
     angle_in_rad = DataManipulation.angleInRadianFromObjectToPoints(x_object=x_location, y_object=y_location,
-                                                                    x_point1=CONSTANTS.X_COORDINATE_POST1,
-                                                                    y_point1=CONSTANTS.Y_COORDINATE_POST1,
-                                                                    x_point2=CONSTANTS.X_COORDINATE_POST2,
-                                                                    y_point2=CONSTANTS.Y_COORDINATE_POST2)
+                                                                    x_point1=CONSTANTS.X_COORDINATE_POST_L,
+                                                                    y_point1=CONSTANTS.Y_COORDINATE_POST_L,
+                                                                    x_point2=CONSTANTS.X_COORDINATE_POST_R,
+                                                                    y_point2=CONSTANTS.Y_COORDINATE_POST_R)
     distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
                                                                x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
                                                                y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
-    penalty_log = DataManipulation.log_penalty_for_single_values(angle=angle_in_rad)
+    penalty_log = DataManipulation.log_angle_single_values(angle=angle_in_rad)
+    # returns the numbers of yards the GK actually is away from this optimal line due to the time limitation
+    delta_distance_GK_to_optimal_position = deltaDistanceGKToOptimalLine(df_opponents=df_opponents,
+                                                                                          shot_location=(x_location, y_location),
+                                                                                          time_ball=time_ball,
+                                                                                          time_teammember=time_teammate)
+    #design choice, if the GK is not in frame, or there is no intersection point, the goalkeeper is automaticall in the right position
+    if delta_distance_GK_to_optimal_position is None:
+        delta_distance_GK_to_optimal_position = 0
     # xG on the current location is the prediction of the expected goal from this location,
     # based on the angle of the location to the goal and the distance of the location to the goal
     # the prediction has to be multiplied with the xPass prediction
     # (the longer the teammate has time, the higher will be xP)
-    xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, penalty_log], attributes=CONSTANTS.ATTRIBUTES)
+    xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, penalty_log, delta_distance_GK_to_optimal_position], attributes=CONSTANTS.ATTRIBUTES)
     xG = xgPrediction * xP
     # predict returns as a dataframe
     # we only need first value out of dataframe
 
-    return xG, xP, ball_control_time
+    return xG, xP, ball_control_time, angle_in_rad, distance_in_yards, delta_distance_GK_to_optimal_position
 
 
 def xPModel(time_bigger, time_smaller):
@@ -222,3 +279,5 @@ def xPModel(time_bigger, time_smaller):
             break
     xP = possible_xP_values[position]
     return xP, ball_control_time
+
+

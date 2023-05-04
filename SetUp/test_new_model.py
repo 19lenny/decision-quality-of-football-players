@@ -1,7 +1,42 @@
+from numpy.linalg import norm
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from tqdm import tqdm
+import DataManipulation, CONSTANTS, JSONtoDF
+from SetUp.DecisionEvaluation import evaluationHelper
+
+
+dfTraining = JSONtoDF.createDF("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SetUp/train_new_model.json")
+def create_model_glm(df, attributes):
+    df = df[['goal', 'distance_to_goal_centre', 'log_angle', 'GK_distance_to_optimal_line', 'angleInRadian']]
+    # drop possible null values, the model gets more accurate
+    df = df.dropna()
+
+    # create the model based on the attributes
+    model = ''
+    for v in attributes[:-1]:
+        model = model + v + ' + '
+    model = model + attributes[-1]
+    #-1 to take away the intercetp
+    model = model +' - 1'
+
+    # Fit the model
+    # the model is based on the binary y value 'goal',
+    # the model gives the values for expected misses
+    # this is corrected automatically in the prediction, where the whole thing is changed to expected goals
+    model = smf.glm(formula="goal ~ " + model, data=df,
+                         family=sm.families.Binomial()).fit()
+    # return the model
+    return model
+ATTRIBUTES = ['distance_to_goal_centre', 'log_angle', 'GK_distance_to_optimal_line']
+model = create_model_glm(df=dfTraining, attributes=ATTRIBUTES)
+print(model.summary())
+
+
 
 
 import pandas as pd
-from Model import model_info
+
 from SetUp import JSONtoDF, DataManipulation, CONSTANTS
 import numpy as np
 
@@ -84,14 +119,16 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
             distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
                                                                        x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
                                                                        y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
-            log_angle = DataManipulation.log_angle_single_values(angle=angle_in_rad)
-            #GK distance = 0 because it is irreleveant for the gK where he is standing for this plot
-            GK_delta = 0
+            penalty_log = DataManipulation.log_angle_single_values(angle=angle_in_rad)
             # xG on the current location is the prediction of the expected goal from this location,
             # based on the angle of the location to the goal and the distance of the location to the goal
             # the prediction has to be multiplied with the xPass prediction
             # (the longer the teammate has time, the higher will be xP)
-            xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, log_angle, GK_delta], attributes=CONSTANTS.ATTRIBUTES)
+            GK_dist = 0
+            data = [[distance_in_yards, penalty_log, GK_dist]]
+            predictionDf = pd.DataFrame(data, columns=ATTRIBUTES)
+            pred = model.predict(predictionDf)
+            xgPrediction = pred[0]
 
             xList.append(x)
             yList.append(y)
@@ -222,7 +259,7 @@ def df_goals_divided_by_shots():
 
 # calculate for every x and y coordinate the xGoal
 # shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
+xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=model)
 #draw the xG histogram
 draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis_0_001.png", title="xGModel")
 

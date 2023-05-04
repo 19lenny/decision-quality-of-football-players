@@ -1,9 +1,11 @@
 from typing import List
 from scipy.stats import ttest_ind
 import pandas as pd
-
+import scipy.stats as stats
 from SetUp import JSONtoDF, CONSTANTS, DataManipulation
 from scipy.stats import levene
+import matplotlib.pyplot as plt
+import numpy as np
 """
 this file tests the time hypotheses based on tTests.
 the results are saved in a json format.
@@ -15,10 +17,8 @@ median_one = []
 median_two = []
 nr_shots_one = []
 nr_shots_two = []
-t_Test = []
+u_Test = []
 p_val = []
-levene_test = []
-p_val_levene = []
 interpretation = []
 
 """
@@ -33,18 +33,15 @@ https://www.statisticshowto.com/t-statistic/
 """
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-
-# check if the assumption of normal distribution is given
-normal_dist = DataManipulation.check_normal_distribution(df_all)
-if not normal_dist:
-    normal_dist = DataManipulation.tranf_normal_distribution(df_all)
+#group 1 is the expensive group, group 0 is cheap group
+df_all['group'] = np.where(df_all['value'] >= df_all['value'].median(), 1, 0)
+df_all.to_csv("C:/Users/lenna/Downloads/df_spss.csv")
 
 
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
 # H1: the decisions of players with a transfermarket value above mean are better than decisions of players with a transfermarket value below mean.
 # reject H0 if pval < alpha
 #todo: mean or median?
-#median, weil hohe Zahlen zerreissen sonst statistik --> todo: suche quelle
 #with median the groups are not the same size
 mean_tm_val = df_all['value'].median()
 
@@ -69,11 +66,11 @@ if mean_expensive > mean_cheap:
     interpretation.append("The decisions were in average " + str(mean_expensive - mean_cheap) + " better when a player with a market value above mean took the shot.")
 else: interpretation.append("The decisions were in average " + str(mean_cheap - mean_expensive) + " better when a player with a market value below mean took the shot.")
 
-lev, p = levene(xG_expensive, xG_Delta_cheap)
-levene_test.append(lev)
-p_val_levene.append(p)
-result_winning_vs_loosing, pVal = ttest_ind(xG_expensive, xG_Delta_cheap)
-t_Test.append(result_winning_vs_loosing)
+#alternative greater means one sided whitneyu test, which assumes that expensive player makes better decisions than cheap players
+# https://www.reneshbedre.com/blog/mann-whitney-u-test.html
+result_winning_vs_loosing, pVal = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='greater')
+result_winning_vs_loosing1, pVal1 = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='two-sided')
+u_Test.append(result_winning_vs_loosing)
 p_val.append(pVal)
 
 """
@@ -92,14 +89,27 @@ data = pd.DataFrame({"factor one" : factor_one,
                      "factor two" :factor_two,
                      "median one": median_one,
                      "median two": median_two,
-                     "tTest" : t_Test,
+                     "u_Test" : u_Test,
                      "p_val" : p_val,
                      "interpretation" : interpretation,
                      "number of shots one": nr_shots_one,
-                     "number of shots two": nr_shots_two,
-                     "levene val": levene_test,
-                     "p_val levene": p_val_levene})
+                     "number of shots two": nr_shots_two})
 
 
 
-data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Market_Value/results/tTest_market_value.json")
+data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Market_Value/results/uTest_market_value.json")
+
+df_test = pd.DataFrame({
+    "expensive" : df_expensive['xG_Delta_decision_alternative'],
+    "cheap" : df_cheap['xG_Delta_decision_alternative']
+})
+df_test.boxplot(column=['expensive', 'cheap'], grid=False)
+plt.show()
+
+fig, (ax1, ax2) = plt.subplots(1, 2)
+fig.suptitle('Frequency histogram of decision')
+ax1.hist(df_test['expensive'], bins=30, histtype='bar', ec='k')
+ax2.hist(df_test['cheap'], bins=30, histtype='bar', ec='k')
+ax1.set_xlabel("expensive")
+ax2.set_xlabel("cheap")
+plt.show()
