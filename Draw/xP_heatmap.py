@@ -29,11 +29,11 @@ def xP_heatmap(correct_decision, title):
     plt.rcParams["figure.autolayout"] = True
 
     fig, ax = plt.subplots()
-    img = plt.imread("40_per_field.png")
-    ax.imshow(img, interpolation='nearest', alpha=0.8, extent=[80, 120, 0, 80])
+    img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/87_120_0_80_33yard.png")
+    ax.imshow(img, interpolation='nearest', alpha=0.8, extent=[87, 120, 0, 80])
 
     cpf = ax.contourf(X, Y, Z, levels=[0, 0.6, 0.7, 0.8, 0.9, 1],
-                      colors=['#006F01', '#49be25', '#96be25', '#fb5f04', '#FF2300'], alpha=0.7, antialiased=True)
+                      colors=['#006F01', '#49be25', '#96be25', '#fb5f04', '#FF2300'], alpha=0.8, antialiased=True)
 
     ax.invert_yaxis()
     ax.set_xlabel('x coordinate')

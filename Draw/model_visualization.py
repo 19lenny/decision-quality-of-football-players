@@ -22,8 +22,8 @@ y_ball = df_test['y_ball']
 
 # Create a new figure and axis
 fig, ax = plt.subplots(figsize= (10,8))
-img = plt.imread("big_penalty_box.png")
-ax.imshow(img, alpha=0.3, extent=[80, 120, 10, 70])
+img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/95_120_09_71_bigpenalty.png")
+ax.imshow(img, alpha=0.6, extent=[95, 120, 9, 71])
 
 #labels for the points
 #passing player

@@ -4,6 +4,7 @@ import pandas as pd
 import scipy.stats as stats
 from SetUp import JSONtoDF, CONSTANTS, DataManipulation
 from scipy.stats import levene
+import numpy as np
 """
 this file tests the time hypotheses based on tTests.
 the results are saved in a json format.
@@ -23,6 +24,11 @@ interpretation = []
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_all = df_all.loc[df_all['score'] != 0]
+#csv for spss
+df_csv = df_all
+df_csv['group_score'] = np.where(df_all['score'] > 0, 1, 0)
+df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Score/CSV_Score_separation/df_score_separation_spss.csv")
+
 
 # check if the assumption of normal distribution is given
 normal_dist = DataManipulation.check_normal_distribution(df_all)

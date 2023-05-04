@@ -15,7 +15,7 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
     # -----------------------------------------------------------------------------------------------------------
     # create a grid which shows for every x and y combination the xGoal according to regression
 
-    x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
+    x_range_pitch = np.arange(95,
                               120.5,
                               square_meter_size)
     # create the y linspace of the pitch, the end value gets +square meter size,
@@ -25,8 +25,8 @@ def calculate_xG_for_grid(square_meter_size, max_shot_distance, modelname):
                               CONSTANTS.Y_MIDDLE_LINE2 + square_meter_size,
                               square_meter_size)
     """
-    y_range_pitch = np.arange(15,
-                              65+square_meter_size,
+    y_range_pitch = np.arange(9,
+                              71+square_meter_size,
                               square_meter_size)
 
     xGList = []
@@ -119,13 +119,13 @@ def draw_xG_model(dfXGGrid, saving_location, title):
     Y_unique = np.sort(dfXGGrid.y.unique())
     X, Y = np.meshgrid(X_unique, Y_unique)
     # Initialize plot objects
-    rcParams['figure.figsize'] = 8, 11  # sets plot size
+    rcParams['figure.figsize'] = 6, 10  # sets plot size
     plt.rcParams["figure.autolayout"] = True
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    img = plt.imread("penalty_box.png")
-    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 120, 16, 65])
+    img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/95_120_09_71_bigpenalty.png")
+    ax.imshow(img, interpolation='nearest', alpha=0.8,extent=[95, 120, 9, 71])
     #levels = np.linspace(Z.min(), Z.max(), 14)
 
 

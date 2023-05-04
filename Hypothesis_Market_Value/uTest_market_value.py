@@ -35,7 +35,7 @@ https://www.statisticshowto.com/t-statistic/
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 #group 1 is the expensive group, group 0 is cheap group
 df_all['group'] = np.where(df_all['value'] >= df_all['value'].median(), 1, 0)
-df_all.to_csv("C:/Users/lenna/Downloads/df_spss.csv")
+df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Market_Value/CSV_MV_separation/df_mv_separation_spss.csv")
 
 
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
@@ -74,10 +74,10 @@ u_Test.append(result_winning_vs_loosing)
 p_val.append(pVal)
 
 """
-"Je nach Fragestellung kann es interessant sein, die Differenz zwischen den beiden Variablen zusätzlich anzugeben. " \
-"Sie steht in der Spalte Mittlere Differenz. " \
-"Aus der Tabelle mit den deskriptiven Statistiken wissen wir, dass die Gruppe ohne Alkohol kürzere Reaktionszeiten hatten" \
-" als die Gruppe mit. Wenn wir die Differenz berichten wollen, sollten wir noch ein Maß für die Variabilität dieser Differenz angeben," \
+"Je nach Fragestellung kann es interessant sein, die Differenz zwischen den beiden Variablen zusätzlich anzugeben. " /
+"Sie steht in der Spalte Mittlere Differenz. " /
+"Aus der Tabelle mit den deskriptiven Statistiken wissen wir, dass die Gruppe ohne Alkohol kürzere Reaktionszeiten hatten" /
+" als die Gruppe mit. Wenn wir die Differenz berichten wollen, sollten wir noch ein Maß für die Variabilität dieser Differenz angeben," /
 " da der Wert alleine betrachtet nur wenig aussagekräftig ist."
 
 The greater the T, the more evidence you have that your team’s scores are significantly different from average. 

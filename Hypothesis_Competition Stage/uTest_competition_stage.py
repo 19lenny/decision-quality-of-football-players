@@ -2,10 +2,16 @@ import tTest_competition_stage
 from SetUp import JSONtoDF, CONSTANTS
 import scipy.stats as stats
 import pandas as pd
-
+import numpy as np
 
 # prepare df that only teams that played in the knock out appear also in the group stage
 df = tTest_competition_stage.preparation(df=JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+ko_stages = ["Round of 16", "Quarter-finals", "Semi-finals", "Final"]
+
+#csv for spss
+df_csv = df
+df_csv['group_KO'] = np.where(df['competition_stage'].isin(ko_stages), 1, 0)
+df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Competition Stage/CSV_CS_separation/df_cs_separation_spss.csv")
 
 factor_one = []
 factor_two = []
@@ -19,8 +25,10 @@ interpretation = []
 
 #2 groups:
 # group 1 --> teams that achieved the knock out stage. These are their decisions in the knock out phase.
-ko_stages = ["Round of 16", "Quarter-finals", "Semi-finals", "Final"]
+
 dfAllMatches_Knock_Out_Stage = df.loc[df['competition_stage'].isin(ko_stages)]
+
+
 
 mean_KO = dfAllMatches_Knock_Out_Stage['xG_Delta_decision_alternative'].mean()
 xG_Delta_KO = dfAllMatches_Knock_Out_Stage['xG_Delta_decision_alternative'].values.tolist()

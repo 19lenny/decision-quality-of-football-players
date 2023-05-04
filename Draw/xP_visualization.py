@@ -28,8 +28,8 @@ counts = df['cluster'].value_counts().sort_index()
 
 # Create figure and axis objects
 fig, ax = plt.subplots(figsize= (16,12))
-img = plt.imread("penalty_box.png")
-ax.imshow(img, alpha=0.7, extent=[95, 120, 16.5, 64])
+img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/102_120_18_62_penalty.png")
+ax.imshow(img, alpha=0.7, extent=[102, 120, 18, 62])
 
 # Plot clusters
 for cluster, data in df.groupby('cluster'):

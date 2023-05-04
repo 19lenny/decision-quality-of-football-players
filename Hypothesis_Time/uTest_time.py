@@ -4,6 +4,7 @@ import pandas as pd
 import scipy.stats as stats
 from SetUp import JSONtoDF, CONSTANTS, DataManipulation
 from scipy.stats import levene
+import numpy as np
 """
 this file tests the time hypotheses based on tTests.
 the results are saved in a json format.
@@ -23,6 +24,11 @@ u_Test = []
 p_val = []
 interpretation = []
 
+df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+#csv for spss
+df_csv = df_all
+
+df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Time/CSV_Time_separation/df_time_separation_spss.csv")
 
 # check if the assumption of normal distribution is given
 normal_dist = DataManipulation.check_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
@@ -34,6 +40,7 @@ if not normal_dist:
 # H1: first half decisions are better than second half ones
 # reject H0 if pval < alpha
 df_first_half = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+
 df_first_half = df_first_half.loc[df_first_half['period'] == first_half]
 mean_first_half = df_first_half['xG_Delta_decision_alternative'].mean()
 xG_Delta_first_half = df_first_half['xG_Delta_decision_alternative'].values.tolist()
@@ -117,10 +124,10 @@ u_Test.append(result_regular_vs_over)
 p_val.append(pVal)
 
 """
-"Je nach Fragestellung kann es interessant sein, die Differenz zwischen den beiden Variablen zusätzlich anzugeben. " \
-"Sie steht in der Spalte Mittlere Differenz. " \
-"Aus der Tabelle mit den deskriptiven Statistiken wissen wir, dass die Gruppe ohne Alkohol kürzere Reaktionszeiten hatten" \
-" als die Gruppe mit. Wenn wir die Differenz berichten wollen, sollten wir noch ein Maß für die Variabilität dieser Differenz angeben," \
+"Je nach Fragestellung kann es interessant sein, die Differenz zwischen den beiden Variablen zusätzlich anzugeben. " /
+"Sie steht in der Spalte Mittlere Differenz. " /
+"Aus der Tabelle mit den deskriptiven Statistiken wissen wir, dass die Gruppe ohne Alkohol kürzere Reaktionszeiten hatten" /
+" als die Gruppe mit. Wenn wir die Differenz berichten wollen, sollten wir noch ein Maß für die Variabilität dieser Differenz angeben," /
 " da der Wert alleine betrachtet nur wenig aussagekräftig ist."
 
 The greater the T, the more evidence you have that your team’s scores are significantly different from average. 
