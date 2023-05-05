@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from SetUp import CONSTANTS, JSONtoDF
+from SetUp import CONSTANTS, JSONtoDF, DataManipulation
 from matplotlib.patches import FancyArrowPatch
 
 from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
@@ -18,12 +18,13 @@ x_alt_opponent = df_test['x_opponent']
 y_alt_opponent = df_test['y_opponent']
 x_ball = df_test['x_ball']
 y_ball = df_test['y_ball']
-
+x_shot = df_test['x_ball'][0]
+y_shot = df_test['y_ball'][0]
 
 # Create a new figure and axis
-fig, ax = plt.subplots(figsize= (10,8))
-img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/95_120_09_71_bigpenalty.png")
-ax.imshow(img, alpha=0.6, extent=[95, 120, 9, 71])
+fig, ax = plt.subplots(figsize=(7,10))
+img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/102_120_18_62_penalty.png")
+ax.imshow(img, alpha=0.8, extent=[102, 120, 18, 62])
 
 #labels for the points
 #passing player
@@ -42,12 +43,16 @@ label_xG_new_loca = df_test['xG_best_alternative']
 #line values are the xP values
 label_xPass = df_test['xP_best_alternative']
 
-#get all the opponents and other teammembers
+#get all the opponents and other teammembers, only plot the players that are within the penalty box, for better visability
 df_to_plot = getPlayersOfEvent(df_test['shot_freeze_frame'][0], "drawing")
-x_teammates_to_plot = df_to_plot["x_coordinate"][df_to_plot['teammate'] == True]
-y_teammates_to_plot = df_to_plot["y_coordinate"][df_to_plot['teammate'] == True]
-x_opponents_to_plot = df_to_plot["x_coordinate"][df_to_plot['teammate'] == False]
-y_opponents_to_plot = df_to_plot["y_coordinate"][df_to_plot['teammate'] == False]
+x_teammates_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == True) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
+y_teammates_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == True) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
+x_opponents_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == False) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
+y_opponents_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == False) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
+x_GK = df_to_plot['x_coordinate'][(df_to_plot['name_position'] == "Goalkeeper") & (df_to_plot['teammate'] == False)].iloc[0]
+y_GK = df_to_plot['y_coordinate'][(df_to_plot['name_position'] == "Goalkeeper") & (df_to_plot['teammate'] == False)].iloc[0]
+
+
 #plot all teammates
 ax.plot(x_teammates_to_plot, y_teammates_to_plot, 'o', color='#89CFF0', label="location teammate")
 #plot all opponents
@@ -113,19 +118,41 @@ for i in range(len(x_original)):
     #show the run of the opponent in the diagram
     arrow = FancyArrowPatch((x_alt_opponent[i], y_alt_opponent[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
                             mutation_scale=10, color='grey', label='run, distance')
+    ax.add_patch(arrow)
     dx = x_ball[i] - x_alt_opponent[i]
     dy = y_ball[i] - y_alt_opponent[i]
-    ax.add_patch(arrow)
     text = str("{: .2f}".format(label_alternative_opponent_distance[i]) + "m")
     ax.annotate(text, xy=(x_alt_opponent[i] + dx / 2, y_alt_opponent[i] + dy / 2), xytext=(-5, 5),
                 textcoords='offset points', fontsize=8, ha='center')
+
+
+#plot the movement of the GK
+x_intersection, y_intersection = DataManipulation.intersection_point_GK_Shot(goalkeeper=(x_GK, y_GK), shot=(x_shot, y_shot))
+ax.plot(x_intersection, y_intersection, 'o', color='orange', label=f"goalkeeper Sommer - end location: ({x_intersection}, {y_intersection})")
+# Add the two points to the axis as scatter plots, with labels
+ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper Sommer - starting location: ({x_GK}, {y_GK})")
+#show the run of the opponent in the diagram
+arrow = FancyArrowPatch((x_GK, y_GK), (x_intersection, y_intersection), arrowstyle='->',
+                        mutation_scale=10, color='grey', label='run, distance')
+ax.add_patch(arrow)
+ax.plot(CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE, 'x', color='gray', label=f"Goal Centre: ({CONSTANTS.X_COORDINATE_GOALCENTRE}, {CONSTANTS.Y_COORDINATE_GOALCENTRE})")
+
+# Add a dashed line showing the optimal line
+ax.plot([x_shot, CONSTANTS.X_COORDINATE_GOALCENTRE], [y_shot, CONSTANTS.Y_COORDINATE_GOALCENTRE], linestyle='--', color='gray', label="defense line GK")
+
+
+# Add a label to the line showing the distance
+
+text = str("{: .2f}".format(df_test['delta_distance_GK_to_optimal_line'][0] * 0.9144) + "m")
+ax.text(x_intersection-1.8, y_intersection-1.25, text, fontsize=8)
+
 
 # Set x and y axis labels
 # Add legend
 handles, labels = ax.get_legend_handles_labels()
 unique_labels = list(set(labels))
 handles = [handles[labels.index(label)] for label in unique_labels]
-legend = ax.legend(handles, unique_labels, loc='upper center', bbox_to_anchor=(-0.4, 0.6), ncol=1, prop={'size': 8}, markerscale=0.8)
+legend = ax.legend(handles, unique_labels, loc='lower center', ncol=1, prop={'size': 7}, markerscale=0.8)
 
 ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')
@@ -133,4 +160,5 @@ ax.set_ylabel('y_coordinate')
 ax.set_title("Decision Visualization")
 
 # Show the plot
+plt.tight_layout()
 plt.show()
