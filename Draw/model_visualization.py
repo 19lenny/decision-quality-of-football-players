@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 from SetUp import CONSTANTS, JSONtoDF, DataManipulation
 from matplotlib.patches import FancyArrowPatch
@@ -7,7 +9,8 @@ from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
 #todo: save the picture and decide on one shot
 df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 #wm 22 switzerland vs brazil
-df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
+#df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
+df_test = df_test.loc[(df_test['match_id'] == 3857293) & (df_test['minute'] == 22)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 # x and y coordinates of the points to be plotted
 x_original = df_test['x_coordinate']
@@ -81,8 +84,8 @@ for i in range(len(x_original)):
     name = label_alternative_player[i]
     all_names = name.split()
     last_name = all_names[-1]
-    #ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
-    ax.text(x_alternative[i] + 0.3, y_alternative[i] + 0.2, "Richarlison", fontsize=8)
+    ax.text(x_alternative[i] + 0.1, y_alternative[i] + 0.1, last_name, fontsize=8)
+    #ax.text(x_alternative[i] + 0.3, y_alternative[i] + 0.2, "Richarlison", fontsize=8)
     # add the name of the alternative opponent
     name = label_alternative_opponent[i]
     all_names = name.split()
@@ -128,11 +131,43 @@ for i in range(len(x_original)):
 
 #plot the movement of the GK
 x_intersection, y_intersection = DataManipulation.intersection_point_GK_Shot(goalkeeper=(x_GK, y_GK), shot=(x_shot, y_shot))
-ax.plot(x_intersection, y_intersection, 'o', color='orange', label=f"goalkeeper Sommer - end location: ({x_intersection}, {y_intersection})")
+
+#additionally we need to plot until which point the goalkeeper can run
+def delta_coordinates(x1, y1, x2, y2, delta):
+    # calculate slope of the line
+    m = (y2 - y1) / (x2 - x1)
+
+    # calculate distance between starting and endpoint
+    d = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+    # calculate horizontal and vertical leg lengths
+    x = math.sqrt(delta**2 / (1 + m**2))
+    y = abs(m * x)
+
+    # calculate new point coordinates
+    if m >= 0:
+        x_new = x2 - x
+        y_new = y2 - y
+    else:
+        x_new = x2 - x
+        y_new = y2 - y
+
+    return x_new, y_new
+
+x_GK_end, y_GK_end = delta_coordinates(x_GK, y_GK, x_intersection, y_intersection, delta=df_test['delta_GK_to_optimal_line'])
 # Add the two points to the axis as scatter plots, with labels
-ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper Sommer - starting location: ({x_GK}, {y_GK})")
+ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper Zigi - starting location: ({x_GK}, {y_GK})")
+text_x = str("{:.2f}".format(x_GK_end))
+text_y = str("{:.2f}".format(y_GK_end))
+ax.plot(x_GK_end, y_GK_end, 'o', color='orange', label=f"goalkeeper Zigi - end location: ({text_x}, {text_y})")
 #show the run of the opponent in the diagram
-arrow = FancyArrowPatch((x_GK, y_GK), (x_intersection, y_intersection), arrowstyle='->',
+arrow = FancyArrowPatch((x_GK_end, y_GK_end), (x_intersection, y_intersection), arrowstyle='->',
+                        mutation_scale=10, color='red', label='delta GK to optimal line')
+ax.add_patch(arrow)
+
+
+#show the run of the opponent in the diagram
+arrow = FancyArrowPatch((x_GK, y_GK), (x_GK_end, y_GK_end), arrowstyle='->',
                         mutation_scale=10, color='grey', label='run, distance')
 ax.add_patch(arrow)
 ax.plot(CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE, 'x', color='gray', label=f"Goal Centre: ({CONSTANTS.X_COORDINATE_GOALCENTRE}, {CONSTANTS.Y_COORDINATE_GOALCENTRE})")
@@ -141,9 +176,10 @@ ax.plot(CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE, 'x
 ax.plot([x_shot, CONSTANTS.X_COORDINATE_GOALCENTRE], [y_shot, CONSTANTS.Y_COORDINATE_GOALCENTRE], linestyle='--', color='gray', label="defense line GK")
 
 
-# Add a label to the line showing the distance
 
-text = str("{: .2f}".format(df_test['delta_distance_GK_to_optimal_line'][0] * 0.9144) + "m")
+# Add a label to the line showing the distance
+GK_to_line = DataManipulation.distanceObjectToPoint(x_GK_end, y_GK_end, x_intersection, y_intersection)
+text = str("{: .2f}".format(GK_to_line * 0.9144) + "m")
 ax.text(x_intersection-1.8, y_intersection-1.25, text, fontsize=8)
 
 

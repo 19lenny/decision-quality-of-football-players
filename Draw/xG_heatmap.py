@@ -159,14 +159,14 @@ def df_goals_divided_by_shots():
     shots_model = shots_model[['goal', 'x_coordinate', 'y_coordinate', 'angle',
                                'angleInRadian', 'distance_to_goal_centre', 'shot_statsbomb_xg']]
 
-    square_meter_size = 1
-    max_shot_distance = 40
+    square_meter_size = 0.5
+    max_shot_distance = 33
     # -----------------------------------------------------------------------------------------------------------
     # create a grid which shows for every x and y combination the xGoal according to regression
 
     # create a grid with a certain amount of bins
     x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                              CONSTANTS.X_COORDINATE_GOALCENTRE,
+                              CONSTANTS.X_COORDINATE_GOALCENTRE+square_meter_size,
                               square_meter_size)
     # create the y linspace of the pitch, the end value gets +square meter size,
     # such that the endpoint is still in the range
@@ -176,8 +176,8 @@ def df_goals_divided_by_shots():
                               square_meter_size)
     """
     # this means shots made from the corner flag are not included in the visualization
-    y_range_pitch = np.arange(15,
-                              65,
+    y_range_pitch = np.arange(9,
+                              71,
                               square_meter_size)
 
     xGList = []
@@ -222,9 +222,9 @@ def df_goals_divided_by_shots():
 
 # calculate for every x and y coordinate the xGoal
 # shot distance in yards
-xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
+#xG_grid = calculate_xG_for_grid(square_meter_size=0.5, max_shot_distance=25, modelname=CONSTANTS.REGRESSION_MODEL)
 #draw the xG histogram
-draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis_0_001.png", title="xGModel")
+#draw_xG_model(dfXGGrid=xG_grid, saving_location="C:/Users/lenna/Downloads/model_vis_0_001.png", title="xGModel")
 
-#dfDivisioned = df_goals_divided_by_shots()
-#draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")
+dfDivisioned = df_goals_divided_by_shots()
+draw_xG_model(dfXGGrid=dfDivisioned, saving_location="C:/Users/lenna/Downloads/goals_divided_by_shots.png", title="goals divided by shots depending on location")

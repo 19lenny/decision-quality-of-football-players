@@ -199,7 +199,7 @@ def decisionEvaluation(dfSeason, eventname):
     dfSeason['player_namer_opponent'] = alternative_player_opponent
     dfSeason['distance_alternative'] = feature_distance
     dfSeason['angle_alternative'] = feature_angle
-    dfSeason['delta_GK_to_optimal_line_alternative'] = feature_GK_distance
+    dfSeason['delta_GK_line_alternative'] = feature_GK_distance
 
 
     return dfSeason
