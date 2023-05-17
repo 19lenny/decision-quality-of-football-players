@@ -4,6 +4,7 @@
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
+
 # create a logistic regression with an intercept
 # filename is the filelocation for which a model should be created, the file has to be in json format
 # attributes are the attributes that the model should learn on (x_values)
@@ -51,8 +52,6 @@ def create_model_glm(df, attributes):
     for v in attributes[:-1]:
         model = model + v + ' + '
     model = model + attributes[-1]
-    # -1 to take away the intercetp
-    model = model + ' - 1'
 
     # Fit the model
     # the model is based on the binary y value 'goal',
@@ -60,5 +59,6 @@ def create_model_glm(df, attributes):
     # this is corrected automatically in the prediction, where the whole thing is changed to expected goals
     model = smf.glm(formula="goal ~ " + model, data=df,
                          family=sm.families.Binomial()).fit()
+
     # return the model
     return model

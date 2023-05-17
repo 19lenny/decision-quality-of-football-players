@@ -97,7 +97,7 @@ dfModelData.reset_index(drop=True, inplace=True)
 # convert coordinates from list, to x and y entries
 dfModelData = DataManipulation.coordinates(dfModelData)
 # add angle
-dfModelData = DataManipulation.angle(dfModelData)
+dfModelData = DataManipulation.angleDeg(dfModelData)
 # add angle in rad
 dfModelData = DataManipulation.angleInRadian(dfModelData)
 #add the penalty for bad radians

@@ -26,8 +26,8 @@ y_shot = df_test['y_ball'][0]
 
 # Create a new figure and axis
 fig, ax = plt.subplots(figsize=(7,10))
-img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/102_120_18_62_penalty.png")
-ax.imshow(img, alpha=0.8, extent=[102, 120, 18, 62])
+img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/95_120_09_71_bigpenalty.png")
+ax.imshow(img, alpha=0.8, extent=[95, 120, 9, 71])
 
 #labels for the points
 #passing player
@@ -48,10 +48,10 @@ label_xPass = df_test['xP_best_alternative']
 
 #get all the opponents and other teammembers, only plot the players that are within the penalty box, for better visability
 df_to_plot = getPlayersOfEvent(df_test['shot_freeze_frame'][0], "drawing")
-x_teammates_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == True) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
-y_teammates_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == True) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
-x_opponents_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == False) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
-y_opponents_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == False) & (df_to_plot['x_coordinate'] >= 102) & (df_to_plot['y_coordinate'] >= 18) & (df_to_plot['y_coordinate'] <= 62)]
+x_teammates_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == True) ]
+y_teammates_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == True) ]
+x_opponents_to_plot = df_to_plot["x_coordinate"][(df_to_plot['teammate'] == False) ]
+y_opponents_to_plot = df_to_plot["y_coordinate"][(df_to_plot['teammate'] == False) ]
 x_GK = df_to_plot['x_coordinate'][(df_to_plot['name_position'] == "Goalkeeper") & (df_to_plot['teammate'] == False)].iloc[0]
 y_GK = df_to_plot['y_coordinate'][(df_to_plot['name_position'] == "Goalkeeper") & (df_to_plot['teammate'] == False)].iloc[0]
 
@@ -157,8 +157,8 @@ def delta_coordinates(x1, y1, x2, y2, delta):
 x_GK_end, y_GK_end = delta_coordinates(x_GK, y_GK, x_intersection, y_intersection, delta=df_test['delta_GK_to_optimal_line'])
 # Add the two points to the axis as scatter plots, with labels
 ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper Zigi - starting location: ({x_GK}, {y_GK})")
-text_x = str("{:.2f}".format(x_GK_end))
-text_y = str("{:.2f}".format(y_GK_end))
+text_x = str("{:.1f}".format(x_GK_end))
+text_y = str("{:.1f}".format(y_GK_end))
 ax.plot(x_GK_end, y_GK_end, 'o', color='orange', label=f"goalkeeper Zigi - end location: ({text_x}, {text_y})")
 #show the run of the opponent in the diagram
 arrow = FancyArrowPatch((x_GK_end, y_GK_end), (x_intersection, y_intersection), arrowstyle='->',

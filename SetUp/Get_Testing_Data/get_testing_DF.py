@@ -47,7 +47,7 @@ def getDF(competition_id, season_id, competition, save_path):
     # convert coordinates from list, to x and y entries
     df_return = DataManipulation.coordinates(df_return)
     # add angle
-    df_return = DataManipulation.angle(df_return)
+    df_return = DataManipulation.angleDeg(df_return)
     # add angle in rad
     df_return = DataManipulation.angleInRadian(df_return)
     # add the penalty for bad radians

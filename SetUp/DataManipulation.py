@@ -39,7 +39,7 @@ def coordinates(dataframe):
 # return the adjusted df
 # visualized in powerpoint 'calculation angle and distance.pptx'
 # angle in degree
-def angle(df):
+def angleDeg(df):
     # Morales cesar a "A mathematics-based new penalty area in football: tackling diving", Journal of sports sciences
     # cosinussatz
 
@@ -58,8 +58,20 @@ def angle(df):
         if b == 0 or c == 0:
             angleList.append(0)
         else:
-            angleList.append(np.rad2deg(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
-                                       / (2 * b * c))))
+            # the arccos for 1 is not defined in python. the result of arccos of 1 should be 0.
+            # therefore if the calculation results in 1 (this is a float calculation, therefore we compare it just to 1 on 5 digits after the point)
+            # the method returns 0 as degree
+            if math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), 1, abs_tol=1e-5):
+                angleList.append(0)
+            # the arccos for -1 is not defined in python. the result of arccos of -1 should be 180 degree.
+            # therefore if the calculation results in -1 (this is a float calculation, therefore we compare it just to -1 on 5 digits after the point)
+            # the method returns 180 as degree
+            elif math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), -1, abs_tol=1e-5):
+                angleList.append(180)
+            else:
+                angleList.append(np.rad2deg(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+                                                      / (2 * b * c))))
+
     df['b'] = bList
     df['c'] = cList
     df['angleDeg'] = angleList
@@ -86,7 +98,18 @@ def angleInRadian(df):
         if b == 0 or c == 0:
             angleList.append(0)
         else:
-            angleList.append(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
+            # the arccos for 1 is not defined in python. the result of arccos of 1 should be 0.
+            # therefore if the calculation results in 1 (this is a float calculation, therefore we compare it just to 1 on 5 digits after the point)
+            # the method returns 0 as degree
+            if math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), 1, abs_tol=1e-5):
+                angleList.append(0)
+            # the arccos for -1 is not defined in python. the result of arccos of -1 should be 180 degree.
+            # therefore if the calculation results in -1 (this is a float calculation, therefore we compare it just to -1 on 5 digits after the point)
+            # the method returns 180 as degree
+            elif math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), -1, abs_tol=1e-5):
+                angleList.append(np.pi)
+            else:
+                angleList.append(np.arccos((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2)
                                        / (2 * b * c)))
     df['b'] = bList
     df['c'] = cList
@@ -103,7 +126,19 @@ def angleInRadianFromObjectToPoints(x_object, y_object, x_point1, y_point1, x_po
     # if the ball is played to the post, then the vectors are 0 and a division by 0 happens.
     # we define the angles when playing to the post as 0, as we should not play the ball to the post
         return 0
-    angle_in_rad = np.arccos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))
+    # the arccos for 1 is not defined in python. the result of arccos of 1 should be 0.
+    # therefore if the calculation results in 1 (this is a float calculation, therefore we compare it just to 1 on 5 digits after the point)
+    # the method returns 0 as degree
+    if math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), 1, abs_tol=1e-5):
+        return 0
+    # the arccos for -1 is not defined in python. the result of arccos of -1 should be 180 degree.
+    # therefore if the calculation results in -1 (this is a float calculation, therefore we compare it just to -1 on 5 digits after the point)
+    # the method returns 180 as degree
+    elif math.isclose(((b ** 2 + c ** 2 - CONSTANTS.GOAL_LENGTH ** 2) / (2 * b * c)), -1, abs_tol=1e-5):
+        return np.pi
+    else:
+        angle_in_rad = np.arccos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))
+
 
     return angle_in_rad
 

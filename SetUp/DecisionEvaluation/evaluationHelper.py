@@ -219,7 +219,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, df_opponents, x_l
     distance_in_yards = DataManipulation.distanceObjectToPoint(x_object=x_location, y_object=y_location,
                                                                x_point=CONSTANTS.X_COORDINATE_GOALCENTRE,
                                                                y_point=CONSTANTS.Y_COORDINATE_GOALCENTRE)
-    penalty_log = DataManipulation.log_angle_single_values(angle=angle_in_rad)
+    ln_angle = DataManipulation.log_angle_single_values(angle=angle_in_rad)
     # returns the numbers of yards the GK actually is away from this optimal line due to the time limitation
     delta_distance_GK_to_optimal_position = deltaDistanceGKToOptimalLine(df_opponents=df_opponents,
                                                                                           shot_location=(x_location, y_location),
@@ -232,7 +232,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, df_opponents, x_l
     # based on the angle of the location to the goal and the distance of the location to the goal
     # the prediction has to be multiplied with the xPass prediction
     # (the longer the teammate has time, the higher will be xP)
-    xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, penalty_log, delta_distance_GK_to_optimal_position], attributes=CONSTANTS.ATTRIBUTES)
+    xgPrediction = model_info.predictionOfSingleValues([distance_in_yards, ln_angle, delta_distance_GK_to_optimal_position], attributes=CONSTANTS.ATTRIBUTES)
     xG = xgPrediction * xP
     # predict returns as a dataframe
     # we only need first value out of dataframe

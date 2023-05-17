@@ -49,4 +49,3 @@ def calculateAccuracy(df, championship):
     return df
 
 
-show_info(CONSTANTS.REGRESSION_MODEL)
