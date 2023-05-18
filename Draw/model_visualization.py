@@ -154,7 +154,7 @@ def delta_coordinates(x1, y1, x2, y2, delta):
 
     return x_new, y_new
 
-x_GK_end, y_GK_end = delta_coordinates(x_GK, y_GK, x_intersection, y_intersection, delta=df_test['delta_GK_to_optimal_line'])
+x_GK_end, y_GK_end = delta_coordinates(x_GK, y_GK, x_intersection, y_intersection, delta=df_test['delta_GK_line_alternative'])
 # Add the two points to the axis as scatter plots, with labels
 ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper Zigi - starting location: ({x_GK}, {y_GK})")
 text_x = str("{:.1f}".format(x_GK_end))

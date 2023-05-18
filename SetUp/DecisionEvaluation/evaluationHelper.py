@@ -46,7 +46,7 @@ def getPlayersOfEvent(shot, keyword):
     # transform it to a real json
     jsonOtherPlayers = json.dumps(shot)
     # save the json (name = sample.json), so we can import it to a dataframe
-    random_number = random.randint(1, 100000)
+    random_number = random.randint(1, 100000000)
     filename = keyword + str(random_number) + ".json"
     with open(filename, "w") as outfile:
         outfile.write(jsonOtherPlayers)
