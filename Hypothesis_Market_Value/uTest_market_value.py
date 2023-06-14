@@ -35,7 +35,8 @@ https://www.statisticshowto.com/t-statistic/
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 #group 1 is the expensive group, group 0 is cheap group
 df_all['group'] = np.where(df_all['value'] >= df_all['value'].median(), 1, 0)
-df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Market_Value/CSV_MV_separation/df_mv_separation_spss.csv")
+df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
+df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Market Value/dfMarketValue.csv")
 
 
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.

@@ -6,6 +6,7 @@ import numpy as np
 
 # prepare df that only teams that played in the knock out appear also in the group stage
 df = dmcs.preparation(df=JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+#todo: describe how many rows had to be dropped and why
 df = df.dropna(subset="xG_Delta_decision_alternative")
 normal = DataManipulation.check_normal_distribution(df)
 ko_stages = ["Round of 16", "Quarter-finals", "Semi-finals", "Final"]

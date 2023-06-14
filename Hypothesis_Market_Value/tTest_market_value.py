@@ -33,6 +33,7 @@ https://www.statisticshowto.com/t-statistic/
 """
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
 
 # check if the assumption of normal distribution is given
 normal_dist = DataManipulation.check_normal_distribution(df_all)

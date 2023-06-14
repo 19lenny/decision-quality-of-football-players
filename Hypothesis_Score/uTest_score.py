@@ -24,10 +24,12 @@ interpretation = []
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_all = df_all.loc[df_all['score'] != 0]
+df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
 #csv for spss
 df_csv = df_all
+#1 winning, 0 loosing
 df_csv['group_score'] = np.where(df_all['score'] > 0, 1, 0)
-df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Score/CSV_Score_separation/df_score_separation_spss.csv")
+df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Score/dfScore.csv")
 
 
 # check if the assumption of normal distribution is given

@@ -25,10 +25,11 @@ p_val = []
 interpretation = []
 
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
 #csv for spss
 df_csv = df_all
+df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Time/dfTime.csv")
 
-df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Time/CSV_Time_separation/df_time_separation_spss.csv")
 
 # check if the assumption of normal distribution is given
 normal_dist = DataManipulation.check_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
@@ -40,6 +41,7 @@ if not normal_dist:
 # H1: first half decisions are better than second half ones
 # reject H0 if pval < alpha
 df_first_half = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_first_half = df_first_half.dropna(subset="xG_Delta_decision_alternative")
 
 df_first_half = df_first_half.loc[df_first_half['period'] == first_half]
 mean_first_half = df_first_half['xG_Delta_decision_alternative'].mean()
@@ -49,6 +51,7 @@ median_one.append(mean_first_half)
 nr_shots_one.append(len(xG_Delta_first_half))
 
 df_second_half = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_second_half = df_second_half.dropna(subset="xG_Delta_decision_alternative")
 df_second_half = df_second_half.loc[df_second_half['period'] == second_half]
 mean_second_half = df_second_half['xG_Delta_decision_alternative'].mean()
 xG_Delta_second_half = df_second_half['xG_Delta_decision_alternative'].values.tolist()
@@ -70,6 +73,7 @@ p_val.append(pVal)
 # H1: first half of overtime decisions are better than second half overtime ones
 # reject H0 if pval < alpha
 df_first_half_ot = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_first_half_ot = df_first_half_ot.dropna(subset="xG_Delta_decision_alternative")
 df_first_half_ot = df_first_half_ot.loc[df_first_half_ot['period'] == first_half_ot]
 mean_first_half_ot = df_first_half_ot['xG_Delta_decision_alternative'].mean()
 xG_Delta_first_half_ot = df_first_half_ot['xG_Delta_decision_alternative'].values.tolist()
@@ -78,6 +82,7 @@ median_one.append(mean_first_half_ot)
 nr_shots_one.append(len(xG_Delta_first_half_ot))
 
 df_second_half_ot = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
+df_second_half_ot = df_second_half_ot.dropna(subset="xG_Delta_decision_alternative")
 df_second_half_ot = df_second_half_ot.loc[df_second_half_ot['period'] == second_half_ot]
 mean_second_half_ot = df_second_half_ot['xG_Delta_decision_alternative'].mean()
 xG_Delta_second_half_ot = df_second_half_ot['xG_Delta_decision_alternative'].values.tolist()
