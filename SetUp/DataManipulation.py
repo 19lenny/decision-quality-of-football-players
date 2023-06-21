@@ -162,21 +162,38 @@ def distanceObjectToPoint(x_object, y_object, x_point, y_point):
     distance = ((x_object - x_point) ** 2 + (y_object - y_point) ** 2) ** 0.5
     return distance
 
+
 def intersection_point_GK_Shot(goalkeeper, shot):
-    x0, y0 = goalkeeper
-    x1, y1 = shot
-    x2, y2 = (CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE)
-    dx, dy = x2 - x1, y2 - y1
-    dot = dx * (x0 - x1) + dy * (y0 - y1)
+    goalkeepeer_x, goalkeeper_y = goalkeeper  # Goalkeeper coordinates
+    shot_x, shot_y = shot  # Shot coordinates
+    goalcenter_x, goalcenter_y = (CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE)  # Goal center coordinates
+
+    # Calculate the vector connecting the shot to the goal line point
+    dx, dy = goalcenter_x - shot_x, goalcenter_y - shot_y
+
+    # Calculate the dot product between the vector (dx, dy) and the vector between the goalkeeper and the shot
+    dot = dx * (goalkeepeer_x - shot_x) + dy * (goalkeeper_y - shot_y)
+
+    # Calculate the squared magnitude of the vector (dx, dy)
     mag = dx ** 2 + dy ** 2
+
+    # If the magnitude is 0, return None (no intersection point)
     if mag == 0:
         return None
     else:
+        # Calculate the parameter 't' representing the position of the intersection along the vector (dx, dy)
         t = dot / mag
+
+        # Limit 't' to the range of 0 to 1 to ensure the intersection point lies within the shot segment
         t = max(0, min(1, t))
-        xi = x1 + t * dx
-        yi = y1 + t * dy
+
+        # Calculate the intersection point (xi, yi) by scaling the vector (dx, dy) with 't' and adding it to the shot coordinates (shot_x, shot_y)
+        xi = shot_x + t * dx
+        yi = shot_y + t * dy
+
         return xi, yi
+
+
 def addGoalBinary(dataframe):
     dataframe['goal'] = np.where(dataframe['shot_outcome'] == 'Goal', 1, 0)
     dataframe['goal'] = np.where(dataframe['type'] == "Own Goal Against", -1, dataframe['goal'])

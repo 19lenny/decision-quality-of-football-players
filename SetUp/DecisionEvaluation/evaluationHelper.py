@@ -18,6 +18,16 @@ def findClosestPlayer(dataframe, x_location, y_location):
     closestDistance = 1000
     position = None
     name = None
+    time = None
+    # before the calculation of the closest teammates can start, it has to be checked if there is a player in the df,
+    # if not the alternative xG value was 0 and the iteration can be skipped
+    if dataframe.empty:
+        x = 0
+        y = 0
+        position = None
+        name = "No Teammate found"
+        time = getTimeForDistance(closestDistance, CONSTANTS.PLAYER_SPEED)
+        return x,y,closestDistance,position,name,time
 
     for row in range(len(dataframe)):
         current_distance = DataManipulation.distanceObjectToPoint(dataframe["x_coordinate"][row],
@@ -31,8 +41,10 @@ def findClosestPlayer(dataframe, x_location, y_location):
             y = dataframe["y_coordinate"][row]
             position = dataframe["name_position"][row]
             name = dataframe['name_player'][row]
+            time = getTimeForDistance(closestDistance, CONSTANTS.PLAYER_SPEED)
 
-    return x, y, closestDistance, position, name
+
+    return x, y, closestDistance, position, name, time
 
 
 # get all players that were in the frame during the current shot
@@ -46,7 +58,7 @@ def getPlayersOfEvent(shot, keyword):
     # transform it to a real json
     jsonOtherPlayers = json.dumps(shot)
     # save the json (name = sample.json), so we can import it to a dataframe
-    random_number = random.randint(1, 100000000)
+    random_number = random.randint(1, 10000000000)
     filename = keyword + str(random_number) + ".json"
     with open(filename, "w") as outfile:
         outfile.write(jsonOtherPlayers)
@@ -225,7 +237,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, df_opponents, x_l
                                                                                           shot_location=(x_location, y_location),
                                                                                           time_ball=time_ball,
                                                                                           time_teammember=time_teammate)
-    #design choice, if the GK is not in frame, or there is no intersection point, the goalkeeper is automaticall in the right position
+    #design choice, if the GK is not in frame, or there is no intersection point, the goalkeeper is automatically in the right position
     if delta_distance_GK_to_optimal_position is None:
         delta_distance_GK_to_optimal_position = 0
     # xG on the current location is the prediction of the expected goal from this location,
@@ -256,13 +268,13 @@ def xPModel(time_bigger, time_smaller):
     # these are the possibilities to control the ball for a certain time span
     """
     To convert the time difference into a probability, an exponential cumulative distribution function (CDF) is used. 
-    Spearman (2018) assumes a lambda in the function of 4.32/second. 
+    Spearman (2018) assumes a lambda in the function of 4.30/second. 
     This would mean that an average professional footballer needs 0.23 seconds to control the ball. 
     On the y-axis of the distribution function, the cumulative probability is described. 
     This means, for example, for the point (x) delta 1 second, that 98% of professional football players can control the ball within this one second.
     source: Spearman, W. (2018). Beyond Expected Goals. MIT SLOAN Sports Analytics Conference.
     """
-    possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 4.32)
+    possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 4.30)
     # find the position where the ball control time is closest to in the possible range of sec
     position = 0
     for position in range(len(possible_range_of_sec)):

@@ -9,8 +9,8 @@ from SetUp.DecisionEvaluation.evaluationHelper import getPlayersOfEvent
 #todo: save the picture and decide on one shot
 df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 #wm 22 switzerland vs brazil
-#df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
-df_test = df_test.loc[(df_test['match_id'] == 3857293) & (df_test['minute'] == 22)].head(1)
+df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
+#df_test = df_test.loc[(df_test['match_id'] == 3857293) & (df_test['minute'] == 22)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 # x and y coordinates of the points to be plotted
 x_original = df_test['x_coordinate']

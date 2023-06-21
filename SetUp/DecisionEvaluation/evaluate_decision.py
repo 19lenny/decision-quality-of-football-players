@@ -62,7 +62,7 @@ def decisionEvaluation(dfSeason, eventname):
         dfOtherPlayers = offside.isOffside(offside_x, dfOtherPlayers)
 
         # split the dataframe in to teammates and opponents
-        # all Teammates which are offside are not taken in to account and are therefore thrown out of the df
+        # all Teammates which are offside are not taken into account and are therefore thrown out of the df
         dfTeammates = dfOtherPlayers.loc[
             (dfOtherPlayers['teammate'] == True) & (dfOtherPlayers['isOffside'] == False)]
         # the index has to be reset, otherwise we cannot go through with a for loop
@@ -73,19 +73,19 @@ def decisionEvaluation(dfSeason, eventname):
         # go through all 0.5 square meters on the pitch
         # but start from 33 yards (=30 meters) from the goal away, everything farther away is not expected to create high xG values
 
-        square_meter_size = 0.5
+        square_yard_size = 0.5
         max_shot_distance = 33
         # create the x linspace of the pitch, the end value gets +square meter size,
         # such that the endpoint is still in the range
         # this creates a range from 90 to 120 with step size 0.5
         x_range_pitch = np.arange(CONSTANTS.X_COORDINATE_GOALCENTRE - max_shot_distance,
-                                  CONSTANTS.X_COORDINATE_GOALCENTRE + square_meter_size,
-                                  square_meter_size)
+                                  CONSTANTS.X_COORDINATE_GOALCENTRE + square_yard_size,
+                                  square_yard_size)
         # create the y linspace of the pitch, the end value gets +square meter size,
         # such that the endpoint is still in the range
         y_range_pitch = np.arange(CONSTANTS.Y_MIDDLE_LINE_TOP,
-                                  CONSTANTS.Y_MIDDLE_LINE_BOTTOM + square_meter_size,
-                                  square_meter_size)
+                                  CONSTANTS.Y_MIDDLE_LINE_BOTTOM + square_yard_size,
+                                  square_yard_size)
         # check every 0.5 square meter of the pitch
         for x in x_range_pitch:
             for y in y_range_pitch:
@@ -95,38 +95,44 @@ def decisionEvaluation(dfSeason, eventname):
 
                 # find the distance the ball has to travel to get from its current location to the location looked at
                 ball_distance = DataManipulation.distanceObjectToPoint(x_shooting_player, y_shooting_player, x, y)
-                # find the distance of the teammate, which is the closest to the current position looked at
-                closest_teammate_x, closest_teammate_y, distance_closest_teammate, position_closest_teammate, name_closest_teammate = \
-                    evaluationHelper.findClosestPlayer(dfTeammates, x, y)
-                # find the distance of the opponent, which is the closest to the current position looked at
-                # the closest opponent is only the goalkeeper, if and only if the keeper is the first on the ball, otherwise the algorithm checks for other opponents which are close
-                closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_opponent_teammate, name_closest_opponent = \
-                    evaluationHelper.findClosestPlayer(dfOpponents, x, y)
-
-                # check if the closest opponent is a goalkeeper,
-                # if not everything's ok.
-                if position_opponent_teammate == 'Goalkeeper':
-                    # if he is a goalkeeper,
-                    # check if the goalkeeper has the longer distance to the square than our team member
-                    # if not (goalkeeper has shorter way) everything's ok
-                    if distance_closest_opponent > distance_closest_teammate:
-                        # if the opponent goalkeeper has the longer way than our team member,
-                        # take goalkeeper out of the opponent dataframe and calculate again for another player of the opponent
-                        dfOpponentsNoGK = dfOpponents.loc[dfOpponents['name_position'] != 'Goalkeeper']
-                        dfOpponentsNoGK.reset_index(drop=True, inplace=True)
-                        closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_opponent_teammate, name_closest_opponent = \
-                            evaluationHelper.findClosestPlayer(dfOpponentsNoGK, x, y)
 
                 # calculate the time (in seconds) it needs for...
                 # ...the ball to arrive at the current looked at location
                 time_ball = evaluationHelper.getTimeForDistance(ball_distance, CONSTANTS.BALL_SPEED)
-                # ...the closest opponent to arrive at the looked at location
-                time_opponent = evaluationHelper.getTimeForDistance(distance_closest_opponent, CONSTANTS.PLAYER_SPEED)
-                # ...the closest teammate to arrive at the looked at location
-                time_team_member = evaluationHelper.getTimeForDistance(distance_closest_teammate,
-                                                                       CONSTANTS.PLAYER_SPEED)
 
+                # find the distance of the teammate, which is the closest to the current position looked at
+                # as soon as the distance is known, the time can be calculated it needs for the player to get there
+                closest_teammate_x, closest_teammate_y, distance_closest_teammate, position_closest_teammate, name_closest_teammate,time_team_member = \
+                    evaluationHelper.findClosestPlayer(dfTeammates, x, y)
+                # find the distance of the opponent, which is the closest to the current position looked at
+                # the closest opponent is only the goalkeeper, if and only if the keeper is the first on the ball, otherwise the algorithm checks for other opponents which are close
+                closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_closest_opponent, name_closest_opponent, time_opponent = \
+                    evaluationHelper.findClosestPlayer(dfOpponents, x, y)
 
+                # check if the closest opponent is a goalkeeper,
+                # if not everything's ok.
+                if position_closest_opponent == 'Goalkeeper':
+                    # if he is a goalkeeper,
+                    # check if the goalkeeper arrives at the square before the ball. If this is the case the goalkeeper will come out of the goal and intercept the ball.
+                    # if not then the ball is there first, so it has to be checked, if the goalkeeper arrives second (after the ball) at the square or if the teammate is second and therefore first on the ball
+                    if time_opponent > time_ball:
+                        # check if the goalkeeper has the longer distance to the square than our team member
+                        # if goalkeeper has shorter way everything's ok. If goalkeeper has longer way, he will not come out of the goal,
+                        # therefore it needs recalculation who is the closest opponent without the goalkeeper.
+                        if time_opponent > time_team_member:
+                            # if the opponent goalkeeper has the longer way than our team member,
+                            # take goalkeeper out of the opponent dataframe and calculate again for another player of the opponent
+                            dfOpponentsNoGK = dfOpponents.loc[dfOpponents['name_position'] != 'Goalkeeper']
+                            dfOpponentsNoGK.reset_index(drop=True, inplace=True)
+                            closest_opponent_x, closest_opponent_y, distance_closest_opponent, position_closest_opponent, name_closest_opponent, time_opponent = \
+                                evaluationHelper.findClosestPlayer(dfOpponentsNoGK, x, y)
+
+                #for debug reasons, the coordinates are just here, so it is not printed 100000 times. one check per shot is enough:
+                if (x == 100) and (y == 40):
+                    if distance_closest_teammate == 1000:
+                        print("no teammate found")
+                    if distance_closest_opponent == 1000:
+                        print("no opponent found")
 
                 # calculate xG for current location, if xG is higher as the last calculated xG, save the value
 
@@ -140,6 +146,7 @@ def decisionEvaluation(dfSeason, eventname):
 
                 # if the alternative xG value for this current location is higher than for the other ones,
                 # than update for the current shot the highest xG alternative
+
                 if xG_for_current_location > xG_best_alternative[currentShot]:
                     xG_best_alternative[currentShot] = xG_for_current_location
                     # if the difference is negative, the player took the wrong decision
