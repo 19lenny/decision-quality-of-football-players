@@ -45,7 +45,7 @@ source: https://stats.stackexchange.com/questions/440242/statsmodels-logistic-re
 def create_model_glm(df, attributes):
 
     # drop possible null values, the model gets more accurate
-    df = df.dropna()
+    df = df.dropna(subset=['log_angle', 'distance_to_goal_centre', 'delta_distance_GK_to_optimal_line'])
 
     # create the model based on the attributes
     model = ''

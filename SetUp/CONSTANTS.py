@@ -21,9 +21,7 @@ JSONSHOTEVALUATIONEM2020 =\
 JSONSHOTEVALUATIONWM2022 =\
     "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/" \
     "JSON/Evaluation/ShotEvaluationWM22INT.json"
-CSV = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/" \
-                    "Masterarbeit/Thesis/thesis/CSV/"
-
+SPSS = "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS"
 
 # locations
 

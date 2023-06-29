@@ -37,6 +37,7 @@ df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_all['group'] = np.where(df_all['value'] >= df_all['value'].median(), 1, 0)
 df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
 df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Market Value/dfMarketValue.csv")
+df_all_describe = df_all.describe()
 
 
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
@@ -48,6 +49,7 @@ mean_tm_val = df_all['value'].median()
 
 # if the column score is bigger than 0 the team of the shooting player was currently winning, before the shot was fired
 df_expensive = df_all.loc[df_all['value'] >= mean_tm_val]
+df_expensive_describe = df_expensive.describe()
 mean_expensive = df_expensive['xG_Delta_decision_alternative'].mean()
 xG_expensive = df_expensive['xG_Delta_decision_alternative'].values.tolist()
 factor_one.append("player value above mean")
@@ -56,6 +58,7 @@ nr_shots_one.append(len(xG_expensive))
 
 # if the score is smaller than 0 the team of the shooting player was currently loosing, before the shot was fired
 df_cheap = df_all.loc[df_all['value'] < mean_tm_val]
+df_cheap_describe = df_cheap.describe()
 mean_cheap = df_cheap['xG_Delta_decision_alternative'].mean()
 xG_Delta_cheap = df_cheap['xG_Delta_decision_alternative'].values.tolist()
 factor_two.append("player value below mean")
@@ -69,9 +72,9 @@ else: interpretation.append("The decisions were in average " + str(mean_cheap - 
 
 #alternative greater means one sided whitneyu test, which assumes that expensive player makes better decisions than cheap players
 # https://www.reneshbedre.com/blog/mann-whitney-u-test.html
-result_winning_vs_loosing, pVal = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='greater')
-result_winning_vs_loosing1, pVal1 = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='two-sided')
-u_Test.append(result_winning_vs_loosing)
+result_expensive_cheap, pVal = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='greater')
+result_expensive_cheap_twoSided, pVal1 = stats.mannwhitneyu(xG_expensive, xG_Delta_cheap, alternative='two-sided')
+u_Test.append(result_expensive_cheap)
 p_val.append(pVal)
 
 """

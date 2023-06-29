@@ -25,17 +25,13 @@ interpretation = []
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_all = df_all.loc[df_all['score'] != 0]
 df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
+df_all_desc = df_all.describe()
 #csv for spss
 df_csv = df_all
 #1 winning, 0 loosing
 df_csv['group_score'] = np.where(df_all['score'] > 0, 1, 0)
 df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Score/dfScore.csv")
 
-
-# check if the assumption of normal distribution is given
-normal_dist = DataManipulation.check_normal_distribution(df_all)
-if not normal_dist:
-    normal_dist = DataManipulation.tranf_normal_distribution(df_all)
 
 
 # H0: the decisions when winning are equal to the decisions when loosing
@@ -44,6 +40,7 @@ if not normal_dist:
 
 # if the column score is bigger than 0 the team of the shooting player was currently winning, before the shot was fired
 df_winning = df_all.loc[df_all['score'] > 0]
+df_winning_describe = df_winning.describe()
 mean_winning = df_winning['xG_Delta_decision_alternative'].mean()
 xG_Delta_winning = df_winning['xG_Delta_decision_alternative'].values.tolist()
 factor_one.append("teams winning")
@@ -52,6 +49,7 @@ nr_shots_one.append(len(xG_Delta_winning))
 
 # if the score is smaller than 0 the team of the shooting player was currently loosing, before the shot was fired
 df_loosing = df_all.loc[df_all['score'] < 0]
+df_loosing_describe = df_loosing.describe()
 mean_loosing = df_loosing['xG_Delta_decision_alternative'].mean()
 xG_Delta_loosing = df_loosing['xG_Delta_decision_alternative'].values.tolist()
 factor_two.append("teams loosing")

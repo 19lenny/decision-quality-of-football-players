@@ -25,11 +25,10 @@ def competition_overview(df, saving_path):
     result_df = result_df.append(sum_row)
 
     # Save the DataFrame as an Excel file
-    #result_df.to_excel(saving_path)
+    result_df.to_excel(saving_path)
     return result_df
 
-dfTrain = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
-overview = competition_overview(dfTrain, "G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Statistics/dfTrain_CompetitionOverview.xlsx")
+
 
 
 

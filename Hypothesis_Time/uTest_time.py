@@ -27,14 +27,9 @@ interpretation = []
 df_all = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_all = df_all.dropna(subset="xG_Delta_decision_alternative")
 #csv for spss
-df_csv = df_all
-df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Time/dfTime.csv")
-
-
-# check if the assumption of normal distribution is given
-normal_dist = DataManipulation.check_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
-if not normal_dist:
-    normal_dist = DataManipulation.tranf_normal_distribution(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+df_csv = df_all.loc[df_all['period'] < 3]
+df_csv.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Time/dfTime.csv")
+df_all_describe = df_csv.describe()
 
 
 # H0: the decisions in the first half are the same as the ones in the second half
@@ -42,8 +37,8 @@ if not normal_dist:
 # reject H0 if pval < alpha
 df_first_half = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_first_half = df_first_half.dropna(subset="xG_Delta_decision_alternative")
-
 df_first_half = df_first_half.loc[df_first_half['period'] == first_half]
+df_first_half_describe = df_first_half.describe()
 mean_first_half = df_first_half['xG_Delta_decision_alternative'].mean()
 xG_Delta_first_half = df_first_half['xG_Delta_decision_alternative'].values.tolist()
 factor_one.append("first half regular time")
@@ -53,6 +48,7 @@ nr_shots_one.append(len(xG_Delta_first_half))
 df_second_half = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_second_half = df_second_half.dropna(subset="xG_Delta_decision_alternative")
 df_second_half = df_second_half.loc[df_second_half['period'] == second_half]
+df_second_half_describe = df_second_half.describe()
 mean_second_half = df_second_half['xG_Delta_decision_alternative'].mean()
 xG_Delta_second_half = df_second_half['xG_Delta_decision_alternative'].values.tolist()
 factor_two.append("second half regular time")
