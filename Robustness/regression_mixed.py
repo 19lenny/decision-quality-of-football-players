@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 
-dfAll = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-df = dfAll
+df = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 
 # prepare for period dummy
 df = df.loc[(df["period"] == 1) | (df["period"] == 2)]

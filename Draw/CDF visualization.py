@@ -7,12 +7,12 @@ from scipy.stats import expon
 possible_range_of_sec = np.arange(0, 1.3, 0.001)  # Adjust the range and number of points as needed
 
 # Calculate the CDF values
-possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 4.30)
+possible_xP_values = expon.cdf(possible_range_of_sec, 0, 1 / 3.30)
 
 # Plotting the CDF
-plt.plot(possible_range_of_sec, possible_xP_values, label='CDF, Lambda=4.30/second')
+plt.plot(possible_range_of_sec, possible_xP_values, label='CDF, Lambda=3.30/second')
 plt.plot([1, 1], [0, 1], 'r--', label='CDF at 1 sec')
-plt.plot([0, 1], [0.985, 0.985], 'r--')
+plt.plot([0, 1], [0.965, 0.965], 'r--')
 plt.xlabel('Delta Time between Teamplayer and Opponent')
 plt.ylabel('Cumulative Probability')
 plt.title('Exponential Cumulative Distribution Function')
