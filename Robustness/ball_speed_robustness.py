@@ -18,5 +18,5 @@ dfTest_ball_speed_40.reset_index(drop=True, inplace=True)
 
 dfTest_ball_speed_40.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Robustness Check/ball speed 40.5/dfTest_ballspeed_40.json")
 
-#todo change to 38.52 again
+
 print("i am finished with ball speed , change ball speed again to 38.52")
