@@ -40,14 +40,30 @@ def data_prep_teamnumber(df):
     df['team_number'] = team_number
     print(teams_dict)
     return df
+
+def market_value_bianry(df):
+    mean_value = df['value'].median()
+    mv_category: List[str] = [''] * len(df)
+    mean_binary_lower: List[float] = [0.0] * len(df)
+    for shot in range(len(df)):
+        # what is the current team
+        current_value = df['value'][shot]
+        if current_value >= mean_value:
+            mv_category[shot] = 'mv above'
+        else:
+            mv_category[shot] = 'mv below'
+    df['mv_category'] = mv_category
+    return df
+
 df_all = data_prep_teamnumber(JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
+df_all = market_value_bianry(df_all)
 #save the df to csv, so it can be analyzed in SPSS
-df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Robustness Check/dfTest_Teamnumbers.csv")
+#df_all.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Robustness Check/dfTest_Teamnumbers.csv")
 # perform the multiple linear regression with categorical variables using the formula API
-model = smf.ols('xG_Delta_decision_alternative ~ C(team_number)', data=df_all).fit()
+model = smf.ols('xG_Delta_decision_alternative ~  C(mv_category)', data=df_all).fit()
 # print the summary of the model
 print(model.summary())
-
+"""
 #prepare for anova test, make groups
 df_competition = data_prep_teamnumber(pd.read_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Competition stage/dfCompetitionStage.csv"))
 #df_competition= df_competition.drop(columns=["Unnamed 0", "Unnamed 0.1", "Unnamed 0.2", "Unnamed 0.3", "Unnamed 0.4"])
@@ -65,6 +81,6 @@ df_time= data_prep_teamnumber(pd.read_csv("G:/Meine Ablage/a_uni 10. Semester - 
 #df_time = df_time.drop(columns=["Unnamed 0", "Unnamed 0.1", "Unnamed 0.2", "Unnamed 0.3", "Unnamed 0.4"])
 #df_time.to_csv("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/SPSS/Hypothese Time/dfTime.csv")
 
-
+"""
 
 
