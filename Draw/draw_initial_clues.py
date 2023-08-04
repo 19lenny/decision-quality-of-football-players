@@ -47,8 +47,7 @@ plt.show()
 
 # Plot the number of GOALS from different points
 # histogram where and how many goals happened
-#todo change away from create goal mouth, instead put image in background
-#todo use same color as the other histograms
+
 fig, ax = FCPython.createGoalMouth()
 histogram = ax.hist2d(x_goals_only, y_goals_only, bins=(25, 25))
 pos = ax.imshow(histogram[0], aspect='auto')

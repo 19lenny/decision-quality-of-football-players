@@ -44,8 +44,7 @@ if not normal_dist:
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
 # H1: the decisions of players with a transfermarket value above mean are better than decisions of players with a transfermarket value below mean.
 # reject H0 if pval < alpha
-#todo: mean or median?
-#median, weil hohe Zahlen zerreissen sonst statistik --> todo: suche quelle
+
 #with median the groups are not the same size
 mean_tm_val = df_all['value'].median()
 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 df_return_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 biins = 30
 
-# Remove invalid values (NaN and inf)
+# Remove invalid values
 xg_values = df_return_test['xG'].dropna().replace([np.inf, -np.inf], np.nan)
 xg_values_statsbomb = df_return_test['shot_statsbomb_xg'].dropna().replace([np.inf, -np.inf], np.nan)
 
@@ -36,15 +36,15 @@ y_statsbomb = kde_statsbomb(x)
 scale_factor_statsbomb = np.max(np.histogram(xg_values_statsbomb, bins=biins, density=True)[0]) / np.max(y_statsbomb)
 y_statsbomb *= scale_factor_statsbomb
 
-# Add the KDE line to the plot
+
 plt.plot(x, y_statsbomb, color='orange')
 
-# Customize the plot
+
 plt.title('Comparison of xG Distribution')
 plt.xlabel('xG')
 plt.ylabel('Density')
 
 plt.legend()
 
-# Display the plot
+
 plt.show()

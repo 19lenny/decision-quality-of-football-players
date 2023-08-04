@@ -11,29 +11,29 @@ import matplotlib as mpl
 from sklearn.cluster import AgglomerativeClustering
 
 
-# ... read in data
+
 df = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df = df.loc[(df['y_ball'] >= 16.5) & (df['y_ball'] <= 65)]
 df = df.sample(50)
 df.reset_index(drop=True, inplace=True)
 
-# Get cluster labels
+# cluster labels
 X = df[['x_coordinate', 'y_coordinate', 'x_ball', 'y_ball']].values
 nr_of_clusters = 10
 kmeans = KMeans(n_clusters=nr_of_clusters, random_state=0).fit(X)
 df['cluster'] = kmeans.labels_
 
-# Get counts per cluster
+# counts per cluster
 counts = df['cluster'].value_counts().sort_index()
 
-# Create figure and axis objects
+# Create figure
 fig, ax = plt.subplots(figsize= (16,12))
 img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/102_120_18_62_penalty.png")
 ax.imshow(img, alpha=0.7, extent=[102, 120, 18, 62])
 
 # Plot clusters
 for cluster, data in df.groupby('cluster'):
-    # Get counts for current cluster
+
     count = counts[cluster]
 
     # Plot connection lines
@@ -59,13 +59,12 @@ for cluster, data in df.groupby('cluster'):
 #ax.set_xlim([min(df['x_coordinate']), max(df['x_ball'])])
 #ax.set_ylim([min(df['y_coordinate']), max(df['y_ball'])])
 
-# Set axis labels
+
 ax.invert_yaxis()
 ax.set_xlabel('X Coordinate')
 ax.set_ylabel('Y Coordinate')
 
-# Show plot
-# Normalizer
+
 norm = mpl.colors.Normalize(vmin=min(df['xP_best_alternative']), vmax=max(df['xP_best_alternative']))
 
 # creating ScalarMappable

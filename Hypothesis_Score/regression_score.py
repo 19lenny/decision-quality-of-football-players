@@ -27,9 +27,7 @@ conditions = [
 values = ["winning", "drawing", "loosing"]
 df_all['score_string'] = np.select(conditions, values)
 df_with_dummies = pd.get_dummies(data=df_all, columns=['score_string'])
-# Next, we’ll construct the regression equation in Patsy syntax:
-# We’ll leave out one dummy variable (score_string_drawing) to void perfect collinearity.
-# The regression model’s intercept will hold the coefficient of score_string_drawing.
+
 
 reg_exp = 'xG_Delta_decision_alternative ~ score_string_winning + score_string_loosing'
 olsr_model = smf.ols(formula=reg_exp, data=df_with_dummies)

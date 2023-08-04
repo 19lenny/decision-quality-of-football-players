@@ -6,16 +6,7 @@ import pandas as pd
 import statsmodels.formula.api as smf
 import tTest_competition_stage
 
-"""
-Interpretation of summary:
-In general, the regression coefficient on a dummy variable gives us the average increase in $y_{i}$ observed
- when the dummy is equal to 1 (with respect to the base case in which the dummy is equal to 0).
-In our case the dummy variable is 1, when the shot is taken in the first half. 
-Ergo if the dummy variable is positive the y value is increasing. 
-An increasing y value (=xG_Delta_decision_alternative) means that the player makes better decisions in comparison to its best alternative.
-if the dummy variable is negative, it means the xG_Delta_decision_alternative increases (=the decisions are getting better) in the second half.
-source: https://www.statlect.com/fundamentals-of-statistics/dummy-variable
-"""
+
 # prepare df that only teams that played in the knock out appear also in the group stage
 df = tTest_competition_stage.preparation(df=JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS))
 df_with_dummies = df

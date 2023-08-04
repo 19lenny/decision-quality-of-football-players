@@ -43,8 +43,8 @@ df_all_describe = df_all.describe()
 # H0: the decisions of players with a transfermarket value above mean are not better than decisions of players with a transfermarket value below mean.
 # H1: the decisions of players with a transfermarket value above mean are better than decisions of players with a transfermarket value below mean.
 # reject H0 if pval < alpha
-#todo: mean or median?
-#with median the groups are not the same size
+
+
 mean_tm_val = df_all['value'].median()
 
 # if the column score is bigger than 0 the team of the shooting player was currently winning, before the shot was fired

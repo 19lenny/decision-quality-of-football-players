@@ -43,7 +43,5 @@ def xP_heatmap(correct_decision, title):
     fig.tight_layout()
     plt.show()
 
-#todo change color code
-
 xP_heatmap(correct_decision=False, title="xP heatmap only false decisions")
 xP_heatmap(correct_decision=True, title="xP heatmap all decisions")

@@ -3,6 +3,5 @@ from SetUp.DecisionEvaluation import evaluationHelper
 
 dfTrain = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
 dfTest = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-
-#test
-#TEST 2
+train_descr = dfTrain.describe()
+test_descr = dfTest.describe()

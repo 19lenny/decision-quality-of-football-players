@@ -164,27 +164,27 @@ def distanceObjectToPoint(x_object, y_object, x_point, y_point):
 
 
 def intersection_point_GK_Shot(goalkeeper, shot):
-    goalkeepeer_x, goalkeeper_y = goalkeeper  # Goalkeeper coordinates
-    shot_x, shot_y = shot  # Shot coordinates
-    goalcenter_x, goalcenter_y = (CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE)  # Goal center coordinates
+    goalkeepeer_x, goalkeeper_y = goalkeeper
+    shot_x, shot_y = shot
+    goalcenter_x, goalcenter_y = (CONSTANTS.X_COORDINATE_GOALCENTRE, CONSTANTS.Y_COORDINATE_GOALCENTRE)
 
-    # Calculate the vector connecting the shot to the goal line point
+    # vector connecting the shot to the goal line point
     dx, dy = goalcenter_x - shot_x, goalcenter_y - shot_y
 
-    # Calculate the dot product between the vector (dx, dy) and the vector between the goalkeeper and the shot
+    # dot product between the vector (dx, dy) and the vector between the goalkeeper and the shot
     dot = dx * (goalkeepeer_x - shot_x) + dy * (goalkeeper_y - shot_y)
 
     # Calculate the squared magnitude of the vector (dx, dy)
     mag = dx ** 2 + dy ** 2
 
-    # If the magnitude is 0, return None (no intersection point)
+    # If the magnitude is 0, return None --> no intersection point
     if mag == 0:
         return None
     else:
-        # Calculate the parameter 't' representing the position of the intersection along the vector (dx, dy)
+        # the parameter 't' representing the position of the intersection along the vector (dx, dy)
         t = dot / mag
 
-        # Limit 't' to the range of 0 to 1 to ensure the intersection point lies within the shot segment
+        # Limit 't' to the range of 0 to 1 to ensure the intersection point lies within the wished line
         t = max(0, min(1, t))
 
         # Calculate the intersection point (xi, yi) by scaling the vector (dx, dy) with 't' and adding it to the shot coordinates (shot_x, shot_y)
@@ -203,9 +203,7 @@ def addDeltaGKToOptimalLine(dataframe):
     distance_from_line = []
 
     for shot in tqdm(range(len(dataframe))):
-        # check if dfTraining every shot has a freeze-frame, if not it can be forgotten to take players movement in to account
-        # kann in backup datei nachgeschaut werden
-        # other possbility would be to throw out the shots that have no freeze frame
+
         dfOtherPlayers = evaluationHelper.getPlayersOfEvent(dataframe['shot_freeze_frame'][shot], "Train")
         # we only need the opponents. the goalkeeper of the own team is not important
         dfOtherPlayers = dfOtherPlayers.loc[dfOtherPlayers['teammate'] == False]

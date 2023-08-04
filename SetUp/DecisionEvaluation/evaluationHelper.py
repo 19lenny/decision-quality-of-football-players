@@ -15,6 +15,8 @@ def findClosestPlayer(dataframe, x_location, y_location):
     x = None
     y = None
     # needs an init value, this value is overwritten with the first player incoming
+    # if no other teammate can be found the distance is set to 1000,
+    # therefore xP will be 0 and the initial shot will always be taken
     closestDistance = 1000
     position = None
     name = None
@@ -253,7 +255,7 @@ def xGFromAlternative(time_teammate, time_opponent, time_ball, df_opponents, x_l
 
 
 def xPModel(time_bigger, time_smaller):
-    # todo: test xP Model function, with help of get_testing_DF
+
     # source: william spearman 2018, beyond expected goals
     # the ball control time can be between 0 and 5, if it is higher than 5, the xP = 100% (according to the formula)
 

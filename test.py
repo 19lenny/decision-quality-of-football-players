@@ -1,16 +1,12 @@
-from SetUp import CONSTANTS, JSONtoDF
-from Model import create_model, model_info
+from statsbombpy import sb
+import pandas as pd
+from SetUp import DataManipulation, CONSTANTS, JSONtoDF
+from Model import model_info
 from SetUp.DecisionEvaluation import evaluate_decision
+from SetUp import TM_values
 
 
 
-
-# the model was saved to a global variable, therefore it is not needed to hand it to the train dataframe.
-# the model needs now to be applied to every square yard for every shot
-dfTest = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
-dfTest.reset_index(drop=True, inplace=True)
-
-#dfTest.to_json(CONSTANTS.JSONTESTSHOTS)
-
-print("i am finished with MAIN")
+TRAIN = JSONtoDF.createDF(CONSTANTS.JSONTRAINSHOTS)
+TEST = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 

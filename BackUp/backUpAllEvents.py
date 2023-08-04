@@ -15,7 +15,7 @@ dfAllEvents = pd.DataFrame()
 dfAllMatches = pd.DataFrame()
 counter = 0
 
-# go through every season in every competitition, except the one that are getting evaluated
+# go through every season in every competition, except the one that are getting evaluated
 for index in range(len(competitionIDs)):
     # lets get all the matches of all seasons
     currentCompetition = competitionIDs[index]
