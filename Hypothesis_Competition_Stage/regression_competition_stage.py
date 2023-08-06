@@ -15,7 +15,7 @@ reg_exp = 'xG_Delta_decision_alternative ~ is_group_stage'
 olsr_model = smf.ols(formula=reg_exp, data=df_with_dummies)
 olsr_model_results = olsr_model.fit()
 model_info.show_info(olsr_model_results)
-with open('G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Competition Stage/results/regression_competition_stage.txt', 'w') as fh:
+with open('/Hypothesis_Competition_Stage/results/regression_competition_stage.txt', 'w') as fh:
     fh.write(olsr_model_results.summary().as_text())
 """
 SOURCE: https://timeseriesreasoning.com/contents/dummy-variables-in-a-regression-model/

@@ -11,6 +11,9 @@ df_test = JSONtoDF.createDF(CONSTANTS.JSONTESTSHOTS)
 df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+plt.rcParams['mathtext.default'] = 'regular'
 
 def point_on_line(start, end, distance=3):
     # Calculate the distance between the start and end points
@@ -57,14 +60,15 @@ def draw_curve(p1, p2):
 #add the angle circle
 x, y = draw_curve(point_l, point_r)
 text = str("{: .1f}".format(df_test['angle'][0]) + "°")
-ax.text((point_l[0]+point_r[0])/2-1.5, (point_l[1]+point_r[1])/2-0.25, text, fontsize=8)
+#ax.text((point_l[0]+point_r[0])/2-2.2, (point_l[1]+point_r[1])/2-0.2, text, fontsize=12)
+ax.text(110,25, text, fontsize=12)
 ax.plot(x, y, label=text, color='blue', linestyle='--')
 
 ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')
 ax.set_ylabel('y_coordinate')
-ax.text(0.5, 1.02, "Angle Player to Goal \n Brazil - Switzerland, World Cup 2022, 26' 40''", ha='center', fontsize=10, transform=ax.transAxes)
-legend = ax.legend(fontsize=8, loc='lower center')
+ax.text(0.5, 1.02, "Angle Player to Goal \n Brazil - Switzerland, World Cup 2022, 26' 40''", ha='center', fontsize=12, transform=ax.transAxes)
+legend = ax.legend(fontsize=10, loc='lower center')
 
 #plt.tight_layout()
 plt.show()

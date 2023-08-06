@@ -16,6 +16,7 @@ df_test = df_test.loc[(df_test['match_id'] == 7546) & (df_test['minute'] == 33) 
 #df_test = df_test.loc[(df_test['match_id'] == 7582) & (df_test['minute'] == 45)].head(1)
 #wm 22 switzerland vs brazil
 #df_test = df_test.loc[(df_test['match_id'] == 3857269) & (df_test['minute'] == 26)].head(1)
+#goalkeeper away from optimal line
 #df_test = df_test.loc[(df_test['match_id'] == 3857293) & (df_test['minute'] == 22)].head(1)
 df_test.reset_index(drop=True, inplace=True)
 # x and y coordinates of the points to be plotted
@@ -29,6 +30,10 @@ x_ball = df_test['x_ball']
 y_ball = df_test['y_ball']
 x_shot = df_test['x_ball'][0]
 y_shot = df_test['y_ball'][0]
+
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+plt.rcParams['mathtext.default'] = 'regular'
 
 # Create a new figure and axis
 fig, ax = plt.subplots(figsize=(7,10))
@@ -85,22 +90,22 @@ for i in range(len(x_original)):
     all_names = name.split()
     last_name = all_names[-1]
     text =  str(last_name+": " "{: .2f}".format(label_xG_original[i])+"xG")
-    ax.text(x_original[i] + 0.3, y_original[i] +1,text, fontsize=8)
+    ax.text(x_original[i] -0.5, y_original[i] +1.2,text, fontsize=12)
     #add the name of the alternative player
     name = label_alternative_player[i]
     all_names = name.split()
     last_name = all_names[-1]
-    ax.text(x_alternative[i] + 0.1, y_alternative[i] -1, last_name, fontsize=8)
+    ax.text(x_alternative[i] -3, y_alternative[i] -0.5, last_name, fontsize=12)
     #ax.text(x_alternative[i] + 0.3, y_alternative[i] + 0.2, "Richarlison", fontsize=8)
     # add the name of the alternative opponent
     name = label_alternative_opponent[i]
     all_names = name.split()
     last_name = all_names[-1]
-    ax.text(x_alt_opponent[i] + 0.1, y_alt_opponent[i] - 0.2, last_name, fontsize=8)
+    ax.text(x_alt_opponent[i] -2.8, y_alt_opponent[i] - 0.6, last_name, fontsize=12)
     #add the xG value of the new shooting position (show 2 decimal values)
     text = str("{: .2f}".format(label_xG_new_loca[i])+"xP*xG")
     #annotation of xG alternative
-    ax.text(x_ball[i] + 0.1, y_ball[i] +0.2, text , fontsize=8)
+    ax.text(x_ball[i] + 0.1, y_ball[i] +1, text , fontsize=12)
 
 
 
@@ -113,8 +118,8 @@ for i in range(len(x_original)):
     dy = y_ball[i] - y_original[i]
     text = str("{: .2f}".format(label_xPass[i])+"xP, "+ "{: .2f}".format(label_pass_distance[i]) + "m")
     # xp annotation and passing distance
-    ax.annotate(text, xy=((x_original[i] + dx / 2)+2, (y_original[i] + dy / 2)+2), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=((x_original[i] + dx / 2)+3.5, (y_original[i] + dy / 2+0.75)), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
     #show the run of the teammate in the diagram
     arrow = FancyArrowPatch((x_alternative[i], y_alternative[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
@@ -124,8 +129,8 @@ for i in range(len(x_original)):
     ax.add_patch(arrow)
     text = str("{: .2f}".format(label_alternative_teammate_distance[i]) + "m")
     #distance alternative teammate
-    ax.annotate(text, xy=(0.4+x_alternative[i] + dx / 2, (y_alternative[i] + dy / 2)+1.3), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=(x_alternative[i] + dx / 2+0.2, (y_alternative[i] + dy / 2)), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
     #show the run of the opponent in the diagram
     arrow = FancyArrowPatch((x_alt_opponent[i], y_alt_opponent[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
@@ -135,8 +140,8 @@ for i in range(len(x_original)):
     dy = y_ball[i] - y_alt_opponent[i]
     text = str("{: .2f}".format(label_alternative_opponent_distance[i]) + "m")
     #annotation of opponent
-    ax.annotate(text, xy=(x_alt_opponent[i] + dx / 2, (y_alt_opponent[i] + dy / 2)-1), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=(x_alt_opponent[i] + dx / 2-1, (y_alt_opponent[i] + dy / 2)), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
 
 #plot the movement of the GK
@@ -188,9 +193,9 @@ ax.plot([x_shot, CONSTANTS.X_COORDINATE_GOALCENTRE], [y_shot, CONSTANTS.Y_COORDI
 
 
 # Add a label to the line showing the distance
-GK_to_line = DataManipulation.distanceObjectToPoint(x_GK_end, y_GK_end, x_intersection, y_intersection)
-text = str("{: .2f}".format(GK_to_line * 0.9144) + "m")
-ax.text(x_intersection-1.8, y_intersection-1.25, text, fontsize=8)
+#GK_to_line = DataManipulation.distanceObjectToPoint(x_GK_end, y_GK_end, x_intersection, y_intersection)
+#text = str("{: .2f}".format(GK_to_line * 0.9144) + "m")
+#ax.text(x_intersection, y_intersection-0.75, text, fontsize=12)
 
 
 # Set x and y axis labels
@@ -198,12 +203,12 @@ ax.text(x_intersection-1.8, y_intersection-1.25, text, fontsize=8)
 handles, labels = ax.get_legend_handles_labels()
 unique_labels = list(set(labels))
 handles = [handles[labels.index(label)] for label in unique_labels]
-legend = ax.legend(handles, unique_labels, loc='lower center', ncol=1, prop={'size': 7}, markerscale=0.8)
+legend = ax.legend(handles, unique_labels, loc='lower center', ncol=1, prop={'size': 10}, markerscale=0.8)
 
 ax.invert_yaxis()
 ax.set_xlabel('x_coordinate')
 ax.set_ylabel('y_coordinate')
-ax.set_title("Decision Visualization")
+ax.set_title("Decision Visualisation")
 
 # Show the plot
 plt.tight_layout()

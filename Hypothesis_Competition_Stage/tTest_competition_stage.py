@@ -104,7 +104,7 @@ data = pd.DataFrame({"factor one" : factor_one,
                      "levene val": levene_test,
                      "p_val levene": p_val_levene})
 
-data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Competition Stage/results/tTest_competition_stage.json")
+data.to_json("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Hypothesis_Competition_Stage/results/tTest_competition_stage.json")
 
 
 

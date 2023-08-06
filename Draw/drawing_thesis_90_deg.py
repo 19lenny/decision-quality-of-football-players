@@ -27,6 +27,10 @@ y_ball = -df_test['x_ball']
 x_shot = df_test['y_ball'][0]
 y_shot = -df_test['x_ball'][0]
 
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+plt.rcParams['mathtext.default'] = 'regular'
+
 # create a new figure and axis
 fig, ax = plt.subplots(figsize=(12,8))
 img = plt.imread("G:/Meine Ablage/a_uni 10. Semester - Masterarbeit/Masterarbeit/Thesis/thesis/Draw/background_pitch/102_120_18_62_90_deg.png")
@@ -61,19 +65,19 @@ y_GK = -df_to_plot['x_coordinate'][(df_to_plot['name_position'] == "Goalkeeper")
 
 
 #plot all teammates
-ax.plot(x_teammates_to_plot, y_teammates_to_plot, 'o', color='#89CFF0', label="location teammate")
+ax.plot(x_teammates_to_plot, y_teammates_to_plot, 'o', color='#F1DE1F', label="location Brazil")
 #plot all opponents
-ax.plot(x_opponents_to_plot, y_opponents_to_plot, 'o', color='#FF6961', label="location opponent")
+ax.plot(x_opponents_to_plot, y_opponents_to_plot, 'o', color='red', label="location Switzerland")
 
 #plot the most important points
 #this is the player which initially took the shot
-ax.plot(x_original, y_original, 'o', color='black', label="location shooting player")
+ax.plot(x_original, y_original, 'D', markeredgecolor='#3E32BA', markerfacecolor='#F1DE1F', label="location initial shot")
 #this is the best alternative
-ax.plot(x_alternative, y_alternative, 'o', color='blue', label="location best alternative")
+ax.plot(x_alternative, y_alternative, '^', markeredgecolor='#3E32BA', markerfacecolor='#F1DE1F', label="location best alternative")
 #this is the closest opponent
-ax.plot(x_alt_opponent, y_alt_opponent, 'o', color='red', label="location best opponent")
+ax.plot(x_alt_opponent, y_alt_opponent, 'o', markeredgecolor='red', markerfacecolor='white', label="location closest defender")
 #this is the location where the new shot will happen
-ax.plot(x_ball, y_ball, 'o', markersize=6, markeredgecolor='black', markerfacecolor='none', label="new shot position")
+ax.plot(x_ball, y_ball, 'o', markersize=6, markeredgecolor='black', markerfacecolor='none', label="location hypothetical shot")
 
 
 # plot the labels
@@ -83,58 +87,58 @@ for i in range(len(x_original)):
     all_names = name.split()
     last_name = all_names[-1]
     text =  str("Vinicius Junior"+": " "{: .2f}".format(label_xG_original[i])+"xG")
-    ax.text(x_original[i] + 0.3, y_original[i] +0.2,text, fontsize=8)
+    ax.text(x_original[i] + 0.3, y_original[i] +0.3,text, fontsize=12)
     #add the name of the alternative player
     name = label_alternative_player[i]
     all_names = name.split()
 
-    ax.text(x_alternative[i] + 3, y_alternative[i] + 0.4, "Richarlison", fontsize=8)
+    ax.text(x_alternative[i] + 3, y_alternative[i] + 0.4, "Richarlison", fontsize=12)
     # add the name of the alternative opponent
     name = label_alternative_opponent[i]
     all_names = name.split()
     last_name = all_names[-1]
     #Akanji
-    ax.text(x_alt_opponent[i] + 0.1, y_alt_opponent[i] +0.35, last_name, fontsize=8)
+    ax.text(x_alt_opponent[i] + 0.1, y_alt_opponent[i] +0.35, last_name, fontsize=12)
     #add the xG value of the new shooting position (show 2 decimal values)
     text = str("{: .2f}".format(label_xG_new_loca[i])+"xP*xG")
     #annotation of xG alternative
-    ax.text(x_ball[i]-0.3 , y_ball[i] -0.2, text , fontsize=8)
+    ax.text(x_ball[i]-0.3 , y_ball[i] -0.3, text , fontsize=12)
 
 
 
 # Connect the points with lines
 for i in range(len(x_original)):
     #show the pass in the diagram
-    arrow = FancyArrowPatch((x_original[i], y_original[i]), (x_ball[i], y_ball[i]), arrowstyle='->', linestyle='dotted', mutation_scale=10, color='grey', label='pass, xP')
+    arrow = FancyArrowPatch((x_original[i], y_original[i]), (x_ball[i], y_ball[i]), arrowstyle='->', linestyle='--', mutation_scale=10, color='black', label='xP, passing distance')
     ax.add_patch(arrow)
     dx = x_ball[i] - x_original[i]
     dy = y_ball[i] - y_original[i]
     text = str("{: .2f}".format(label_xPass[i])+"xP, "+ "{: .2f}".format(label_pass_distance[i]) + "m")
     # xp annotation and passing distance
-    ax.annotate(text, xy=(33.5,-114), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=(34,-114), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
     #show the run of the teammate in the diagram
     arrow = FancyArrowPatch((x_alternative[i], y_alternative[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
-                            mutation_scale=10, color='grey', label='running distance')
+                            mutation_scale=10, color='grey', label='run to hypothetical shot')
     dx = x_ball[i] - x_alternative[i]
     dy = y_ball[i] - y_alternative[i]
     ax.add_patch(arrow)
     text = str("{: .2f}".format(label_alternative_teammate_distance[i]) + "m")
     #distance alternative teammate
-    ax.annotate(text, xy=(44.5,-114), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=(44.1,-114), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
     #show the run of the opponent in the diagram
     arrow = FancyArrowPatch((x_alt_opponent[i], y_alt_opponent[i]), (x_ball[i], y_ball[i]), arrowstyle='->',
-                            mutation_scale=10, color='grey', label='running distance')
+                            mutation_scale=10, color='grey', label='run')
     ax.add_patch(arrow)
     dx = x_ball[i] - x_alt_opponent[i]
     dy = y_ball[i] - y_alt_opponent[i]
     text = str("{: .2f}".format(label_alternative_opponent_distance[i]) + "m")
     #annotation of opponent, akanji distance
-    ax.annotate(text, xy=(40.8,-112.5), xytext=(-5, 5),
-                textcoords='offset points', fontsize=8, ha='center')
+    ax.annotate(text, xy=(41.3,-112.5), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
 
 
 #plot the movement of the GK
@@ -167,33 +171,33 @@ def delta_coordinates(x1, y1, x2, y2, delta):
 
     return x_new, y_new
 
+# Add a dashed line showing the optimal line
+ax.plot([x_shot, CONSTANTS.Y_COORDINATE_GOALCENTRE], [y_shot,-CONSTANTS.X_COORDINATE_GOALCENTRE ], linestyle='dotted', color='lightgray', label="bisection hypothetical shot, goal centre")
+
 x_GK_end, y_GK_end = delta_coordinates(x_GK, y_GK, x_intersection, y_intersection, delta=df_test['delta_GK_line_alternative'])
 # Add the two points to the axis as scatter plots, with labels
-ax.plot(x_GK, y_GK, 'o', color='orange', label=f"goalkeeper - start location: ({-y_GK}, {x_GK})")
+ax.plot(x_GK, y_GK, 'o', color='blue', label=f"goalkeeper - start location: ({-y_GK}, {x_GK})")
 text_x = str("{:.1f}".format(-y_GK_end))
 text_y = str("{:.1f}".format(x_GK_end))
-ax.plot(x_GK_end, y_GK_end, 'o', color='orange', label=f"goalkeeper - end location: ({text_x}, {text_y})")
-#show the run of the opponent in the diagram
-#arrow = FancyArrowPatch((x_GK_end, y_GK_end), (x_intersection, y_intersection), arrowstyle='->',
-                       #mutation_scale=10, color='red', label='delta GK to optimal line')
-#ax.add_patch(arrow)
-
+ax.plot(x_GK_end, y_GK_end, 's', markeredgecolor='lightgray', markerfacecolor='blue', label=f"goalkeeper - end location: ({text_x}, {text_y})")
 
 #show the run of the opponent in the diagram
 arrow = FancyArrowPatch((x_GK, y_GK), (x_GK_end, y_GK_end), arrowstyle='->',
-                        mutation_scale=10, color='grey', label='running distance')
+                        mutation_scale=10, color='grey', label='run to hypothetical shot')
 ax.add_patch(arrow)
-ax.plot(CONSTANTS.Y_COORDINATE_GOALCENTRE,-CONSTANTS.X_COORDINATE_GOALCENTRE , 'x', color='gray', label=f"goal centre: ({CONSTANTS.X_COORDINATE_GOALCENTRE}, {CONSTANTS.Y_COORDINATE_GOALCENTRE})")
+text = "2.70m"
+ax.annotate(text, xy=(37.1,-119.93), xytext=(-5, 5),
+                textcoords='offset points', fontsize=12, ha='center')
+#ax.plot(CONSTANTS.Y_COORDINATE_GOALCENTRE,-CONSTANTS.X_COORDINATE_GOALCENTRE , 'x', color='gray', label=f"goal centre: ({CONSTANTS.X_COORDINATE_GOALCENTRE}, {CONSTANTS.Y_COORDINATE_GOALCENTRE})")
 
-# Add a dashed line showing the optimal line
-ax.plot([x_shot, CONSTANTS.Y_COORDINATE_GOALCENTRE], [y_shot,-CONSTANTS.X_COORDINATE_GOALCENTRE ], linestyle='--', color='gray', label="defense line GK")
+
 
 # Set x and y axis labels
 # Add legend
-desired_order = ['goalkeeper - start location: (118.8, 37.3)', 'goalkeeper - end location: (120.0, 40.0)', 'defense line GK',
-                 'location shooting player', 'pass, xP', 'location best alternative', 'location best opponent', 'running distance',
-                 'location teammate', 'location opponent',
-                 'new shot postion', 'goal centre: (120, 40)']
+desired_order = ['goalkeeper - start location: (118.8, 37.3)', 'goalkeeper - end location: (120.0, 40.0)', 'bisection hypothetical shot, goal centre',
+                 'location initial shot', 'xP, passing distance', 'location best alternative', 'location closest defender', 'run',
+                 'location Brazil', 'location Switzerland',
+                 'location hypothetical shot', 'goal centre: (120, 40)']
 
 # get the legend
 handles, labels = ax.get_legend_handles_labels()
@@ -208,12 +212,12 @@ for label in desired_order:
         sorted_labels.append(labels[index])
 
 
-legend = ax.legend(sorted_handles, sorted_labels, loc='upper right', ncol=1, prop={'size': 8}, markerscale=0.8, bbox_to_anchor=(1, 0.93))
+legend = ax.legend(sorted_handles, sorted_labels, loc='upper right', ncol=1, prop={'size': 10}, markerscale=0.8, bbox_to_anchor=(1, 0.93))
 
 ax.invert_xaxis()
 ax.axes.xaxis.set_visible(False)
 ax.axes.yaxis.set_visible(False)
-ax.set_title("Visualisation of the xG model and the decision quality")
+ax.set_title("Visualisation of the xG model and the decision quality", fontsize=12)
 
 # Show the plot
 plt.tight_layout()
