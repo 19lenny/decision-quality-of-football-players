@@ -69,6 +69,6 @@ REGMODELINTERC = create_model.create_model_glm(JSONtoDF.createDF(JSONTRAINSHOTS)
 MODELNAME = MODELNAMEINTERCEPT
 REGRESSION_MODEL = REGMODELINTERC
 
-#normal distribution
+
 EVALUATION_VARIABLE = "xG_Delta_decision_alternative"
 
